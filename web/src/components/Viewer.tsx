@@ -725,7 +725,7 @@ export function Viewer({ pack, s, update, notice }: Props) {
                   {s.fov > 0 && targetPix && (
                     <button className="btn" onClick={() => { const c = pixToSky(meta, targetPix.x, targetPix.y); update({ ra: c.ra, dec: c.dec }) }}>Centre the view on the target</button>
                   )}
-                  {s.fov > 0 && pick && (
+                  {s.fov > 0 && pick && !meta.live && (
                     <button className="btn" onClick={() => { const c = pixToSky(meta, pick.x, pick.y); update({ ra: c.ra, dec: c.dec }) }}>Centre the view on the picked pixel</button>
                   )}
                 </div>
@@ -735,7 +735,7 @@ export function Viewer({ pack, s, update, notice }: Props) {
                 <div className="stack-gap" role="tabpanel">
                   {OVERLAYS.map((o) => {
                     const need = o === 'mismatch' ? (fi === null ? 'Needs a single frame (not a stack).' : partner < 0 ? 'This frame has no partner.' : null)
-                      : !available[o] ? (o === 'track' ? 'Only for fields with a moving target and two passes.' : 'Not in this field’s data yet.') : null
+                      : !available[o] ? (o === 'track' ? 'Only for fields with a moving target and two passes.' : meta.live ? 'Not fetched for live fields.' : 'Not in this field’s data yet.') : null
                     return (
                       <label key={o} className={need ? 'check off' : 'check'}>
                         <input type="checkbox" checked={on.has(o)} onChange={() => toggle(o)} />
@@ -770,7 +770,7 @@ export function Viewer({ pack, s, update, notice }: Props) {
                         ['Detector', `D${f.det[fi]}`], ['Wavelength at field centre', `${fmt(f.lam[fi], 5)} µm`],
                         ['Bandwidth', `${fmt(f.bw[fi], 3)} µm (resolving power ${fmt((f.lam[fi] ?? NaN) / (f.bw[fi] ?? NaN), 3)})`],
                         ['Wavelength across the field', `${fmt(lamAt(f.lamFit[fi], 0, 0, n), 5)} to ${fmt(lamAt(f.lamFit[fi], n - 1, n - 1, n), 5)} µm, corner to corner`],
-                        ['Noise, 1 sigma per pixel', `${fmt(f.sigma[fi])} MJy/sr = ${fmt((f.sigma[fi] ?? NaN) * kUJy)} µJy`],
+                        [meta.live ? 'Noise, 1 sigma per pixel (robust scatter of the frame)' : 'Noise, 1 sigma per pixel', `${fmt(f.sigma[fi])} MJy/sr = ${fmt((f.sigma[fi] ?? NaN) * kUJy)} µJy`],
                         ['Residual sky removed', f.sky ? `${fmt(f.sky[fi])} MJy/sr` : null], ['Zodiacal light removed', f.zodi ? `${fmt(f.zodi[fi])} MJy/sr` : null],
                         ['Star image width (FWHM)', f.fwhm ? `${fmt(f.fwhm[fi])} arcsec` : null],
                         ['Frames behind the template', f.nRef ? fmt(f.nRef[fi]) : null],

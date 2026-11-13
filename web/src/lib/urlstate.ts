@@ -1,6 +1,9 @@
 /**
  * The view state and its round trip through the page URL, so that any view can be
  * shared or embedded: ?field=&ra=&dec=&fov=&det=&mode=&frame=&embed=1 (plus display extras).
+ * A live request (a field built in the browser from the public archive) is
+ * ?ra=&dec=&live=1&size=<arcmin>&dets=<2,5|all>&max=<images>; without size / dets the
+ * view's own fov / det stand in, so ?ra=&dec=&fov=3&det=3&live=1 works too.
  * SI disclosure: written with the help of an SI coding assistant (Claude), checked by the team.
  */
 import type { CmapName, Mode, Seq, StretchKind } from './types'
@@ -9,6 +12,16 @@ export type Page = 'home' | 'view' | 'how' | 'about'
 
 export const OVERLAYS = ['target', 'track', 'gaia', 'wise', 'sso', 'flags', 'mismatch', 'detections', 'candidates'] as const
 export type OverlayName = (typeof OVERLAYS)[number]
+
+/** A request to build a field in the browser (see lib/live.ts). */
+export interface LiveRequest {
+  sizeArcmin: number
+  /** 1..6; empty = all six */
+  detectors: number[]
+  maxImages: number
+}
+
+export const LIVE_REQUEST_DEFAULT: LiveRequest = { sizeArcmin: 3, detectors: [2, 5], maxImages: 360 }
 
 export interface ViewState {
   page: Page
@@ -22,6 +35,7 @@ export interface ViewState {
   seq: Seq | null // null = the field's default
   embed: boolean
   engine: string | null
+  live: LiveRequest | null // build the field at ra, dec in the browser
   stretch: StretchKind
   cmap: CmapName | null // null = default for the mode
   pLo: number
@@ -46,6 +60,7 @@ export const DEFAULT_STATE: ViewState = {
   seq: null,
   embed: false,
   engine: null,
+  live: null,
   stretch: 'asinh',
   cmap: null,
   pLo: 1,
@@ -114,6 +129,20 @@ export function parseQuery(query: string): ViewState {
   if (pix.length === 2 && pix.every((v) => Number.isInteger(v) && v >= 0)) s.pix = [pix[0], pix[1]]
   const ap = num(q.get('ap'))
   if (ap !== null && [0, 1, 2].includes(ap)) s.ap = ap
+  if (q.get('live') === '1' && s.ra !== null && !s.field) {
+    const d = LIVE_REQUEST_DEFAULT
+    const size = num(q.get('size')) ?? (s.fov > 0 ? s.fov : d.sizeArcmin)
+    const dets = q.get('dets')
+    const list = dets === null ? (s.det ? [s.det] : d.detectors) : dets === 'all' ? [] : dets.split(',').map(Number)
+    const max = num(q.get('max'))
+    const ok = [...new Set(list.filter((v) => Number.isInteger(v) && v >= 1 && v <= 6))].sort((a, b) => a - b)
+    s.live = {
+      sizeArcmin: Math.min(20, Math.max(0.5, size)),
+      detectors: ok.length || dets === 'all' ? ok : d.detectors,
+      maxImages: max !== null && max >= 1 ? Math.floor(max) : d.maxImages,
+    }
+    if (s.live.detectors.length === 6) s.live.detectors = []
+  }
   const page = pick(q.get('page'), ['how', 'about'] as const)
   s.page = page ?? (s.field || s.ra !== null ? 'view' : 'home')
   return s
@@ -143,6 +172,12 @@ export function toQuery(s: ViewState): string {
     if (s.overlays) q.set('ov', s.overlays.join(','))
     if (s.pix) q.set('pix', s.pix.join(','))
     if (s.ap !== d.ap) q.set('ap', String(s.ap))
+  }
+  if (s.live && s.ra !== null && !s.field) {
+    q.set('live', '1')
+    q.set('size', String(+s.live.sizeArcmin.toFixed(2)))
+    q.set('dets', s.live.detectors.length ? s.live.detectors.join(',') : 'all')
+    if (s.live.maxImages !== LIVE_REQUEST_DEFAULT.maxImages) q.set('max', String(s.live.maxImages))
   }
   if (s.engine) q.set('engine', s.engine)
   if (s.embed) q.set('embed', '1')

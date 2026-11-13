@@ -76,7 +76,7 @@ A cell that has no entry in `shards` holds no images: do not request it.
 | 14 | int16 | `y2` | corner 2 north |
 | 16 | int16 | `x3` | corner 3 east |
 | 18 | int16 | `y3` | corner 3 north |
-| 20 | uint32 | `t` | exposure start: `MJD = 60000 + t * 1e-6` (TDB-free plain MJD as published by IRSA in `time_bounds_lower` / `t_min`) |
+| 20 | uint32 | `t` | exposure start: `MJD = 60000 + t * 1e-6` (the MJD that IRSA publishes as `time_bounds_lower` / `t_min`, kept to its full 6 decimals) |
 | 24 | uint32 | `id` | bit field, see below |
 
 `id` bits (bit 0 is the least significant):
@@ -111,7 +111,7 @@ IRSA's `s_ra`, `s_dec`; it is a centre for this index, not a replacement for the
 
 Rounding: each stored corner is within 0.24 arcsec of IRSA's corner, the derived fourth
 corner within about 0.7 arcsec (0.1 SPHEREx pixel; pixels are 6.15 arcsec). The exact
-worst case of a build is `quality.max_corner_error_arcsec`.
+worst case of a build is `quality.max_corner_error_arcsec` (0.66 in the shipped build).
 
 Orientation, if wanted: the position angle of the edge corner 1 -> corner 2 is
 `atan2(x2 - x1, y2 - y1)` (east of north). Which corner is detector pixel (0, 0) is not
@@ -125,7 +125,7 @@ Band `b` is cut into `n = cells_per_band[b]` equal RA cells of width `w = 360 / 
 degrees; cell `k` covers `k*w <= RA < (k+1)*w`. Always take `n` from the manifest.
 
 A footprint is about 3.5 x 3.5 degrees, so its centre can be up to
-`R = search_radius_deg` (about 2.56 degrees) from a point it contains. To find every
+`R = search_radius_deg` (2.58 degrees in the shipped build) from a point it contains. To find every
 image containing the point (RA, Dec), read every cell that a disc of radius R about the
 point can touch. Rule (all angles in degrees, `floor` rounds towards minus infinity):
 
@@ -346,3 +346,84 @@ data, a pause between queries, and the User-Agent `ParallaX-SpaceApps2026/1.0`.
 
 Shard files are replaced as a whole by a rebuild, and part boundaries can move when
 new data arrive, so a client must not cache shards across different `built_utc` values.
+Indices into `prefixes` can also change between builds; never store them.
+
+## 10. The shipped build (2026-11-13) and how it was checked
+
+Source: every row of `spherex.plane` joined to `spherex.artifact` at IRSA, MJD
+60789.75 to 61318.00 (530 MJD days, 601 MB of CSV, about 75 minutes at 50-350 kB/s).
+
+| collection | images indexed | rows IRSA reports | MJD range |
+|---|---:|---:|---|
+| spherex_dr1 | 945,725 | 945,725 | 60789.750762 - 61174.491426 |
+| spherex_dr1_deep | 233,681 | 233,681 | 60789.771067 - 61174.503382 |
+| spherex_qr3 | 362,124 | 362,124 | 61174.506011 - 61318.001388 |
+| spherex_qr3_deep | 86,700 | 86,700 | 61174.532694 - 61317.969626 |
+| total | 1,628,230 | 1,628,230 | |
+
+(The 88 rows of `spherex_dr1_cal` have no observation time at IRSA; the dump selects
+by time, so they are not in the index.) No row was skipped, none was unencodable, none was duplicated;
+DR1 and QR3 do not overlap in time, so no image appears in both.
+
+Size: 1664 shard files, 45.59 MB, plus a 92 kB manifest. Shard size: median 22 kB,
+90th percentile 27 kB, 99th percentile 280 kB, maximum 459 kB (the cap). 1654 cells
+hold data (median 793 images per cell); 6 cells need more than one part, the largest
+holds 51,785 images in 4 parts (band 5, cell 7, the southern deep field).
+
+Path strings: 151 planning periods (110 in DR1, 41 in QR3, none shared), 546 prefix
+entries. Every period has exactly one normal processing version `l2b-v27-YYYY-DDD`;
+122 of the 151 periods also have files under `l2b_retry-v27-YYYY-DDD` (10,978 files,
+0.67 percent). Largest `seq` 1364, `suffix` 1 to 4.
+
+Check against IRSA (`build_sky_index.py --skip-dump --verify`): for each position the
+set of file paths from `SkyIndex.query` was compared with a live TAP query
+`CONTAINS(POINT('ICRS', ra, dec), p.poly) = 1`.
+
+| position | RA, Dec | IRSA | index | match | miss | extra | shards read |
+|---|---|---:|---:|---:|---:|---:|---|
+| Barnard's Star | 269.4463, +4.7680 | 358 | 358 | 358 | 0 | 0 | 4 (0.10 MB) |
+| M51 | 202.4696, +47.1953 | 413 | 413 | 413 | 0 | 0 | 4 (0.10 MB) |
+| WISE 0855 | 133.7688, -7.2429 | 258 | 258 | 258 | 0 | 0 | 4 (0.06 MB) |
+| near north ecliptic pole | 270.0, +66.56 | 29,398 | 29,399 | 29,398 | 0 | 1 | 9 (3.39 MB) |
+| near RA 0 | 0.05, +10.0 | 330 | 330 | 330 | 0 | 0 | 4 (0.08 MB) |
+| south ecliptic pole region | 90.0, -66.56 | 6,796 | 6,796 | 6,796 | 0 | 0 | 7 (2.26 MB) |
+
+The single extra is an image whose edge passes 0.06 arcsec from the point (1/100 of a
+pixel): the index says inside, IRSA says outside. That is the corner rounding of
+section 3. So IRSA's `CONTAINS` uses great-circle edges, like this format. 24 keys
+drawn at random from all four collections and both kinds of processing version were
+requested from S3 with `HEAD`: all 24 exist and answer `Access-Control-Allow-Origin: *`.
+
+### Test vectors for a new client
+
+First record of `b18/c053_000.bin` (756 records in that shard), 28 bytes in hex:
+
+```
+47b60c9e 03ed2f02 19bc b352 554f 9441 8444 1dad 9ce79f35 8a4db801
+```
+
+decodes to `ra = 2651633223` (265.1633223 deg), `dec = 36695299` (+3.6695299 deg),
+corners `(-17383, 21171) (20309, 16788) (17540, -21219)` and the derived fourth
+`(-20466, -16740)`, `t = 899671964` (MJD 60899.671964), `id = 28855690`:
+detector 3, suffix 1, seq 310, prefix 110 = `[0,"dr1","2025W33_1B","l2b-v27-2026-227"]`,
+so the key is
+`dr1/level2/2025W33_1B/l2b-v27-2026-227/3/level2_2025W33_1B_0310_1D3_spx_l2b-v27-2026-227.fits`.
+
+Shard selection with R = 2.58 (as `[band, cell]`):
+
+| point | cells |
+|---|---|
+| 269.4463, +4.7680 | [18,53] [18,54] [19,52] [19,53] |
+| 202.4696, +47.1953 | [26,29] [26,30] [27,27] [27,28] |
+| 133.7688, -7.2429 | [16,25] [16,26] [17,26] [17,27] |
+| 270.0, +66.56 | [30,24] [30,25] [31,20] [31,21] |
+| 0.05, +10.0 (RA wrap) | [19,70] [19,0] [20,69] [20,0] |
+| 90.0, -66.56 | [4,6] [4,7] [5,7] [5,8] |
+| 0.0, +90.0 (pole) | [35,0] [35,1] [35,2] |
+| 0.0, -90.0 (pole) | [0,0] [0,1] [0,2] |
+
+Query results of this build (they grow when new data are added): the first hit for
+Barnard's Star is
+`dr1/level2/2025W33_2C/l2b-v27-2026-228/3/level2_2025W33_2C_0321_1D3_spx_l2b-v27-2026-228.fits`
+at MJD 60902.864715 with margin 1689.3 arcsec; the two celestial poles return 430
+(north) and 526 (south) images.

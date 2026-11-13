@@ -11,9 +11,10 @@ Two services, used for what each does best:
 * JPL **Horizons** knows the SPHEREx spacecraft (body -163182), so every object SkyBoT
   puts in or near the field is re-computed at the exact time of each frame as seen from
   SPHEREx (observer ``500@-163182``). SPHEREx is in low Earth orbit, about 7000 km from
-  the geocentre: the geocentric position is off by 9.65 arcsec / (distance in au), i.e.
-  about 5 arcsec (most of a pixel) for a main-belt asteroid and far more for a
-  near-Earth object.
+  the geocentre, so a geocentric position can be off by up to 9.65 arcsec / (distance in
+  au): up to about 5 arcsec for a main-belt asteroid and far more for a near-Earth
+  object. In practice SPHEREx looks away from the Earth, which keeps the offset well below
+  that bound: we measured 0.2-0.5 arcsec for (52) Europa at 2.75 au (tests/test_sso.py).
 
 Rates in the output are the *geocentric* sky rates from SkyBoT (arcsec/h, RA rate
 includes cos(dec)). The instantaneous rate seen from SPHEREx wobbles by tens of arcsec/h
@@ -40,13 +41,16 @@ from __future__ import annotations
 
 import json
 import re
+import time
 from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
 
-from .catalogs import fetch_text
+from .catalogs import RejectedResponse, fetch_text
 from .frames import grid_wcs
+
+SKYBOT_RETRY_S = 2.0
 
 SKYBOT_URL = "https://ssp.imcce.fr/webservices/skybot/api/conesearch.php"
 HORIZONS_URL = "https://ssd.jpl.nasa.gov/api/horizons.api"
@@ -112,8 +116,10 @@ def horizons_command(name: str | int) -> str:
         return f"{m.group(1)};"
     if re.match(r"^\d{4}\s+[A-Z]{1,2}\d*$", s):
         return f"DES={s};"
-    if re.match(r"^(\d+[PI]|[CPI]/)", s):
-        return f"DES={s.split('/')[0] if re.match(r'^\d+[PI]', s) else s};CAP;NOFRAG"
+    if re.match(r"^\d+[PI]", s):  # numbered comet or interstellar object, e.g. 3I/ATLAS
+        return f"DES={s.split('/')[0]};CAP;NOFRAG"
+    if re.match(r"^[CPI]/", s):
+        return f"DES={s};CAP;NOFRAG"
     return f"{s};"
 
 
@@ -227,7 +233,12 @@ def parse_skybot(text: str) -> list[dict]:
 
 def skybot_cone(mjd: float, ra: float, dec: float, radius_deg: float,
                 cache_dir: Path | None = None) -> list[dict]:
-    """Asteroids, planets and comets within ``radius_deg`` of (ra, dec), geocentric."""
+    """Asteroids, planets and comets within ``radius_deg`` of (ra, dec), geocentric.
+
+    SkyBoT answers HTTP 204 with an empty body when the cone is empty, and now and then
+    also when it is not (seen once in 15 queries), so an empty answer is asked again once
+    and is never cached.
+    """
     params = {
         "-ep": f"{mjd + MJD_TO_JD:.5f}", "-ra": f"{ra:.5f}", "-dec": f"{dec:.5f}",
         "-rd": f"{radius_deg:.4f}", "-mime": "json", "-output": "all", "-loc": "500",
@@ -235,7 +246,16 @@ def skybot_cone(mjd: float, ra: float, dec: float, radius_deg: float,
         "-from": "ParallaX-SpaceApps2026",
     }
     ok = lambda t: t.lstrip().startswith(("[", "{")) or "No solar system object" in t  # noqa: E731
-    return parse_skybot(fetch_text("skybot", SKYBOT_URL, params, cache_dir=cache_dir, accept=ok))
+    for attempt in range(2):
+        try:
+            return parse_skybot(
+                fetch_text("skybot", SKYBOT_URL, params, cache_dir=cache_dir, accept=ok))
+        except RejectedResponse as e:
+            if e.text.strip():
+                raise
+            if attempt == 0:
+                time.sleep(SKYBOT_RETRY_S)
+    return []
 
 
 def group_times(mjd: np.ndarray, max_span_h: float = 8.0) -> list[list[int]]:

@@ -44,6 +44,12 @@ function pairSnr(pack: Pack, i: number, j: number): Float32Array {
 }
 
 const BROWSER_NOTE = 'Computed in your browser from the two frames and their median noise (the pipeline has not added its calibrated version to this field yet).'
+const LIVE_NOTE = 'Computed in your browser from the two frames and their robust noise. Live frames are not flag-masked, so hot pixels and cosmic rays show up as isolated dots.'
+
+/** Shown wherever a live field is asked for the chromatic template. */
+export const LIVE_NO_TEMPLATE =
+  'The chromatic template is computed by the ParallaX Python pipeline: it models every pixel across all survey passes, which is more than this page does when it fetches a field live. ' +
+  'Run the ParallaX engine for this position to get it. The naive and gated pair differences, computed in your browser, are available now.'
 
 function pairProduct(pack: Pack, i: number, j: number, cube: Int8Array | null, none: string): Product {
   if (j < 0) return { data: null, unit: 'SNR', missing: none }
@@ -51,7 +57,7 @@ function pairProduct(pack: Pack, i: number, j: number, cube: Int8Array | null, n
     if (snrAllUndefined(cube, i, pack.n)) return { data: null, unit: 'SNR', missing: none, partner: j }
     return { data: decodeSnr(cube, i, pack.n), unit: 'SNR', partner: j }
   }
-  return { data: pairSnr(pack, i, j), unit: 'SNR', partner: j, note: BROWSER_NOTE }
+  return { data: pairSnr(pack, i, j), unit: 'SNR', partner: j, note: pack.meta.live ? LIVE_NOTE : BROWSER_NOTE }
 }
 
 /** The chromatic difference (frame minus its chromatic template) as signal-to-noise. */
@@ -73,7 +79,7 @@ export function chromaProduct(pack: Pack, i: number): Product {
   return {
     data: null,
     unit: 'SNR',
-    missing: 'This field does not carry a chromatic template yet. It appears here as soon as the pipeline adds it.',
+    missing: pack.meta.live ? LIVE_NO_TEMPLATE : 'This field does not carry a chromatic template yet. It appears here as soon as the pipeline adds it.',
   }
 }
 

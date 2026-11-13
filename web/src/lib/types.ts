@@ -146,6 +146,35 @@ export interface Meta {
   candidates?: Candidate[]
   science?: Record<string, unknown>
   ledger?: Record<string, unknown>
+  /** present only on fields built in the browser from the public archive (lib/live.ts) */
+  live?: LiveInfo
+}
+
+/** How a live field was built: counts, cost and what it lacks compared with a pipeline pack. */
+export interface LiveInfo {
+  source: string
+  /** false while frames are still arriving */
+  complete: boolean
+  /** images that cover the position, all detectors */
+  available: number
+  /** of those, in the chosen detectors */
+  matching: number
+  /** images requested after the maximum-count cut (evenly spaced in time) */
+  requested: number
+  /** matching - requested */
+  dropped: number
+  loaded: number
+  /** the field falls mostly off the detector */
+  skipped: number
+  /** network errors after all retries */
+  failed: number
+  bytes: number
+  requests: number
+  seconds: number
+  detectors: number[]
+  sizeArcmin: number
+  /** build time of the sky index that listed the images */
+  indexBuilt: string
 }
 
 export type TypedArray = Uint16Array | Uint8Array | Int8Array | Float32Array

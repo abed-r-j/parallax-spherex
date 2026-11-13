@@ -6,9 +6,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { CoordBox, Home, Resolve } from './components/Home'
 import { About, HowItWorks } from './components/Info'
+import { LiveField } from './components/Live'
 import { Viewer } from './components/Viewer'
 import { loadPack } from './lib/decode'
 import { engineBase, engineDataBase } from './lib/engine'
+import { liveKey, normaliseSpec } from './lib/live'
 import type { Pack, PackIndex } from './lib/types'
 import { parseQuery, toQuery, type Page, type ViewState } from './lib/urlstate'
 
@@ -71,19 +73,19 @@ export default function App() {
   const [theme, flipTheme] = useTheme()
 
   // URL <-> state. A new page or field makes a history entry; everything else replaces it.
-  const last = useRef<{ page: Page; field: string | null } | null>(null)
+  const last = useRef<{ page: Page; field: string | null; live: boolean } | null>(null)
   useEffect(() => {
     const q = toQuery(s)
     const url = q ? `?${q}` : location.pathname
     const prev = last.current
-    if (prev && (prev.page !== s.page || prev.field !== s.field)) history.pushState(null, '', url)
+    if (prev && (prev.page !== s.page || prev.field !== s.field || prev.live !== !!s.live)) history.pushState(null, '', url)
     else history.replaceState(null, '', url)
-    last.current = { page: s.page, field: s.field }
+    last.current = { page: s.page, field: s.field, live: !!s.live }
   }, [s])
   useEffect(() => {
     const pop = () => {
       const next = parseQuery(location.search)
-      last.current = { page: next.page, field: next.field }
+      last.current = { page: next.page, field: next.field, live: !!next.live }
       setS(next)
     }
     window.addEventListener('popstate', pop)
@@ -120,7 +122,7 @@ export default function App() {
     setShare(false)
     if (page === 'home') {
       setNotice(null)
-      update({ page, field: null, ra: null, dec: null })
+      update({ page, field: null, ra: null, dec: null, live: null })
     } else if (page === 'view') update({ page })
     else update({ page })
   }
@@ -128,6 +130,8 @@ export default function App() {
   const pack = current?.pack ?? null
   const dois = pack?.meta.release?.doi ?? []
   const viewing = s.page === 'view'
+  // a field to build in the browser from the public archive (no precomputed pack, no engine)
+  const liveSpec = !key && s.live && s.ra !== null && s.dec !== null ? normaliseSpec({ ra: s.ra, dec: s.dec, ...s.live }) : null
 
   let body
   if (s.page === 'how') body = <HowItWorks />
@@ -143,6 +147,8 @@ export default function App() {
         </div>
       )
     else body = <div className="resolve"><p role="status">Loading the field.</p><div className="bar busy"><i /></div></div>
+  } else if (viewing && liveSpec) {
+    body = <LiveField key={liveKey(liveSpec)} s={s} update={update} />
   } else if (viewing && s.ra !== null && s.dec !== null) {
     body = index ? <Resolve index={index} s={s} update={update} onNotice={setNotice} /> : <div className="resolve"><p role="status">Loading the list of fields.</p></div>
   } else body = <Home index={index} indexError={indexError} update={update} />
@@ -170,8 +176,8 @@ export default function App() {
           <button className={s.page === 'home' ? 'navlink on' : 'navlink'} onClick={() => go('home')}>Fields</button>
           <button className={s.page === 'how' ? 'navlink on' : 'navlink'} onClick={() => go('how')}>How it works</button>
           <button className={s.page === 'about' ? 'navlink on' : 'navlink'} onClick={() => go('about')}>About and credits</button>
-          {(s.page === 'how' || s.page === 'about') && key && <button className="navlink" onClick={() => go('view')}>Back to {pack?.meta.name ?? 'the field'}</button>}
-          {viewing && pack && <button className="btn" onClick={() => setShare((v) => !v)} aria-expanded={share}>Share</button>}
+          {(s.page === 'how' || s.page === 'about') && (key || liveSpec) && <button className="navlink" onClick={() => go('view')}>Back to {pack?.meta.name ?? 'the field'}</button>}
+          {viewing && (pack || liveSpec) && <button className="btn" onClick={() => setShare((v) => !v)} aria-expanded={share}>Share</button>}
           <button className="btn" onClick={flipTheme} aria-label={`Switch to the ${theme === 'dark' ? 'light' : 'dark'} theme`}>{theme === 'dark' ? 'Light' : 'Dark'}</button>
         </nav>
         {share && <Share s={s} onClose={() => setShare(false)} />}

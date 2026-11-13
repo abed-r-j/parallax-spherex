@@ -229,11 +229,13 @@ def find_images(name: str | int, mjd_start: float = ARCHIVE_MJD[0],
 
 
 def best_fixed_field(hits: list[MoverHit], size_pix: int = 61, scale: float = PIXEL_ARCSEC,
-                     margin_pix: float = 6.0) -> tuple[float, float, list[int]]:
+                     margin_pix: float = 6.0, max_days: float = 45.0,
+                     ) -> tuple[float, float, list[int]]:
     """Field centre (ra, dec) whose square field holds the most distinct visits.
 
-    Candidate centres are the hit positions and the midpoints of pairs of hits. The
-    object must stay ``margin_pix`` inside the field edge. Ties are broken in favour of
+    Candidate centres are the hit positions and the midpoints of pairs of hits less than
+    ``max_days`` apart (one survey pass). The object must stay ``margin_pix`` inside the
+    field edge. Ties are broken in favour of
     more hits, then of the object being farther from the image edges.
     Returns (ra, dec, indices of the hits inside the field).
     """
@@ -245,7 +247,7 @@ def best_fixed_field(hits: list[MoverHit], size_pix: int = 61, scale: float = PI
     half = (size_pix / 2.0 - margin_pix) * scale
     best: tuple[tuple, float, float, np.ndarray] | None = None
     for i in range(len(hits)):
-        near = np.flatnonzero(np.abs(mjd - mjd[i]) < 3.0)
+        near = np.flatnonzero(np.abs(mjd - mjd[i]) < max_days)
         for j in near[near >= i]:
             c_ra, c_dec = (float(v) for v in _midpoint(ra[i], dec[i], ra[j], dec[j]))
             x, y = _gnomonic(ra[near], dec[near], c_ra, c_dec)
@@ -337,15 +339,92 @@ def download_cutouts(jobs: list[tuple[ImageRef, float, float]], size_pix: int, o
 
 def fixed_field_jobs(ra: float, dec: float, hits: list[MoverHit], inside: list[int],
                      max_n: int, dets: tuple[int, ...] | None = None,
-                     ) -> list[tuple[ImageRef, float, float]]:
-    """Download jobs for a fixed field: every frame with the object, plus other visits."""
+                     ) -> tuple[list[tuple[ImageRef, float, float]], int]:
+    """Download jobs for a fixed field: every frame with the object, plus other visits.
+
+    With ``dets`` only those detectors are used at all. Returns (jobs, number of images
+    available at that position in those detectors before the cap).
+    """
     refs = {r.name: r for r in list_images(ra, dec)}
     must = set()
     for k in inside:
-        refs.setdefault(hits[k].ref.name, hits[k].ref)
-        must.add(hits[k].ref.name)
+        if dets is None or hits[k].det in dets:
+            refs.setdefault(hits[k].ref.name, hits[k].ref)
+            must.add(hits[k].ref.name)
+    if dets is not None:
+        refs = {k: r for k, r in refs.items() if int(r.band[-1]) in dets}
     chosen = select_refs(list(refs.values()), must, max_n, dets)
-    return [(r, ra, dec) for r in chosen]
+    return [(r, ra, dec) for r in chosen], len(refs)
+
+
+def box_flux(img: np.ndarray, cx: int, cy: int, half: int = 2, gap: int = 2,
+             width: int = 3) -> tuple[float, float, int]:
+    """Background-subtracted sum in a (2*half+1)^2 box, in MJy/sr * pixels.
+
+    The background is the median of a square ring ``gap`` pixels outside the box and
+    ``width`` pixels wide; the error is the ring scatter times sqrt(box area). Returns
+    (sum, error, number of non-finite box pixels). A deliberately simple estimator: no
+    PSF fit, no aperture correction (the 5x5 box is 31 arcsec across).
+    """
+    r_out = half + gap + width
+    yy, xx = np.mgrid[0:img.shape[0], 0:img.shape[1]]
+    cheb = np.maximum(np.abs(xx - cx), np.abs(yy - cy))
+    box = cheb <= half
+    ring = (cheb > half + gap) & (cheb <= r_out) & np.isfinite(img)
+    if box.sum() < (2 * half + 1) ** 2 or ring.sum() < 20:
+        return float("nan"), float("nan"), int(box.sum())
+    bkg = float(np.median(img[ring]))
+    sd = 1.4826 * float(np.median(np.abs(img[ring] - bkg)))
+    vals = img[box]
+    n_bad = int((~np.isfinite(vals)).sum())
+    return float(np.nansum(vals - bkg)), sd * float(np.sqrt(box.sum())), n_bad
+
+
+def comoving_spectrum(raw_dir: Path, ujy_per_mjysr: float = 889.86) -> list[dict]:
+    """Box photometry of the object in every co-moving cutout of ``raw_dir``.
+
+    Reads the ``_mover.json`` manifest written by ``scripts/find_mover_fields.py comoving``
+    and returns one dict per usable cutout, sorted by wavelength:
+    ``{lam, bw, flux_mjy, err_mjy, mjd, det, vmag, delta, n_bad, name}``. The object is
+    located from the Horizons position through the cutout's own WCS. Cutouts with missing
+    pixels or pixels flagged as bad or suspect (cosmic-ray transients, non-linear, ...)
+    inside the box are kept but carry ``n_bad`` > 0; plot only ``n_bad == 0``.
+    """
+    from astropy.io import fits  # local imports keep the search functions light
+    from astropy.wcs import WCS
+
+    from .frames import BAD_HARD, bitmask, wavelength_at
+
+    raw_dir = Path(raw_dir)
+    manifest = json.loads((raw_dir / "_mover.json").read_text(encoding="utf-8"))
+    size = manifest["size_pix"]
+    out = []
+    for h in manifest["hits"]:
+        fn = raw_dir / h["uri"].rsplit("/", 1)[1].replace(".fits", f"_cut{size}.fits")
+        if not fn.exists():
+            continue
+        with fits.open(fn) as hl:
+            hdr = hl["IMAGE"].header
+            img = hl["IMAGE"].data.astype(float) - hl["ZODI"].data.astype(float)
+            flg = hl["FLAGS"].data.astype(np.int64)
+            px, py = (float(v) for v in WCS(hdr).all_world2pix(h["ra"], h["dec"], 0))
+            lam, bw = wavelength_at(hl["WCS-WAVE"], hdr, np.array(px), np.array(py))
+        cx, cy = round(px), round(py)
+        s, e, n_bad = box_flux(img, cx, cy)
+        if not np.isfinite(s):
+            continue
+        # OUTLIER and SOURCE are not counted: the archive pipeline sets them on the moving
+        # object itself (half of the box pixels of (52) Europa carry OUTLIER).
+        suspect = BAD_HARD | bitmask("TRANSIENT", "OVERFLOW", "NONLINEAR", "PERSIST")
+        n_bad += int(((flg[cy - 2:cy + 3, cx - 2:cx + 3] & suspect) != 0).sum())
+        out.append({
+            "lam": round(float(lam), 4), "bw": round(float(bw), 4),
+            "flux_mjy": round(s * ujy_per_mjysr / 1000.0, 3),
+            "err_mjy": round(e * ujy_per_mjysr / 1000.0, 3), "mjd": h["mjd"], "det": h["det"],
+            "vmag": h["vmag"], "delta": h["delta"], "n_bad": n_bad,
+            "name": fn.name,
+        })
+    return sorted(out, key=lambda r: r["lam"])
 
 
 def register_target(path: Path, entry: dict) -> None:

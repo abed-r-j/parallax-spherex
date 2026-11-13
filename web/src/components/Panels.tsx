@@ -91,13 +91,16 @@ function Empty({ children }: { children: ReactNode }) {
   return <p className="empty">{children}</p>
 }
 
+/** Live fields carry pixels only: searching and measuring them is the pipeline's work. */
+const LIVE_EMPTY = 'This field was fetched live in your browser, so it carries pictures only. Searches, measurements and the three-way ledger are made by the ParallaX Python pipeline: run the engine for this position to get them.'
+
 export function CandidatesPanel({ pack, selected, onSelect }: { pack: Pack; selected: string | null; onSelect: (c: Candidate) => void }) {
   const cands = pack.meta.candidates ?? []
   const nDet = pack.meta.detections?.length ?? 0
   if (!cands.length)
     return (
       <Empty>
-        {nDet
+        {pack.meta.live ? LIVE_EMPTY : nDet
           ? `The pipeline found ${nDet} single-frame detections in this field but linked none of them into a candidate.`
           : 'No candidates in this field yet. When the pipeline has searched the chromatic differences, anything that moves or varies is listed here.'}
       </Empty>
@@ -145,7 +148,7 @@ export function SciencePanel({ pack, quick }: { pack: Pack; quick: ReactNode }) 
           <DataTree value={sci[k]} />
         </section>
       ))}
-      {!keys.length && <Empty>The pipeline has not attached a science measurement to this field yet.</Empty>}
+      {!keys.length && <Empty>{pack.meta.live ? LIVE_EMPTY : 'The pipeline has not attached a science measurement to this field yet.'}</Empty>}
       {quick}
     </div>
   )
@@ -203,7 +206,7 @@ function LedgerCurves({ injection }: { injection: Obj }) {
 export function LedgerPanel({ pack }: { pack: Pack }) {
   const led = pack.meta.ledger ?? {}
   if (!Object.keys(led).length)
-    return <Empty>The three-way comparison (naive pair, gated pair, chromatic template) has not been measured for this field yet. It appears here when the pipeline adds it.</Empty>
+    return <Empty>{pack.meta.live ? LIVE_EMPTY : 'The three-way comparison (naive pair, gated pair, chromatic template) has not been measured for this field yet. It appears here when the pipeline adds it.'}</Empty>
   const modes = isObj(led.modes) ? led.modes : {}
   const names = Object.keys(modes)
   const inj = isObj(led.injection) ? led.injection : null

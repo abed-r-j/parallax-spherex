@@ -13,10 +13,11 @@ import { percentiles, renderRgba, upsampleBicubic } from '../lib/stretch'
 import type { IndexField, Pack, PackIndex } from '../lib/types'
 import type { ViewState } from '../lib/urlstate'
 import { formatDec, formatRa, mjdToYear, propagate, skyToPix } from '../lib/wcs'
+import { LiveOffer } from './Live'
 import { SkyCanvas, type Raster } from './SkyCanvas'
 
 type Update = (patch: Partial<ViewState>) => void
-const OPEN: Partial<ViewState> = { page: 'view', frame: 0, mode: 'image', seq: null, det: 0, fov: 0, pix: null, overlays: null, cmap: null, smooth: null }
+const OPEN: Partial<ViewState> = { page: 'view', frame: 0, mode: 'image', seq: null, det: 0, fov: 0, pix: null, overlays: null, cmap: null, smooth: null, live: null }
 
 export function CoordBox({ index, update, big }: { index: PackIndex | null; update: Update; big?: boolean }) {
   const [text, setText] = useState('')
@@ -171,17 +172,23 @@ export function Home({ index, indexError, update }: { index: PackIndex | null; i
 
 type Phase =
   | { kind: 'checking' }
+  | { kind: 'ready' }
   | { kind: 'working'; job: JobStatus }
   | { kind: 'none' }
   | { kind: 'failed'; why: string }
 
-/** Coordinates without a field: find the precomputed field, or ask the engine to build one. */
+/**
+ * Coordinates without a field: open the precomputed field if one covers them; otherwise
+ * offer the two ways to get one: fetch it live in the browser, or ask a ParallaX engine.
+ */
 export function Resolve({ index, s, update, onNotice }: { index: PackIndex; s: ViewState; update: Update; onNotice: (n: string | null) => void }) {
   const ra = s.ra!
   const dec = s.dec!
   const [base, setBase] = useState(() => engineBase(s.engine))
   const [draft, setDraft] = useState(base)
   const [attempt, setAttempt] = useState(0)
+  // an engine named in the address is used at once; otherwise the reader chooses
+  const [useEngine, setUseEngine] = useState(!!s.engine)
   const [phase, setPhase] = useState<Phase>({ kind: 'checking' })
 
   useEffect(() => {
@@ -203,6 +210,10 @@ export function Resolve({ index, s, update, onNotice }: { index: PackIndex; s: V
       setPhase({ kind: 'checking' })
       if (!(await engineHealthy(base))) {
         if (!stop) setPhase({ kind: 'none' })
+        return
+      }
+      if (!useEngine) {
+        if (!stop) setPhase({ kind: 'ready' })
         return
       }
       try {
@@ -232,42 +243,59 @@ export function Resolve({ index, s, update, onNotice }: { index: PackIndex; s: V
       clearTimeout(timer)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [index, ra, dec, base, attempt])
+  }, [index, ra, dec, base, attempt, useEngine])
 
   const near = nearestFields(index.fields, ra, dec, 4)
+  const working = phase.kind === 'working' || (useEngine && phase.kind === 'checking')
   return (
     <div className="resolve">
       <h1>{formatRa(ra)} {formatDec(dec)}</h1>
       <p className="muted num">RA {ra.toFixed(5)}, Dec {dec.toFixed(5)} degrees</p>
-      {phase.kind === 'checking' && (
-        <>
-          <p role="status">These coordinates are outside the precomputed fields. Looking for a live engine at {base}.</p>
-          <div className="bar busy"><i /></div>
-        </>
-      )}
-      {phase.kind === 'working' && (
-        <>
-          <p role="status">The engine is fetching SPHEREx cutouts for this position and building the field. This takes a few minutes: the archive serves about one frame every ten seconds.</p>
-          <div className={phase.job.progress === null ? 'bar busy' : 'bar'} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={phase.job.progress === null ? undefined : Math.round(phase.job.progress * 100)}>
-            <i style={phase.job.progress === null ? undefined : { width: `${phase.job.progress * 100}%` }} />
-          </div>
-          <p className="muted">{phase.job.message || phase.job.state}{phase.job.progress !== null ? ` (${Math.round(phase.job.progress * 100)}%)` : ''}</p>
-        </>
-      )}
-      {(phase.kind === 'none' || phase.kind === 'failed') && (
-        <>
-          <p role="alert">
-            {phase.kind === 'none'
-              ? `These coordinates are outside the precomputed fields, and no live engine answered at ${base}. This site is static: new positions need the ParallaX engine running on your computer.`
-              : `The engine at ${base} could not build this field: ${phase.why}`}
+      {!working && <p>These coordinates are outside the fields that were computed in advance. There are two ways to see this patch of sky.</p>}
+      {!working && <LiveOffer ra={ra} dec={dec} update={update} />}
+      <section className="card">
+        <h2>Use a ParallaX engine</h2>
+        {!working && (
+          <p className="muted small">
+            The engine is the full Python pipeline running on a computer: it also builds the chromatic template, the three-way comparison and the searches. It takes several minutes per field.
           </p>
-          <form className="row wrap" onSubmit={(e) => { e.preventDefault(); const b = draft.trim().replace(/\/+$/, ''); saveEngineBase(b); setBase(b || engineBase()); setAttempt((a) => a + 1) }}>
-            <label className="field grow"><span>Engine address</span>
-              <input type="url" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="http://127.0.0.1:8000" /></label>
-            <button className="btn" type="submit">Try again</button>
-          </form>
-        </>
-      )}
+        )}
+        {phase.kind === 'checking' && (
+          <>
+            <p role="status">Looking for an engine at {base}.</p>
+            <div className="bar busy"><i /></div>
+          </>
+        )}
+        {phase.kind === 'ready' && (
+          <div className="row wrap">
+            <span className="grow">An engine answers at {base}.</span>
+            <button className="btn" onClick={() => setUseEngine(true)}>Build this field with the engine</button>
+          </div>
+        )}
+        {phase.kind === 'working' && (
+          <>
+            <p role="status">The engine is fetching SPHEREx cutouts for this position and building the field. This takes a few minutes: the archive serves about one frame every ten seconds.</p>
+            <div className={phase.job.progress === null ? 'bar busy' : 'bar'} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={phase.job.progress === null ? undefined : Math.round(phase.job.progress * 100)}>
+              <i style={phase.job.progress === null ? undefined : { width: `${phase.job.progress * 100}%` }} />
+            </div>
+            <p className="muted">{phase.job.message || phase.job.state}{phase.job.progress !== null ? ` (${Math.round(phase.job.progress * 100)}%)` : ''}</p>
+          </>
+        )}
+        {(phase.kind === 'none' || phase.kind === 'failed') && (
+          <>
+            <p role={phase.kind === 'failed' ? 'alert' : 'status'}>
+              {phase.kind === 'none'
+                ? `No engine answered at ${base}. If you run one on your computer or elsewhere, give its address.`
+                : `The engine at ${base} could not build this field: ${phase.why}`}
+            </p>
+            <form className="row wrap" onSubmit={(e) => { e.preventDefault(); const b = draft.trim().replace(/\/+$/, ''); saveEngineBase(b); setBase(b || engineBase()); setAttempt((a) => a + 1) }}>
+              <label className="field grow"><span>Engine address</span>
+                <input type="url" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="http://127.0.0.1:8000" /></label>
+              <button className="btn" type="submit">Try again</button>
+            </form>
+          </>
+        )}
+      </section>
       {near.length > 0 && (
         <>
           <h2>Nearest fields that are ready</h2>
@@ -281,7 +309,7 @@ export function Resolve({ index, s, update, onNotice }: { index: PackIndex; s: V
           </ul>
         </>
       )}
-      <p><button className="btn" onClick={() => update({ page: 'home', ra: null, dec: null, field: null })}>Back to all fields</button></p>
+      <p><button className="btn" onClick={() => update({ page: 'home', ra: null, dec: null, field: null, live: null })}>Back to all fields</button></p>
     </div>
   )
 }

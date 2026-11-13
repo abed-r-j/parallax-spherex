@@ -7,7 +7,7 @@ SI disclosure: written with the help of an SI coding assistant (Claude), checked
     find_mover_fields.py fixed   NAME KEY [--size 61] [--max 200] [--dets 1,2,3] [--dry]
         Best FIXED sky field the object crosses; downloads all (or --max) frames of that
         position into data/raw/KEY and registers KEY in data/extra_targets.json.
-    find_mover_fields.py comoving NAME KEY [--size 41] [--max 40] [--from MJD --to MJD]
+    find_mover_fields.py comoving NAME KEY [--size 41] [--max 40] [--from MJD --to MJD] [--dets 5]
         Cutouts centred on the object in each image, into data/raw/KEY, plus manifest.
 
 NAME is anything JPL Horizons understands through parallax.sso.horizons_command, e.g.
@@ -77,28 +77,31 @@ def cmd_fixed(a: argparse.Namespace) -> None:
     hits = load_hits(a.name)
     summary(a.name, hits)
     ra, dec, inside = movers.best_fixed_field(hits, a.size)
-    h = [hits[i] for i in inside]
+    dets = tuple(int(d) for d in a.dets.split(",")) if a.dets else None
+    h = [hits[i] for i in inside if dets is None or hits[i].det in dets]
     say(f"best fixed field: RA {ra:.5f} Dec {dec:.5f}, {a.size} px; object inside in "
         f"{len(h)} images, {iso(h[0].mjd)} .. {iso(h[-1].mjd)}")
     for x in h:
         say(f"   {iso(x.mjd)} D{x.det}  RA {x.ra:.5f} Dec {x.dec:+.5f}  V {x.vmag:.2f}  "
             f"rate {x.rate_ra:+.1f} {x.rate_dec:+.1f} arcsec/h  {x.uri.rsplit('/', 1)[1]}")
-    dets = tuple(int(d) for d in a.dets.split(",")) if a.dets else None
-    jobs = movers.fixed_field_jobs(ra, dec, hits, inside, a.max, dets)
-    say(f"{len(jobs)} cutouts selected (cap {a.max}, detectors {dets or 'all'})")
+    jobs, n_all = movers.fixed_field_jobs(ra, dec, hits, inside, a.max, dets)
+    per_det = dict(sorted(Counter(j[0].band[-1] for j in jobs).items()))
+    say(f"{n_all} images cover the field centre; {len(jobs)} cutouts selected "
+        f"(cap {a.max}, detectors {dets or 'all'}): {per_det}")
     if a.dry:
         return
     out = DATA / "raw" / a.key
     stats = movers.download_cutouts(jobs, a.size, out, progress=say)
     say(json.dumps({k: v for k, v in stats.items() if k != "failed"}) + f" failed={len(stats['failed'])}")
     manifest = {"object": a.name, "ra": ra, "dec": dec, "size_pix": a.size,
+                "n_available": n_all, "n_selected": len(jobs), "detectors": dets,
                 "hits_inside": movers.hits_table(h), "download": stats}
     (out / "_mover.json").write_text(json.dumps(manifest, indent=1))
     movers.register_target(DATA / "extra_targets.json", {
         "key": a.key, "name": a.label or f"{a.name} crossing", "kind": "mover",
         "ra": ra, "dec": dec, "epoch": 2000.0, "pm_ra": 0.0, "pm_dec": 0.0,
         "size_pix": a.size, "max_images": None,
-        "blurb": a.blurb or (f"A fixed patch of sky that asteroid {a.name} crosses between "
+        "blurb": a.blurb or (f"A fixed patch of sky that {a.name} crosses between "
                              f"{iso(h[0].mjd)} and {iso(h[-1].mjd)} UT: present in "
                              f"{len(h)} frames, absent from all the others."),
         "source": "JPL Horizons ephemeris as seen from SPHEREx (500@-163182); "
@@ -107,8 +110,9 @@ def cmd_fixed(a: argparse.Namespace) -> None:
 
 
 def cmd_comoving(a: argparse.Namespace) -> None:
+    dets = tuple(int(d) for d in a.dets.split(",")) if a.dets else (1, 2, 3, 4, 5, 6)
     hits = [h for h in load_hits(a.name)
-            if a.t0 <= h.mjd <= a.t1 and h.edge_arcsec > a.size * 3.1]
+            if a.t0 <= h.mjd <= a.t1 and h.edge_arcsec > a.size * 3.1 and h.det in dets]
     if len(hits) > a.max:
         hits = [hits[i] for i in np.unique(np.linspace(0, len(hits) - 1, a.max).round().astype(int))]
     say(f"{len(hits)} co-moving cutouts of {a.name}")
@@ -117,9 +121,13 @@ def cmd_comoving(a: argparse.Namespace) -> None:
     out = DATA / "raw" / a.key
     stats = movers.download_cutouts([(h.ref, h.ra, h.dec) for h in hits], a.size, out, progress=say)
     say(json.dumps({k: v for k, v in stats.items() if k != "failed"}) + f" failed={len(stats['failed'])}")
-    (out / "_mover.json").write_text(json.dumps(
+    fn = out / "_mover.json"
+    old = json.loads(fn.read_text())["hits"] if fn.exists() else []  # runs accumulate
+    table = {h["uri"]: h for h in old + movers.hits_table(hits)}
+    fn.write_text(json.dumps(
         {"object": a.name, "comoving": True, "size_pix": a.size,
-         "hits": movers.hits_table(hits), "download": stats}, indent=1))
+         "hits": sorted(table.values(), key=lambda h: (h["mjd"], h["det"])),
+         "download": stats}, indent=1))
 
 
 def main() -> None:
@@ -145,6 +153,7 @@ def main() -> None:
     c.add_argument("--max", type=int, default=40)
     c.add_argument("--from", dest="t0", type=float, default=0.0)
     c.add_argument("--to", dest="t1", type=float, default=1e9)
+    c.add_argument("--dets", default="")
     c.add_argument("--dry", action="store_true")
     c.set_defaults(fn=cmd_comoving)
     a = p.parse_args()

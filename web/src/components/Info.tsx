@@ -3,8 +3,10 @@
  * acknowledgements and disclosures.
  * SI disclosure: written with the help of an SI coding assistant (Claude), checked by the team.
  */
+import { useEffect, useState } from 'react'
 import type { PackIndex } from '../lib/types'
 import { DEFAULT_ENGINE_URL } from '../lib/engine'
+import { loadManifest, type SkyManifest } from '../lib/skyindex'
 
 const DET = ['var(--d1)', 'var(--d2)', 'var(--d3)', 'var(--d4)', 'var(--d5)', 'var(--d6)']
 
@@ -117,6 +119,37 @@ export function HowItWorks() {
   )
 }
 
+/** What the sky index of this site covers, read from its manifest. */
+function IndexCoverage() {
+  const [m, setM] = useState<SkyManifest | null>(null)
+  const [missing, setMissing] = useState(false)
+  useEffect(() => {
+    let on = true
+    loadManifest().then((v) => on && setM(v), () => on && setMissing(true))
+    return () => {
+      on = false
+    }
+  }, [])
+  if (missing) return <> This copy of the site carries no sky index, so the live route is not available here.</>
+  if (!m) return null
+  let lo = Infinity
+  let hi = -Infinity
+  for (const s of m.shards) {
+    lo = Math.min(lo, s[4])
+    hi = Math.max(hi, s[5])
+  }
+  const day = (mjd: number) => new Date((mjd - 40587) * 86400000).toISOString().slice(0, 10)
+  const total = m.rows?.total
+  const gaps = m.coverage?.missing_days?.length ?? 0
+  return (
+    <>
+      {' '}The index on this site was built on {m.built_utc.slice(0, 10)} and lists {typeof total === 'number' ? total.toLocaleString('en-US') : 'all'} images
+      taken from {day(lo)} to {day(hi)} ({m.collections.join(', ')}){m.coverage ? (m.coverage.complete || !gaps ? ', with no day missing' : `, with ${gaps} day${gaps === 1 ? '' : 's'} still missing`) : ''}.
+      Images released after that date are not listed.
+    </>
+  )
+}
+
 export function About({ index, dois }: { index: PackIndex | null; dois: string[] }) {
   return (
     <article className="prose">
@@ -152,8 +185,21 @@ export function About({ index, dois }: { index: PackIndex | null; dois: string[]
       <h2>How it is made</h2>
       <p>
         A Python pipeline downloads the SPHEREx cutouts, builds the chromatic templates and the three kinds of difference, measures them, and writes one small data pack per field.
-        This website only reads those packs. It is a static site: no server, no tracking, no outside requests. It works offline. For positions outside the precomputed fields it
-        can talk to a ParallaX engine running on your own computer (by default at {DEFAULT_ENGINE_URL}).
+        This website only reads those packs. It is a static site: no server and no tracking. With the precomputed fields it makes no outside requests and works offline.
+      </p>
+      <h2>Any other position: fetched live in your browser</h2>
+      <p>
+        For coordinates outside the precomputed fields, the page can build a field itself. A compact index, shipped with the site, lists every public SPHEREx Level-2 image:
+        where it points, when it was taken and its file name. Your browser then reads the pixels straight from the SPHEREx Level-2 spectral images in the NASA/IPAC Infrared Science Archive
+        public bucket on Amazon Web Services (<code>nasa-irsa-spherex</code>): from each 65 MB file only the header, the few detector rows that cover the field and the wavelength table.
+        These are the only outside requests the site makes, and only when you ask for a live field.
+        <IndexCoverage />
+      </p>
+      <p>
+        A live field shows the frames, the per-pass stacks, spectra, add and subtract and the two pair differences. To stay small it removes one robust sky level per frame
+        instead of the archive&rsquo;s zodiacal-light model, estimates the noise from the frame itself, and does not read the pixel flags, so hot pixels and cosmic rays are not masked.
+        The chromatic template, the three-way ledger and the searches are made only by the Python pipeline. To get those for a new position, run a ParallaX engine
+        on your own computer (by default at {DEFAULT_ENGINE_URL}) and the page will use it.
       </p>
       <p>
         To embed a view in another page, use the Share button: the address carries the coordinates, field of view, detector, mode and frame, and <code>embed=1</code> hides everything but the picture and its player.

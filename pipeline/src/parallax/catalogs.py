@@ -52,6 +52,14 @@ def default_cache_dir() -> Path:
     return Path(env) if env else Path(__file__).resolve().parents[3] / "data" / "cache"
 
 
+class RejectedResponse(RuntimeError):
+    """A service answered, but not with the expected kind of body (kept in ``text``)."""
+
+    def __init__(self, service: str, text: str):
+        super().__init__(f"{service}: unexpected response: {text[:200]!r}")
+        self.text = text
+
+
 def _request(method: str, url: str, params: dict[str, str], timeout: float) -> str:
     """The only function that touches the network (tests replace it)."""
     kw: dict[str, Any] = {"data": params} if method == "POST" else {"params": params}
@@ -67,7 +75,7 @@ def fetch_text(service: str, url: str, params: dict[str, str], *, method: str = 
     """GET/POST ``url`` and return the body, reading and writing the on-disk cache.
 
     ``accept(text)`` may reject a body (return False) so that error pages are not cached;
-    a rejected body raises ``RuntimeError``.
+    a rejected body raises :class:`RejectedResponse`.
     """
     root = (cache_dir or default_cache_dir()) / service
     key = hashlib.sha1(json.dumps([method, url, params], sort_keys=True).encode()).hexdigest()
@@ -76,7 +84,7 @@ def fetch_text(service: str, url: str, params: dict[str, str], *, method: str = 
         return fn.read_text(encoding="utf-8")
     text = _request(method, url, params, timeout)
     if accept is not None and not accept(text):
-        raise RuntimeError(f"{service}: unexpected response: {text[:200]!r}")
+        raise RejectedResponse(service, text)
     root.mkdir(parents=True, exist_ok=True)
     tmp = fn.with_suffix(".tmp")
     tmp.write_text(text, encoding="utf-8")
