@@ -247,7 +247,8 @@ def predict_frame(f: Field, t: int, refs: np.ndarray, ok: np.ndarray, kernel: fl
     todo = np.isfinite(bw)
     if robust:
         s = within(ROBUST_SCALE)
-        okr[s] &= _outliers(y[s], v[s], dl[s], okr[s], kernel * ROBUST_SCALE * bw)
+        if len(s):  # a sparse field can leave a frame with no reference in reach
+            okr[s] &= _outliers(y[s], v[s], dl[s], okr[s], kernel * ROBUST_SCALE * bw)
     for scale in KERNEL_SCALES:
         s = within(scale)
         if len(s) == 0:

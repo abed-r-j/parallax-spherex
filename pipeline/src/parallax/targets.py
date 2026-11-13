@@ -27,6 +27,8 @@ class Target:
     max_images: int | None = None
     blurb: str = ""
     source: str = ""
+    field_ra: float | None = None  # explicit cutout centre, if not the 2026.0 position
+    field_dec: float | None = None
 
     def at(self, year: float) -> tuple[float, float]:
         dt = year - self.epoch
@@ -36,6 +38,9 @@ class Target:
 
     @property
     def centre(self) -> tuple[float, float]:
+        """Centre of the downloaded cutouts."""
+        if self.field_ra is not None and self.field_dec is not None:
+            return self.field_ra, self.field_dec
         return self.at(2026.0)
 
 
@@ -45,7 +50,8 @@ TARGETS: dict[str, Target] = {
         Target(
             "barnard", "Barnard's Star", "motion", 269.452075, 4.693391, 2000.0,
             -798.58, 10328.12,
-            blurb="The fastest-moving star in the sky: 10.4 arcsec per year, about 1.7 SPHEREx pixels.",
+            blurb="The fastest-moving star in the sky: 10.4 arcsec per year, "
+                  "about 1.7 SPHEREx pixels.",
             source="Gaia DR3 4472832130942575872 (position propagated to J2000)",
         ),
         Target(
@@ -55,11 +61,14 @@ TARGETS: dict[str, Target] = {
             source="Scholz et al. 2003; King et al. 2010",
         ),
         Target(
-            "wise0855", "WISE 0855-0714", "motion", 133.795129, -7.245147, 2014.3,
+            "wise0855", "WISE 0855-0714", "motion", 133.795129, -7.245147, 2010.4,
             -8118.0, 680.0, size_pix=81,
             blurb="The coldest known brown dwarf (about 250 K), moving 8.1 arcsec per year. "
-                  "The challenge coordinates are its 2014 position.",
-            source="Luhman 2014; Luhman & Esplin 2016",
+                  "The challenge coordinates are its 2010 WISE position; by 2026 it is "
+                  "2 arcmin further west.",
+            source="Luhman 2014; Luhman & Esplin 2016. Epoch 2010.4 is the mean WISE epoch "
+                   "of the designation; our own SPHEREx detection confirms it.",
+            field_ra=133.768533, field_dec=-7.242937,
         ),
         Target(
             "rwaur", "RW Aurigae", "variable", 76.956417, 30.401417, 2000.0,
