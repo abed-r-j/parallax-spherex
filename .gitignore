@@ -10,3 +10,5 @@ node_modules/
 .coverage
 htmlcov/
 *.egg-info/
+web/dist/
+web/node_modules/
