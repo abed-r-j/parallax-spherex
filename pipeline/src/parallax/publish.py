@@ -149,17 +149,22 @@ def publish_field(
     return entry
 
 
-def _label_known(blocks: dict, radius_pix: float = 2.5) -> None:
+def _label_known(blocks: dict, radius_pix: float = 2.5, max_vmag: float = 17.5) -> None:
     """Attach the name of a predicted solar-system object to detections that sit on it."""
     by_frame: dict[int, list[dict]] = {}
     for o in blocks.get("sso", []):
+        # Objects fainter than V ~ 17.5 are below the single-frame depth: a residual that
+        # happens to sit near one is far more likely to be noise than the object itself.
+        if o.get("vmag") is not None and o["vmag"] > max_vmag:
+            continue
         by_frame.setdefault(int(o["frame"]), []).append(o)
     for d in blocks.get("detections", []):
+        if d.get("snr", 0) <= 0:
+            continue
         for o in by_frame.get(int(d["frame"]), []):
             if abs(d["x"] - o["x"]) <= radius_pix and abs(d["y"] - o["y"]) <= radius_pix:
                 d["known"] = o["name"]
-                if d.get("cls") in ("mover", "artifact", "star-residual"):
-                    d["cls"] = "mover"
+                d["cls"] = "mover"
                 break
 
 

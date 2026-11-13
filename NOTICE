@@ -1,0 +1,64 @@
+ParallaX: chromatic difference imaging for the SPHEREx sky
+Copyright 2026 Abed El Rahmane Jaafir and Mohamad Alayli (team ZENITH LABS)
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this software except in compliance with the License. A copy of the License is in
+the file LICENSE and at http://www.apache.org/licenses/LICENSE-2.0
+
+This product was created for the NASA Space Apps Challenge 2026 (challenge
+"Planet X and SPHEREx", local event Beirut). It is not affiliated with or
+endorsed by NASA, JPL, Caltech, IPAC, ESA or IMCCE.
+
+--------------------------------------------------------------------------------
+Data acknowledgements
+--------------------------------------------------------------------------------
+
+This publication makes use of data products from the Spectro-Photometer for the
+History of the Universe, Epoch of Reionization and Ices Explorer (SPHEREx), which
+is a joint project of the Jet Propulsion Laboratory and the California Institute
+of Technology, and is funded by the National Aeronautics and Space
+Administration.
+
+This research has made use of the NASA/IPAC Infrared Science Archive, which is
+funded by the National Aeronautics and Space Administration and operated by the
+California Institute of Technology.
+
+SPHEREx Level-2 spectral images: Data Release 1, doi:10.26131/IRSA678, and Quick
+Release 3, doi:10.26131/IRSA662.
+
+This work uses data from the European Space Agency (ESA) mission Gaia, Data
+Release 3, processed by the Gaia Data Processing and Analysis Consortium (DPAC).
+
+This work uses the CatWISE2020 catalogue, built from data of the Wide-field
+Infrared Survey Explorer (WISE) and NEOWISE, served by the NASA/IPAC Infrared
+Science Archive.
+
+This research has made use of LTE SkyBoT VO tool (IMCCE, Observatoire de Paris;
+Berthier et al. 2006, bibcode 2006ASPC..351..367B).
+
+NASA/JPL Solar System Dynamics. Data retrieved on 13 November 2026. Horizons
+System. https://ssd.jpl.nasa.gov
+
+--------------------------------------------------------------------------------
+Third-party components
+--------------------------------------------------------------------------------
+
+The built website bundles:
+
+  * React and React DOM, Copyright (c) Meta Platforms, Inc. and affiliates,
+    MIT License.
+  * IBM Plex Sans and IBM Plex Mono, Copyright IBM Corp., SIL Open Font
+    License 1.1. "Plex" is a reserved font name; the font files are
+    redistributed unmodified through the @fontsource packages.
+
+The Python pipeline depends on, and does not redistribute, NumPy, SciPy,
+Astropy, HTTPX, Pillow, FastAPI, Uvicorn and Typer, among others. The complete
+list of dependencies with their licences is in THIRD_PARTY_LICENSES.md.
+
+--------------------------------------------------------------------------------
+Use of SI (AI)
+--------------------------------------------------------------------------------
+
+The software, documents and figures were produced with the help of an SI coding
+assistant (Claude, by Anthropic), directed, reviewed and run by the team. See
+docs/SI_DISCLOSURE.md.

@@ -43,9 +43,13 @@ of `n` x `n` pixels of `scale` arcsec centred on (`ra0`, `dec0`). Array layout i
               "naivePartner": [], "gatedPartner": [], "nRef": [] },
   "campaigns": [ { "index": 0, "start": "2025-08-15", "end": "2025-08-28", "nFrames": 120 } ],
   "gaia": [], "wise": [], "sso": [], "detections": [], "candidates": [],
-  "science": {}, "ledger": {}
+  "science": {}, "ledger": {},
+  "live": {}
 }
 ```
+
+`live` is present only on fields built in the browser (see "Fields built in the browser"
+below); pipeline packs do not carry it.
 
 ### `encoding` and the `img` / `tpl` sections
 
@@ -67,8 +71,8 @@ so `v = soft * sinh(lo + (q - 1) / 65534 * (hi - lo))`.
 | `flags` | uint8 | [N, n, n] | bit 1 = no data / dead pixel, 2 = suspect (transient, overflow, non-linear, persistence), 4 = catalogued source, 8 = pipeline outlier |
 | `tpl` | uint16 | [N, n, n] | chromatic template: what a static sky would look like in this frame, predicted from the *other* survey passes at this frame's per-pixel wavelength. Encoded like `img`. 0 = no prediction |
 | `snrCorr` | int8 | [N, n, n] | (img - tpl) / sigma, times 4, clipped to +-127; -128 = undefined |
-| `snrNaive` | int8 | [N, n, n] | same for the naive pair difference (frame minus `naivePartner`) |
-| `snrGated` | int8 | [N, n, n] | same for the wavelength-gated pair difference (frame minus `gatedPartner`); all -128 when the frame has no partner |
+| `snrNaive` | int8 | [N, n, n] | same for the naive pair difference (frame minus `naivePartner`). The sigma includes the fitted "star noise" term (see RESULTS.md section 2.2), not only the statistical variance |
+| `snrGated` | int8 | [N, n, n] | same for the wavelength-gated pair difference (frame minus `gatedPartner`), also with the star-noise term in sigma; all -128 when the frame has no partner |
 | `stack` | float32 | [C, 6, n, n] | per survey pass, per detector, inverse-variance mean image in MJy/sr (NaN = no data) |
 
 Sections other than `img`, `flags` and `stack` may be absent; the app must cope.
@@ -88,18 +92,38 @@ Sections other than `img`, `flags` and `stack` may be absent; the app must cope.
 ### Overlays
 
 * `gaia[]`: `{ id, ra, dec, pmRa, pmDec, plx, g }` at epoch 2016.0 (Gaia DR3); the app
-  moves each star to the frame date.
-* `wise[]`: `{ id, ra, dec, w1, w2, pmRa, pmDec }` (CatWISE2020).
+  moves each star to the frame date. `id` is a **string**: Gaia source identifiers exceed
+  2^53 and would lose digits as JSON numbers. `ra`, `dec` in degrees, `pmRa` (includes
+  cos(dec)) and `pmDec` in mas/yr, `plx` in mas, `g` in magnitudes.
+* `wise[]`: `{ id, ra, dec, w1, w2, pmRa, pmDec }` (CatWISE2020). Positions are the
+  catalogue's motion-fit positions at epoch MJD 57170 (**2015.4**), in degrees; `pmRa` and
+  `pmDec` are in **mas/yr** (converted from the table's arcsec/yr); `w1`, `w2` in Vega
+  magnitudes. Rows that come from the AllWISE fallback (used where CatWISE2020 has a hole)
+  are at epoch 2010.56. CatWISE motions are unreliable for very fast stars (Barnard's Star
+  appears as two entries with wrong motions), so the app should not use them to move fast
+  stars.
 * `sso[]`: known solar-system objects predicted inside a frame:
-  `{ frame, name, number, ra, dec, x, y, vmag, rateRa, rateDec, source }` (rates arcsec/h).
+  `{ frame, name, number, ra, dec, x, y, vmag, rateRa, rateDec, source }`. `ra`, `dec`,
+  `x`, `y` are the position as seen from SPHEREx at the frame time (JPL Horizons) when
+  `source` says it was refined, otherwise the geocentric SkyBoT position. `rateRa` and
+  `rateDec` (arcsec/h) are always the **geocentric** rates from SkyBoT, because the rate seen
+  from the spacecraft wobbles with its 98-minute orbit. `vmag` may be **null**.
 
 ### Detections and candidates
 
-* `detections[]`: `{ frame, x, y, ra, dec, snr, fluxUJy, cls, known }` from `snrCorr`.
-  `cls` is `mover`, `variable`, `motion-dipole`, `chromatic`, `star-residual` or `artifact`;
-  `known` is the name of a matching catalogued solar-system object or null.
-* `candidates[]`: linked detections: `{ id, cls, frames: [], ra: [], dec: [], mjd: [],
-  rate: arcsec/h or null, pa: deg or null, known, note }`.
+* `detections[]`: `{ frame, x, y, ra, dec, snr, fluxUJy, cls, known, npix, evidence }` from
+  `snrCorr`. `cls` is `mover`, `variable`, `motion-dipole`, `chromatic`, `star-residual` or
+  `artifact`; `known` is the name of a matching catalogued solar-system object or null;
+  `npix` is the number of connected pixels above the detection threshold; `evidence` is a
+  short sentence saying why the class was given.
+* `candidates[]`: linked or grouped detections: `{ id, cls, frames: [], ra: [], dec: [],
+  mjd: [], rate: arcsec/h or null, pa: deg or null, known, note, chance }`.
+  * Linked movers have `cls: "mover"`, a fitted `rate` and `pa`, and `chance`, the expected
+    number of chance alignments of unrelated detections that would look the same.
+  * Grouped candidates collect repeated detections at one place: ids starting with `D` are
+    `motion-dipole` groups (a bright and a dark lobe side by side) and ids starting with `V`
+    are `variable` groups. For these `rate` and `pa` are null.
+  * The app also shows `verdict` and `snr` columns when a candidate carries them.
 
 ### `science` and `ledger`
 
@@ -108,3 +132,49 @@ Free-form but stable blocks filled by the pipeline:
 `science.lightcurve` (variable-star light curve at matched wavelength),
 `ledger` (the three-way comparison naive / gated / chromatic: false detections per square
 degree, usable-frame yield, depth, injection-recovery curves).
+
+The ledger's per-method results sit under `ledger.modes.<mode>` with the mode keys `naive`,
+`gated` and **`corrected`**. `corrected` is the chromatic template; readers should accept
+`chromatic` as a synonym and label both "Chromatic template". Each mode holds
+`usableFraction`, `depthUJy`, `false`, `falsePlain`, `thresholdAtFixedRate`, `knownSignal`,
+`starNoiseGain` and `detectionsByClassPerFrame`; the injection-recovery curves are under
+`ledger.injection.atThreshold5` and `ledger.injection.atFixedRate`.
+
+## Fields built in the browser (`meta.live`)
+
+For coordinates outside the published packs the web app can build a field itself from the
+public archive (`web/src/lib/live.ts`). Such a field is handed to the viewer as an ordinary
+pack held in memory, with one extra block, `meta.live`, whose shape is the `LiveInfo`
+interface in `web/src/lib/types.ts`:
+
+```json
+"live": {
+  "source": "...",          "complete": true,
+  "available": 413,         "matching": 55,   "requested": 55,  "dropped": 0,
+  "loaded": 55,             "skipped": 0,     "failed": 0,
+  "bytes": 21400000,        "requests": 111,  "seconds": 11.2,
+  "detectors": [3],         "sizeArcmin": 3,  "indexBuilt": "2026-11-13T..."
+}
+```
+
+| key | meaning |
+|---|---|
+| `source` | where the pixels came from (the public SPHEREx bucket) |
+| `complete` | false while frames are still arriving |
+| `available` | images that cover the position, all detectors |
+| `matching` | of those, in the chosen detectors |
+| `requested` | images requested after the maximum-count cut (evenly spaced in time) |
+| `dropped` | `matching - requested` |
+| `loaded` | images read and resampled |
+| `skipped` | images where the field falls mostly off the detector |
+| `failed` | network errors after all retries |
+| `bytes`, `requests`, `seconds` | cost of the fetch |
+| `detectors` | detectors used (1 to 6; empty means all six) |
+| `sizeArcmin` | requested field size |
+| `indexBuilt` | build time of the sky index that listed the images |
+
+A live field has the `img`, `flags` (only the no-data bit) and `stack` sections. It has no
+`tpl`, `snrCorr`, `snrNaive` or `snrGated` sections and empty `gaia`, `wise`, `sso`,
+`detections`, `candidates`, `science` and `ledger` blocks; the app computes the naive and
+gated pair differences itself and labels them as browser-computed. The numbers in the example
+are illustrative of a real M51 run (55 images, 21.4 MB, 111 requests).

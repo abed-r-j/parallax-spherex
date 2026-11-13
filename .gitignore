@@ -12,3 +12,6 @@ htmlcov/
 *.egg-info/
 web/dist/
 web/node_modules/
+presentation/node_modules/
+paper/node_modules/
+.tools/

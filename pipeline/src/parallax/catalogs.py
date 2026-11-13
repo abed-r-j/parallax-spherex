@@ -14,7 +14,10 @@ empty and the warning says why, so the pipeline can still publish the field.
   ``catwise_2020``. Position is the motion-fit position ``ra_pm``/``dec_pm`` (epoch
   MJD 57170 = 2015.4), magnitudes are ``w1mpro``/``w2mpro`` (Vega), proper motions are
   converted from the catalogue's arcsec/yr to mas/yr to match Gaia. CatWISE motions are
-  noisy and wrong for blended or saturated stars; use Gaia where both exist.
+  noisy and wrong for blended or saturated stars; use Gaia where both exist. Where
+  CatWISE2020 has a hole around a very bright star (R Draconis: no source within
+  4.8 arcmin) the rows come from AllWISE (``allwise_p3as_psd``, epoch 2010.56) and the
+  warning string says so.
 
 Every HTTP response is cached on disk (``data/cache/<service>/``), keyed by the request.
 
@@ -31,6 +34,7 @@ import csv
 import hashlib
 import io
 import json
+import logging
 import os
 from math import cos, hypot, radians
 from pathlib import Path
@@ -41,6 +45,7 @@ import httpx
 USER_AGENT = "ParallaX-SpaceApps2026/1.0"
 GAIA_TAP = "https://gea.esac.esa.int/tap-server/tap/sync"
 IRSA_TAP = "https://irsa.ipac.caltech.edu/TAP/sync"
+IRSA_TIMEOUT = 420.0  # a CatWISE cone takes 15-25 s normally, over 200 s when IRSA is busy
 CATWISE_EPOCH_MJD = 57170.0
 GAIA_EPOCH = 2016.0
 PIXEL_ARCSEC = 6.15
@@ -170,11 +175,13 @@ def catwise_cone(ra: float, dec: float, radius_deg: float, w1max: float = 17.5,
         f"AND w1mpro < {w1max:.2f} ORDER BY w1mpro"
     )
     try:
-        text = fetch_text("catwise", IRSA_TAP, {"QUERY": q, "FORMAT": "CSV"},
+        text = fetch_text("catwise", IRSA_TAP, {"QUERY": q, "FORMAT": "CSV"}, timeout=IRSA_TIMEOUT,
                           cache_dir=cache_dir, accept=_is_csv("source_name"))
         rows = _csv_rows(text, "source_name")
     except Exception as e:
         return [], f"CatWISE2020 unavailable ({type(e).__name__}: {str(e)[:120]})"
+    if not rows:
+        return _allwise_cone(ra, dec, radius_deg, w1max, top, cache_dir)
     out = []
     for r in rows:
         pmra, pmdec = _num(r["pmra"], 6), _num(r["pmdec"], 6)
@@ -186,6 +193,65 @@ def catwise_cone(ra: float, dec: float, radius_deg: float, w1max: float = 17.5,
             "pmDec": None if pmdec is None else round(pmdec * 1000.0, 1),
         })
     return out, ""
+
+
+def _allwise_cone(ra: float, dec: float, radius_deg: float, w1max: float, top: int,
+                  cache_dir: Path | None) -> tuple[list[dict], str]:
+    """AllWISE instead of CatWISE2020, for the holes CatWISE leaves around very bright stars.
+
+    Measured: CatWISE2020 has no source at all within 4.8 arcmin of the Mira variable
+    R Draconis, while AllWISE has 50. AllWISE positions are at epoch 2010.56 and its
+    apparent motions are already in mas/yr. NOT YET VERIFIED LIVE: the two COUNT queries
+    behind the numbers above worked, but the row query below timed out at IRSA on the
+    night it was written, so its column list is the documented AllWISE one, untested.
+    """
+    q = (
+        f"SELECT TOP {int(top)} designation, ra, dec, w1mpro, w2mpro, pmra, pmdec "
+        "FROM allwise_p3as_psd "
+        f"WHERE CONTAINS(POINT('ICRS', ra, dec), "
+        f"CIRCLE('ICRS', {ra:.6f}, {dec:.6f}, {radius_deg:.5f})) = 1 "
+        f"AND w1mpro < {w1max:.2f} ORDER BY w1mpro"
+    )
+    try:
+        text = fetch_text("allwise", IRSA_TAP, {"QUERY": q, "FORMAT": "CSV"}, timeout=IRSA_TIMEOUT,
+                          cache_dir=cache_dir, accept=_is_csv("designation"))
+        rows = _csv_rows(text, "designation")
+    except Exception as e:
+        return [], ("CatWISE2020 has no sources here and AllWISE is unavailable "
+                    f"({type(e).__name__}: {str(e)[:100]})")
+    out = [{"id": r["designation"].strip(), "ra": _num(r["ra"], 7), "dec": _num(r["dec"], 7),
+            "w1": _num(r["w1mpro"], 3), "w2": _num(r["w2mpro"], 3),
+            "pmRa": _num(r["pmra"], 1), "pmDec": _num(r["pmdec"], 1)} for r in rows]
+    warn = "CatWISE2020 has no sources in this cone (bright-star hole); used AllWISE instead"
+    return out, warn if out else ""
+
+
+WARNINGS: list[str] = []  # warning strings of the list-only wrappers below, newest last
+
+
+def _note(warning: str) -> None:
+    if warning:
+        WARNINGS.append(warning)
+        logging.getLogger("parallax.catalogs").warning(warning)
+
+
+def gaia_dr3(ra: float, dec: float, radius_arcsec: float,
+             cache_dir: Path | None = None) -> list[dict]:
+    """List-only form of :func:`gaia_cone` used by ``parallax.publish`` (radius in arcsec).
+
+    A failure gives ``[]``; the reason is appended to ``catalogs.WARNINGS`` and logged.
+    """
+    rows, warning = gaia_cone(ra, dec, radius_arcsec / 3600.0, cache_dir=cache_dir)
+    _note(warning)
+    return rows
+
+
+def catwise(ra: float, dec: float, radius_arcsec: float,
+            cache_dir: Path | None = None) -> list[dict]:
+    """List-only form of :func:`catwise_cone` used by ``parallax.publish``."""
+    rows, warning = catwise_cone(ra, dec, radius_arcsec / 3600.0, cache_dir=cache_dir)
+    _note(warning)
+    return rows
 
 
 def field_radius_deg(n: int, scale: float = PIXEL_ARCSEC, margin_pix: float = 2.0) -> float:

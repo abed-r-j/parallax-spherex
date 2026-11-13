@@ -151,6 +151,25 @@ def test_box_flux_recovers_a_point_source():
     assert np.isnan(movers.box_flux(img, 1, 1)[0])  # box falls off the image
 
 
+def test_most_cross_check_agrees_with_find_images(monkeypatch, tmp_path):
+    """IRSA MOST lists the same images; its positions agree to better than 1 arcsec."""
+    seen = {}
+
+    def request(method, url, params, timeout):
+        seen.update(params)
+        return fx("most_europa.tbl")
+
+    monkeypatch.setattr(catalogs, "_request", request)
+    rows = movers.most_search(20000052, "2025-08-20", "2025-08-22", cache_dir=tmp_path)
+    assert seen["obj_name"] == "20000052:NID" and seen["catalog"] == "spherex"
+    assert len(rows) == 4
+    assert all(r["name"].startswith("level2_2025W34_") and r["name"].endswith(".fits")
+               for r in rows)
+    assert all(60907.0 < r["mjd"] < 60909.0 and 12.0 < r["vmag"] < 12.6 for r in rows)
+    assert all(abs(r["dec"] - 11.21) < 0.01 and 54.6 < r["ra"] < 55.0 for r in rows)
+    assert movers.parse_ipac_table("no table here") == []
+
+
 def test_register_target_replaces_by_key(tmp_path):
     fn = tmp_path / "extra_targets.json"
     movers.register_target(fn, {"key": "a", "ra": 1.0})

@@ -154,6 +154,17 @@ def test_skybot_failure_gives_empty_block(monkeypatch, tmp_path):
     assert rows == [] and len(warnings) == 1 and "SkyBoT failed" in warnings[0]
 
 
+def test_publish_interface(monkeypatch, tmp_path):
+    """parallax.publish calls sso.known_objects(field, cache_dir=...) and expects a list."""
+    monkeypatch.setattr(catalogs, "_request", fake_net(
+        fx("skybot_europa.json"), httpx.ConnectError("down")))
+    before = len(catalogs.WARNINGS)
+    rows = sso.known_objects(stub_field(), cache_dir=tmp_path)
+    assert isinstance(rows, list) and len(rows) == 6
+    assert "Horizons failed for Europa" in catalogs.WARNINGS[-1]
+    del catalogs.WARNINGS[before:]
+
+
 def test_empty_skybot_answer_means_no_objects_and_is_not_cached(monkeypatch, tmp_path):
     calls: list[str] = []
     monkeypatch.setattr(catalogs, "_request", fake_net("", calls=calls))

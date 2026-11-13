@@ -1,0 +1,33 @@
+1
+00:00:00,000 --> 00:00:03,000
+We are Abed and Mohamad, team ZENITH LABS.
+
+2
+00:00:03,000 --> 00:00:07,000
+Pluto was found by blinking two photos. We
+blink SPHEREx.
+
+3
+00:00:07,000 --> 00:00:11,500
+This is ParallaX: see what really moved or
+changed in the infrared.
+
+4
+00:00:11,500 --> 00:00:15,500
+SPHEREx never repeats a colour, so stars
+become false alarms.
+
+5
+00:00:15,500 --> 00:00:20,500
+From NASA’s open data, we predict each
+frame’s own colours, and subtract.
+
+6
+00:00:20,500 --> 00:00:25,000
+Next: anyone types coordinates and
+explores the changing sky.
+
+7
+00:00:25,000 --> 00:00:28,500
+ParallaX: open source, open data.
+

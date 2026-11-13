@@ -1,0 +1,330 @@
+% ParallaX paper, IEEE conference format. GENERATED from paper.html by html_to_tex.py:
+% edit paper.html and re-run the script, or edit both files together.
+% Compile (for example on Overleaf): pdflatex main, bibtex main, pdflatex main, pdflatex main.
+% SI disclosure: written with the help of an SI coding assistant (Claude), checked by the team.
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{cite}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{url}
+
+\begin{document}
+
+\title{ParallaX: Chromatic Template Differencing for Time-Domain Exploration of the SPHEREx All-Sky Spectral Survey\thanks{Team ZENITH LABS, NASA Space Apps Challenge 2026, Beirut. Not affiliated with or endorsed by NASA.}}
+
+\author{\IEEEauthorblockN{Abed El Rahmane Jaafir}
+\IEEEauthorblockA{\textit{Saint Joseph University of Beirut}\\
+Beirut, Lebanon}
+\and
+\IEEEauthorblockN{Mohamad Alayli}
+\IEEEauthorblockA{\textit{Lebanese American University}\\
+Beirut, Lebanon}}
+
+\maketitle
+
+
+\begin{abstract}
+SPHEREx maps the whole sky every six months in 102 near-infrared channels, but it never images a sky position twice at the same wavelength: each exposure passes through a linear variable filter, so every pixel has its own wavelength, and the 6.15~arcsec pixels under-sample the image. Blinking or subtracting two dates therefore makes static stars look like changes. We present ParallaX, an open web tool and pipeline that shows how any SPHEREx field changes with time. Its core is a chromatic template: for each frame we predict the static sky at that frame's per-pixel wavelength, by local-linear regression over the spectrum each pixel showed in the other survey passes, and subtract it under an empirically calibrated noise model. On five fields of real Level-2 data (1,991 images) the template is 3 to 15\% deeper than a wavelength-gated pair difference, recovers injected moving sources 1.2 to 1.8 times fainter on blank sky at a matched false-detection rate, and gives fewer false detections in four fields. It rescues few frames, and pair differences show one-to-two-pixel stellar motion better. We recover the proper motions of Barnard's Star and Epsilon Indi~B within one sigma, and find (52)~Europa and Pluto within 0.05 pixel of their predicted positions. A distant planet is the motivation of this work, not a claim.
+\end{abstract}
+
+\begin{IEEEkeywords}
+astronomical image processing, citizen science, difference imaging, infrared surveys, local regression, moving-object detection, spectrophotometry, time-domain astronomy.
+\end{IEEEkeywords}
+
+\section{Introduction}
+
+Pluto, the original ``Planet~X'', was found by comparing two photographs of the same sky taken on different dates and noticing one point of light that had shifted~\cite{spaceapps2026}. In the Backyard Worlds project, volunteers inspect animations built from time-resolved coadds of WISE images and have found brown dwarfs below the single-exposure limit~\cite{kuchner2017}; the WiseView viewer~\cite{caselden2018} serves the same time-resolved unWISE coadds~\cite{meisner2018coadds} to anyone with a browser.
+
+SPHEREx~\cite{bock2026}, launched in March 2025, surveys the entire sky twice a year at 0.75--5.0~$\mu$m in 102 spectral channels. The NASA Space Apps Challenge 2026 asked for a public web tool that displays SPHEREx images of any patch of sky ``like a little video'', so that anyone can spot objects that move or vary~\cite{spaceapps2026}.
+
+The difficulty is in the instrument. Each detector sits behind a linear variable filter (LVF), so the wavelength changes continuously across the image and every pixel of every exposure has its own wavelength~\cite{bock2026,akeson2026}. A revisit lands on another part of the filter, so two dates differ in colour as well as in time, and a naive blink turns every star with a sloped spectrum into a false alarm. The pixels are also coarse (6.15~arcsec)~\cite{expsupp2026} and under-sample the point-spread function, so the pixel values of a star change with the sub-pixel pointing even at a fixed wavelength.
+
+ParallaX contributes:
+
+\begin{itemize}
+\item a \emph{chromatic template} that predicts, for every frame, the static sky at that frame's per-pixel wavelength from the other survey passes (Section~IV);
+\item a reproducible three-way ledger (naive pair, wavelength-gated pair, chromatic template) with injection-recovery tests on real frames and its measured limits (Sections~V,~VI);
+\item validation on the five challenge targets, an asteroid and Pluto;
+\item a serverless access path: a 45.6~MB static index of all 1,628,230 public Level-2 images and cutouts read from the public archive by HTTP range requests, in the browser.
+\end{itemize}
+
+\section{Background and Related Work}
+
+\subsection{The SPHEREx Instrument and Survey}
+
+SPHEREx observes with six 2040$\times$2040-pixel detector arrays (bands D1--D6) that together cover 0.75--5.0~$\mu$m; a dichroic lets one pointing expose two arrays at once (D1/D4, D2/D5, D3/D6), each seeing about 3.5$^\circ\times$11.3$^\circ$~\cite{bock2026,expsupp2026}. The 102 channels (17 per band) have a median resolving power of 34--42 in bands 1--4 and 112--128 in bands 5 and 6~\cite{expsupp2026}. The pixel scale is 6.15~arcsec. From a Sun-synchronous low Earth orbit the telescope looks about 90$^\circ$ from the Sun along a great circle that rotates once a year, so the whole sky is covered twice a year, with deep fields near the ecliptic poles~\cite{bock2026}. In the archive, a mid-latitude position is exposed in bursts of up to four frames about 2.2~min apart, each one channel further in wavelength; a typical position collects about 75 pointings per survey pass within roughly two weeks, and passes repeat about every six months.
+
+\subsection{Image Differencing and Wavelength Gating}
+
+Difference imaging matches a reference image to a new image and subtracts it, classically by fitting a convolution kernel~\cite{alard1998} or by the statistically optimal ZOGY subtraction~\cite{zackay2016}. Both assume that the two images share a bandpass and that the PSF is sampled well enough to be matched. Neither holds for SPHEREx single exposures. Simple viewers instead avoid the colour problem by \emph{gating}: two frames are compared only if their wavelengths agree within a tolerance. Gating is robust, but its noise is that of a single partner frame and it does nothing about pixel sampling. It is our baseline.
+
+\subsection{Moving Objects and Citizen Science}
+
+Surveys find moving objects by linking detections across exposures~\cite{holman2018} or by shifting and stacking along trial tracks~\cite{rice2020}. For slow, faint, nearby objects the human blink of time-resolved coadds remains effective~\cite{kuchner2017,meisner2018coadds}.
+
+\subsection{A Distant Planet in the Infrared}
+
+The clustering of distant Kuiper-belt orbits led to the Planet Nine hypothesis~\cite{batygin2016}, with an estimated mass of about six Earth masses and a semimajor axis of about 380~au~\cite{brown2021}. Its predicted brightness is low: a fiducial model at 622~au has V~$\approx$~21.6~\cite{fortney2016}. Searches of WISE data found no distant companion~\cite{luhman2014search} and exclude W1~$<$~16.7 over three quarters of the sky~\cite{meisner2018p9}; a far-infrared search reports one candidate needing follow-up~\cite{phan2025}. The SPHEREx 5$\sigma$ depth after four all-sky maps is 19.5--19.9~AB mag at 0.75--3.8~$\mu$m and 17.8--18.8 at 3.8--5.0~$\mu$m~\cite{bock2026}. In our assessment a detection of such a body in single SPHEREx frames is implausible; the question is our motivation, and we test the method on objects that are really there.
+
+\section{Data and Access}
+
+We use the SPHEREx Level-2 spectral images of Data Release~1 \cite{spherexdr1} and Quick Release~3 \cite{spherexqr3}, retrieved from the NASA/IPAC Infrared Science Archive (IRSA) on 13 November 2026. A Level-2 file is a 65~MB multi-extension FITS file of one detector exposure~\cite{akeson2026,expsupp2026}: the calibrated image (MJy/sr), a flag image, a variance image, a zodiacal-light model, a table of PSFs, and a wavelength table that gives the central wavelength and bandwidth on a grid of control points.
+
+\emph{Range-request cutouts.} The archive serves byte ranges over HTTP, so our reader fetches only the header, the pixel rows of the four image extensions that cover the cutout, and the wavelength table: about 0.5~MB per image instead of 65~MB, with pixels identical to those of the IRSA cutout service. The 358 images of one field were retrieved in 13 minutes.
+
+\emph{Sky index.} A browser cannot query the archive catalogue directly, so we ship a static index. Each image is a 28-byte record (footprint centre, three corners as tangent-plane offsets, exposure time and a packed file identifier); records are grouped into small binary files by 5$^\circ$ declination band and right-ascension cell. All 1,628,230 public Level-2 images take 45.6~MB, and a position query reads about four cells. Against the live archive at six positions, the index missed no image.
+
+\emph{Fields.} Table~I lists the five challenge fields. Two further fields contain known movers: (52)~Europa (111 frames of detectors 3 and 6; the asteroid is in 24) and Pluto (46 frames of detector 2; Pluto is in 18).
+
+\begin{table}[t]
+\caption{The Five Challenge Fields}
+\label{tab:fields}
+\centering
+\footnotesize
+\begin{tabular}{@{}lcccl@{}}
+\toprule
+Field & Images & Passes & Size & Target core saturated \\
+\midrule
+Barnard's Star & 357 & 3 & 6.25$'$ & in 99\% of frames \\
+Epsilon Indi B & 454 & 4 & 6.25$'$ & no \\
+WISE 0855$-$0714 & 258 & 3 & 8.3$'$ & no \\
+RW Aurigae & 332 & 3 & 6.25$'$ & in 39\% of frames \\
+R Draconis & 590$^{a}$ & cont.$^{b}$ & 6.25$'$ & in 97\% of frames \\
+\bottomrule
+\end{tabular}
+\par\vspace{3pt}
+\parbox{\linewidth}{\scriptsize $^{a}$Of 2,493 available. $^{b}$Deep field with continuous coverage.}
+\end{table}
+
+\section{Method}
+
+\subsection{A Common Grid that Keeps the Wavelength}
+
+Every cutout is resampled bilinearly onto one north-up tangent-plane grid of 6.15~arcsec pixels centred on the field. The zodiacal model and a robust residual sky level are subtracted. For each output pixel we also evaluate the wavelength table at the corresponding detector position, so that frame $t$ carries, for every pixel $p$, a flux $I_{t}$($p$), a variance $v_{t}$($p$), a wavelength $\lambda_{t}$($p$), a bandwidth $b_{t}$($p$) and the union of the flags of the contributing pixels. Frames are grouped into survey passes: a new pass starts after a gap of more than 30 days.
+
+\subsection{The Chromatic Template}
+
+For a target frame $t$ and a pixel $p$, the reference samples are the measurements ($y_{i}$, $v_{i}$, $\lambda_{i}$) of the same sky pixel in all frames $i$ of the \emph{other} survey passes (leave-own-pass-out), excluding flagged pixels. Anything that moved or varied between passes is absent from the prediction and survives the subtraction. With $\Delta_{i}$~=~$\lambda_{i}$~$-$~$\lambda_{t}$($p$), each sample receives a Gaussian kernel weight tied to the local bandwidth,
+
+\begin{equation}
+K_i=\exp\!\left(-\Delta_i^2/2h^2\right)\ \ \text{for}\ |\Delta_i|<3h,\qquad h=s\,b_t(p),
+\end{equation}
+
+\noindent and zero otherwise, where $s$ is a scale factor. The template is the intercept of a weighted local-linear fit in wavelength,
+
+\begin{equation}
+T_t(p)=\hat a,\qquad(\hat a,\hat c)=\operatorname*{arg\,min}_{a,c}\sum_i w_i\,(y_i-a-c\Delta_i)^2,
+\end{equation}
+
+\noindent with $w_{i}$~=~$K_{i}$/$v_{i}$. The fit is a linear smoother, $T_{t}$($p$)~=~$\sum_{i}$~$\ell_{i}y_{i}$, with
+
+\begin{equation}
+\ell_i=\frac{w_i\,(S_2-S_1\Delta_i)}{S_0S_2-S_1^2},\qquad S_k=\sum_i w_i\Delta_i^k,
+\end{equation}
+
+\noindent from which follow the statistical variance of the template and the effective number of references,
+
+\begin{equation}
+\sigma_T^2=\sum_i \ell_i^2 v_i,\qquad n_{\mathrm{eff}}=1\Big/\sum_i \ell_i^2 .
+\end{equation}
+
+\noindent Where the samples do not span a line ($S_{0}S_{2}$~$-$~$S_{1}^{2}$~$\le$~10$^{-4}S_{0}S_{2}$) the fit falls back to the weighted mean.
+
+\emph{Adaptive kernel.} The fit starts with a narrow kernel, $s$~=~0.5, and is repeated with $s$~=~1, 2 and 4 only for pixels where $n_{\mathrm{eff}}$ is still below the target of 4; a wider fit replaces the previous one only if it raises $n_{\mathrm{eff}}$. Pixels that end with $n_{\mathrm{eff}}$~$<$~2 receive no prediction. A dense spectrum is thus followed closely (Fig.~1) and a sparse one still gets a fit. With two or three other passes, $n_{\mathrm{eff}}$ is about 6 per pixel.
+
+\emph{Robust rejection.} Before the fits, one pass with a wide kernel ($s$~=~2) removes outlying samples, so that a cosmic ray or a mover sitting in a reference frame cannot drag the fit. A sample is dropped if its leave-one-out residual $r_{i}$/max(1~$-$~$\ell_{i}$,~0.3) exceeds 3.5~($v_{i}$~+~$d^{\,2}$)$^{1/2}$, where $r_{i}$ is the residual from the fit and $d$ is 1.4826 times the median absolute residual.
+
+\emph{Empirical model error.} Statistical variance does not describe how well other visits predict an under-sampled star. We measure the kernel-weighted scatter $s_{w}^{2}$ of the reference samples about the fit and compare it with their mean variance $\bar{v}$. The scatter is measured \emph{within} each reference pass, after removing the mean residual of that pass: a source that really changed between two reference passes then does not inflate the error and hide itself, while pixel-phase noise, which is random from frame to frame, is measured in full. With $\nu$ the effective degrees of freedom (kernel-effective sample number minus two fitted parameters and one level per extra pass), the model error is kept only where the excess is significant (otherwise it is biased high on empty sky):
+
+\begin{equation}
+m^2=\begin{cases} s_{\mathrm{w}}^2-\bar v, & s_{\mathrm{w}}^2>\bar v\,\bigl(1+1.5\sqrt{2/\nu}\bigr),\\ 0, & \text{otherwise.}\end{cases}
+\end{equation}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig1_template_spectrum.png}
+\caption{The chromatic template for one bright pixel (a field star) of the Barnard's Star field. Blue points: the reference samples from the other survey passes. Green line and band: the template and its total uncertainty at the wavelengths of this pass. Orange squares: what this pass measured. Look at the scatter about the line below 2~$\mu$m: it far exceeds the error bars and is the pixel-phase noise that the model-error term measures.}
+\label{fig:1}
+\end{figure}
+
+\emph{Calibrated signal-to-noise.} The residual of frame $t$ is $D_{t}$~=~$I_{t}$~$-$~$T_{t}$~$-$~$o_{t}$, where $o_{t}$ is the median of the raw difference over faint pixels ($|T_{t}|$ below three statistical sigma). Its variance is
+
+\begin{equation}
+\sigma_t^2=\alpha_t^2\,(v_t+\sigma_T^2)+\max\!\bigl[(g_dC_t)^2,\;m^2\,(1+1/n_{\mathrm{eff}})\bigr],
+\end{equation}
+
+\noindent and the detection statistic is $D_{t}$/$\sigma_{t}$. Here $\alpha_{t}$ is a per-frame scale (limited to 0.5--5) that gives the faint-sky residuals unit robust variance. $C_{t}$ is the local contrast of the subtracted image, the maximum minus the minimum of each 3$\times$3 neighbourhood, which measures how much a sub-pixel shift can change a pixel. The ``star-noise'' amplitude $g_{d}$ is fitted for each detector $d$ as the robust width of $D_{t}$/$C_{t}$ over pixels whose contrast exceeds ten statistical sigma, leaving out the surroundings of the known target. The model-error term counts the scatter of the target sample and of the fit. The fitted $g_{d}$ is roughly 0.06--0.14 in four fields: a bright star's pixel is uncertain by about a tenth of its local contrast.
+
+\subsection{Two Baselines}
+
+\emph{Naive pair:} a frame minus the frame of the same detector, from another pass, that is nearest in time. \emph{Wavelength-gated pair:} a frame minus the other-pass frame (any detector) whose wavelength at the field centre is closest, accepted only if the two differ by less than 0.5 bandwidth; otherwise the frame has no result. Both receive the same calibration as the template (offset, noise scale and the fitted star-noise term, with $C_{t}$ taken from the partner frame and no model-error term), so no method is favoured by its noise model; we also report false-detection rates under statistical noise alone.
+
+\subsection{Detection, Classification and the Same-Visit Veto}
+
+A detection is a connected group of pixels of one sign above 2.5 in signal-to-noise whose peak reaches 5 and that has at least two pixels. Each detection is classified, with its evidence recorded, as a \emph{motion dipole} (opposite lobes on a static source), \emph{variable} (same sign through the frames of a pass), \emph{mover} (positive, point-like, no static counterpart), \emph{chromatic} or \emph{star residual}, or \emph{artifact}.
+
+The survey pattern provides a free veto: a position is normally exposed again about two minutes later, and nothing in the sky moves a pixel in that time. A mover candidate whose signal-to-noise in the next same-detector exposure of the visit (within six minutes) is less than half its own is reclassified as a cosmic ray or detector transient. In the first 202 frames of the Barnard field this removed 14 of 17 single-frame mover candidates, some at a signal-to-noise of 20 to 70 and unflagged in the archive.
+
+\subsection{Injection-Recovery and the Matched False Rate}
+
+Achromatic Gaussian point sources, with the header PSF width broadened by the pixel and by the resampling, are added to the target frames only, at eleven fluxes from 50 to 3000~$\mu$Jy. Because every method subtracts data from other passes, an injection changes the residual by exactly the injected image and leaves $\sigma_{t}$ unchanged. Each frame receives up to two sources on blank sky (nothing above 3$\sigma$ within two pixels) and two next to a star (within two pixels of a pixel above 10$\sigma$), at a new random position in every frame. A source counts as recovered if a positive detection lies within 1.5 pixels and there was no detection within 2.5 pixels before the injection; frames without a result count as misses.
+
+A common threshold would reward the most optimistic noise model. We therefore find, for each method, the threshold at which the real frames give the same false-detection rate, 0.5 per usable frame, and quote the flux $f_{50}$ at which half of the injected sources are recovered at that threshold. False detections are counted outside 14 pixels of the known changing target.
+
+\subsection{Astrometry and Photometry for Validation}
+
+Positions are measured on clipped mean stacks, one per survey pass and detector. The centre fit assumes only a round profile of free shape (a sum of concentric Gaussians solved linearly, on a tilted plane), so it also works on the wings of a star whose core is saturated. The scatter between the detectors' independent positions sets the error. Each pass is registered with the median shift of field stars, and proper motion is fitted with the parallax fixed or free.
+
+A raw light curve mixes colour with variability, so we form matched-wavelength ratio spectra: each flux is divided by the reference pass's spectrum interpolated to the same wavelength. Fluxes come from aperture photometry (radius 2.5 pixels) or, for saturated stars, from a ring on the wings (10--13 pixels), which gives relative brightness only. For a target too faint for single frames we fit one moving point source to the pass-minus-mean images of all passes, in which static sources cancel.
+
+Overlays use Gaia DR3~\cite{gaia2023} and CatWISE2020~\cite{marocco2021}. Known solar-system objects are found with SkyBoT~\cite{berthier2016} and refined with JPL Horizons~\cite{horizons}, with SPHEREx itself as the observing site. The pipeline is built on Astropy~\cite{astropy2022}.
+
+\section{Results}
+
+\subsection{The Three-Way Ledger}
+
+Table~II gives the ledger for the five fields, and Figs.~2 and~3 show the Barnard's Star field. The chromatic template is 3 to 15\% deeper than the gated pair in every field. At the matched false-detection rate it recovers moving sources 1.2 to 1.8 times fainter on blank sky (563 against 1025~$\mu$Jy in the Barnard field). At the common threshold of 5 it gives fewer false detections than the gated pair in four of five fields (0.99 against 2.44 per frame in the Barnard field).
+
+Under statistical noise alone, the pair methods give 7.6 to 32 false detections per frame in the four ordinary fields and the template, which carries its model-error map, 1.8 to 2.2. Most of what a simple subtraction flags on SPHEREx data is not change in the sky.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig2_ledger_barnard.png}
+\caption{The ledger for the Barnard's Star field. (a) False detections per square degree per frame at $|$S/N$|$~$>$~5: hatched bars use statistical noise only, solid bars add the fitted star-noise term to every method. The template is lowest in both cases. (b),~(c) Fraction of injected moving point sources recovered, at the thresholds that give each method 0.5 false detections per frame. Look at where each curve crosses the dotted 50\% line: the template reaches it at 563~$\mu$Jy on blank sky, the gated pair at 1025~$\mu$Jy.}
+\label{fig:2}
+\end{figure*}
+
+\begin{table*}[t]
+\caption{Three-Way Ledger on Real SPHEREx Level-2 Frames}
+\label{tab:ledger}
+\centering
+\footnotesize
+\begin{tabular}{@{}llcccccc@{}}
+\toprule
+Field & Method & Usable & Depth & False detections & Same, statistical & $f_{50}$, blank sky & $f_{50}$, next to a star \\
+ & & frames (\%) & ($\mu$Jy) & per frame & noise only & ($\mu$Jy) & ($\mu$Jy) \\
+\midrule
+Barnard's Star & naive pair & 93.6 & 38.9 & 4.64 & 28.70 & 1457 & 2334 \\
+ & gated pair & 96.4 & 33.8 & 2.44 & 31.99 & 1025 & 1668 \\
+ & \textbf{chromatic template} & \textbf{100} & \textbf{30.5} & \textbf{0.99} & \textbf{1.91} & \textbf{563} & \textbf{1047} \\
+\addlinespace
+Epsilon Indi B & naive pair & 100 & 28.4 & 2.51 & 7.56 & 955 & 1524 \\
+ & gated pair & 99.3 & 25.3 & 2.34 & 7.88 & 808 & 1176 \\
+ & \textbf{chromatic template} & \textbf{100} & \textbf{24.5} & \textbf{2.09} & \textbf{2.23} & \textbf{571} & \textbf{1094} \\
+\addlinespace
+RW Aurigae & naive pair & 100 & 30.4 & 3.28 & 24.84 & 1014 & 1349 \\
+ & gated pair & 99.4 & 30.2 & 2.54 & 23.67 & 1150 & 1568 \\
+ & \textbf{chromatic template} & \textbf{100} & \textbf{25.8} & \textbf{1.28} & \textbf{1.81} & \textbf{593} & \textbf{982} \\
+\addlinespace
+WISE 0855$-$0714 & naive pair & 100 & 27.5 & 3.54 & 18.98 & 2193 & not reached \\
+ & gated pair & 98.8 & 19.1 & 2.22 & 19.77 & 859 & 1326 \\
+ & \textbf{chromatic template} & \textbf{99.6} & \textbf{18.0} & \textbf{1.64} & \textbf{2.07} & \textbf{707} & \textbf{1157} \\
+\addlinespace
+R Draconis & naive pair & 100 & 147.4 & 0.49 & 3.27 & 1793 & not reached \\
+ & gated pair & 79.0 & 106.8 & 0.58 & 3.30 & 1743 & not reached \\
+ & chromatic template & 97.1 & 103.1 & 0.61 & 1.26 & 1136 & not reached \\
+\bottomrule
+\end{tabular}
+\par\vspace{3pt}
+\parbox{\linewidth}{\scriptsize Depth: median one-sigma noise of the difference per pixel. False detections: residual sources with $|$S/N$|$~$>$~5 and at least two pixels, outside 14 pixels of the target, per usable frame; the next column switches the fitted star-noise term off. $f_{50}$: flux at which half of the injected moving point sources are recovered, at the threshold that gives each method 0.5 false detections per frame; ``not reached'' means below 50\% at 3000~$\mu$Jy.}
+\end{table*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.72\textwidth]{figures/fig3_three_panel_barnard.png}
+\caption{One frame of the Barnard's Star field (the frame with the median naive wavelength mismatch) as residual signal-to-noise in the three methods, with the same calibration; grey pixels have no data, including the saturated core of the star. At the centre the star has moved north since the other passes, so real lobes appear in every panel. Look away from the centre, where nothing should change: the naive pair shows isolated residuals beyond 5$\sigma$, and the template panel is the quietest.}
+\label{fig:3}
+\end{figure*}
+
+\begin{table*}[t]
+\caption{Measurements of the Five Challenge Targets Against Catalogue Values}
+\label{tab:targets}
+\centering
+\footnotesize
+\begin{tabular}{@{}p{0.13\textwidth}p{0.57\textwidth}p{0.26\textwidth}@{}}
+\toprule
+Target & Measured with ParallaX & Reference \\
+\midrule
+Barnard's Star & proper motion 10.21~$\pm$~0.26~arcsec/yr at position angle 356.3$^\circ$~$\pm$~1.5$^\circ$ (shift of 1.65 pixels over 3 passes, from the wings of a saturated star) & 10.36~arcsec/yr at 355.6$^\circ$ (Gaia DR3) \\
+Epsilon Indi B & 4.64~$\pm$~0.09~arcsec/yr at 122.6$^\circ$~$\pm$~1.3$^\circ$ (shift of 1.02 pixels over 4 passes) & 4.70~arcsec/yr at 122.7$^\circ$ \\
+WISE 0855$-$0714 & moving source at S/N 6.6 in stacks of detectors 5 and 6 only (395~$\pm$~69~$\mu$Jy); 7.81~$\pm$~1.57~arcsec/yr at 278.2$^\circ$~$\pm$~4.3$^\circ$; absent in detectors 1--4 & 8.15~arcsec/yr at 274.8$^\circ$ \\
+RW Aurigae & September 2025 relative to September 2026: 0.37~$\pm$~0.14~mag fainter at 0.75--1.1~$\mu$m and 0.76~$\pm$~0.03~mag brighter at 4.4--5.0~$\mu$m & irregular T~Tauri variable \\
+R Draconis & periodic change significant in 22 of 43 wavelength bins, median peak-to-peak 1.18~mag (2--3~mag near 0.8~$\mu$m, about 1~mag at 4.5~$\mu$m); free period 250~d over 2.1 cycles & Mira variable, catalogued period about 246~d \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\subsection{The Five Challenge Targets}
+
+In Table~III, the two fast stars shift by only 1.65 and 1.02 pixels over the baseline, yet their proper motions are recovered within one sigma. Sub-pixel centres scatter between detectors by 0.04 pixel (0.24~arcsec) for the unsaturated Epsilon Indi~B and by 0.11 pixel on the wings of the saturated Barnard's Star.
+
+WISE~0855$-$0714, the coldest known brown dwarf~\cite{luhman2014wise0855}, is invisible in single frames in every method. A moving source appears only in stacks of detectors 5 and 6, 1.5~arcsec from the predicted position. Its significance of 6.6 comes from non-independent pass differences and about 59 trial positions, and is moderately optimistic. A static neighbour of 277~$\mu$Jy lies inside the same beam at shorter wavelengths. The challenge coordinates are the 2010 WISE position; the source is now about 2~arcmin further west, where we find it.
+
+RW~Aurigae changed in opposite directions at the two ends of the spectrum, while a control star is constant to 0.005~mag. R~Draconis and Barnard's Star saturate SPHEREx, so their fluxes come from the wings and are relative; detector~3 photometry of R~Draconis is unreliable and excluded.
+
+\subsection{Solar-System Movers}
+
+To test the tool on things that really move, we built two fields around known objects (Fig.~4). The main-belt asteroid (52)~Europa (V~$\approx$~12.2) crosses its field in three visits on 20--21 August 2025. Over the 24 frames that contain it, the flux-weighted centroid differs from the Horizons prediction for an observer at SPHEREx by $-$0.05~$\pm$~0.04 and 0.00~$\pm$~0.07 pixel (about 0.3~arcsec). Pluto (V~$\approx$~14.5) drifts 12 pixels in 6.4 days and is seen at 83 to 176 sigma in each of 18 single frames, within +0.03~$\pm$~0.10 and +0.01~$\pm$~0.04 pixel of the prediction.
+
+A set of 60 cutouts that follow Europa through all six detectors (5 August to 15 September 2025) gives a spectrum from single exposures, with no stacking (Fig.~5): 45 clean points from 0.79 to 4.97~$\mu$m. These are box sums, without aperture correction and uncorrected for the change in distance, phase and rotation over the 41 days. On Europa, 757 of 1500 box pixels carry the archive's OUTLIER flag: a pipeline that masks such pixels in the image being searched would erase the asteroid, so we exclude them from the template references only.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/fig4_movers.png}
+\caption{Known movers in single SPHEREx Level-2 frames (6.25~arcmin fields, north up, east left). Orange circles mark the positions predicted by JPL Horizons for an observer at SPHEREx; they are not fitted to the images. Look inside each circle: (52)~Europa crosses the field in ten hours and Pluto drifts westward by a few pixels in six days, each frame at a different wavelength.}
+\label{fig:4}
+\end{figure*}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig5_europa_spectrum.png}
+\caption{Spectrum of (52)~Europa from single SPHEREx exposures, one point per exposure, coloured by detector. Look at the shape: a flat reflected-sunlight continuum of about 80--87~mJy up to 1.9~$\mu$m, a minimum of about 33~mJy near 3.0--3.5~$\mu$m, and a thermal rise to 361~mJy at 4.97~$\mu$m.}
+\label{fig:5}
+\end{figure}
+
+\subsection{System Performance}
+
+For coordinates outside the precomputed fields, the static site looks up the index and reads the pixels from the public archive in the browser, with no server: 55 images of M51 are displayed in 10 to 12~s on a fast connection (one to two minutes on a slow one). Live fields offer the blink, per-pass and per-detector stacks, spectra on the fly and pair differences; the template and ledger need the Python engine (two to four minutes per field on a laptop).
+
+\section{Discussion and Limitations}
+
+\emph{Gating costs few frames.} Between 96 and 99\% of frames find a partner within half a bandwidth (79\% in the R~Draconis deep field), because the survey revisits at nearly repeating wavelengths; the template needs no partner. The advantage of the template is depth and false-alarm rate, not rescued frames.
+
+\emph{Pixel sampling, not colour, is the largest noise term.} The peak pixel of a bright star scatters by 23 to 27\% from frame to frame at fixed wavelength. This is why pair differences flood with false detections under a statistical noise model. Frame registration is not the cause (0.16~arcsec rms on 25 stars).
+
+\emph{For a star that moves one or two pixels, a pair shows the dipole better.} Both lobes exceed 5$\sigma$ in 69\% of Barnard frames for the gated pair against 17\% for the template: a template built from two other passes averages two old positions and dilutes the negative lobe. For such stars the tool defaults to blinking and subtracting per-pass stacks.
+
+\emph{R~Draconis is not a clean test.} The saturated Mira fills the cutout; depth is three to four times worse in every method and the template has slightly more false detections than the gated pair (0.61 against 0.58 per frame).
+
+\emph{Choices.} Injected sources are achromatic Gaussians; the 14-pixel exclusion radius and the matched rate of 0.5 per frame are our choices, recorded in the ledger files.
+
+\emph{Parallax is not measured reliably.} With a free annual term, the fit for Barnard's Star returns about three times its true parallax. Field stars shift between passes by 0.03 to 0.07 pixel, alternating in sign and aligned with the parallax direction; before we corrected for this registration wobble it imitated a parallax 2.7 times too large, and a residual remains whose cause we have not established. SPHEREx always looks about 90$^\circ$ from the Sun, so consecutive passes, six months apart, sit at opposite extremes of the parallax ellipse. Any systematic error that follows this Sun-synchronous pattern alternates in the same way and is degenerate with parallax.
+
+\emph{Reducing pixel-phase noise.} We measure pixel-phase noise but do not model it. Our resampled frames do not keep the sub-pixel phase of the native grid. Storing it for each frame would let the template regress on phase as well as wavelength, and fitting with the archive's position-dependent PSFs would replace bilinear resampling. We expect this to be the largest gain available.
+
+\emph{What the tool can say about a distant planet.} By our own calculation (206265~arcsec divided by the distance in au; not a published result), a body at 300, 500 or 700~au would shift by about 22.9, 13.8 or 9.8~arcmin between consecutive passes, that is 224, 134 or 96 pixels, while moving by two pixels or less within one two-week visit. The search for such a body is therefore a pass-to-pass comparison, which the per-pass stacks support; sensitivity is the obstacle (Section~II-D). ParallaX makes the method verifiable on real movers; it does not make a distant planet detectable, and we report no candidate.
+
+\section{Conclusion and Future Work}
+
+SPHEREx cannot be blinked like a camera: no two exposures of a sky position share a wavelength, and the image is under-sampled. Predicting each frame from the spectrum that every pixel showed in the other passes, with a noise model measured from the data, gives difference images that are deeper and cleaner than wavelength-gated pairs, and the same data yield proper motions, chromatic variability and asteroid positions that agree with catalogues and ephemerides. The gain has measured limits, which we publish with it.
+
+Next steps are a template that models sub-pixel phase with the archive PSFs, co-moving fields with shift-and-stack, and a parallax-aware search between passes.
+
+\section*{Data and Code Availability}
+
+The code (Apache-2.0) is to be published at \url{https://github.com/abed-r-j/parallax-spherex} and the web tool at \url{https://abed-r-j.github.io/parallax-spherex/}; neither is public at the time of writing. Every number in Sections~V and~VI is regenerated by two scripts in the repository.
+
+\section*{Acknowledgments}
+
+This publication makes use of data products from the Spectro-Photometer for the History of the Universe, Epoch of Reionization and Ices Explorer (SPHEREx), which is a joint project of the Jet Propulsion Laboratory and the California Institute of Technology, and is funded by the National Aeronautics and Space Administration. This research has made use of the NASA/IPAC Infrared Science Archive, which is funded by the National Aeronautics and Space Administration and operated by the California Institute of Technology. The data are SPHEREx DR1 (doi:10.26131/IRSA678) and QR3 (doi:10.26131/IRSA662). We also used data from the ESA mission Gaia (DR3), the CatWISE2020 catalogue served by IRSA, the IMCCE SkyBoT service, and the Horizons system of JPL Solar System Dynamics. This work is not affiliated with or endorsed by NASA.
+
+\emph{Use of SI tools.} The software, this document and its figures were produced with the help of an SI coding assistant (Claude, by Anthropic) directed by the team. The team defined the problem and the approach, and reviewed and ran everything. All results are computed by the project's own code from real SPHEREx data; no SI-generated images, video, voices or faces are used. Development began on 12--13 November 2026, before the on-site event of 14--15 November, after the local organizers allowed early preparation.
+
+\bibliographystyle{IEEEtran}
+\bibliography{refs}
+
+\end{document}

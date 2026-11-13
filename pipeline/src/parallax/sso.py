@@ -40,6 +40,7 @@ SI disclosure: written with the help of an SI coding assistant (Claude), checked
 from __future__ import annotations
 
 import json
+import logging
 import re
 import time
 from dataclasses import dataclass
@@ -47,7 +48,7 @@ from pathlib import Path
 
 import numpy as np
 
-from .catalogs import RejectedResponse, fetch_text
+from .catalogs import WARNINGS, RejectedResponse, fetch_text
 from .frames import grid_wcs
 
 SKYBOT_RETRY_S = 2.0
@@ -321,6 +322,18 @@ def _row(frame, obj, ra, dec, x, y, vmag, rate_ra, rate_dec, source) -> dict:
         "rateRa": round(float(rate_ra), 2), "rateDec": round(float(rate_dec), 2),
         "source": source,
     }
+
+
+def known_objects(field, cache_dir: Path | None = None, **kwargs) -> list[dict]:
+    """List-only form of :func:`sso_for_field` used by ``parallax.publish``.
+
+    Warnings go to ``parallax.catalogs.WARNINGS`` and to the ``parallax.sso`` logger.
+    """
+    rows, warnings = sso_for_field(field, cache_dir, **kwargs)
+    for w in warnings:
+        WARNINGS.append(w)
+        logging.getLogger("parallax.sso").warning(w)
+    return rows
 
 
 def sso_for_field(field, cache_dir: Path | None = None, *, refine: bool = True,

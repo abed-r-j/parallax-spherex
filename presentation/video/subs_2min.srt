@@ -1,0 +1,122 @@
+1
+00:00:00,000 --> 00:00:04,500
+We are ZENITH LABS. I am Abed El Rahmane
+Jaafir.
+
+2
+00:00:04,500 --> 00:00:11,000
+And I am Mohamad Alayli. This is ParallaX,
+for the challenge Planet X and SPHEREx.
+
+3
+00:00:11,000 --> 00:00:16,791
+Pluto was found by blinking two
+photographs. The challenge asks for a tool
+
+4
+00:00:16,791 --> 00:00:20,000
+to do that with the SPHEREx infrared sky.
+
+5
+00:00:20,000 --> 00:00:26,319
+But SPHEREx never photographs a spot in
+the same colour twice, and its pixels are
+
+6
+00:00:26,319 --> 00:00:31,000
+coarse. Blink two dates, and stars light
+up as false alarms.
+
+7
+00:00:31,000 --> 00:00:36,500
+So we chose to correct the colour first,
+and only then compare.
+
+8
+00:00:36,500 --> 00:00:42,558
+Our data is open: SPHEREx images from the
+NASA/IPAC archive, with Gaia, CatWISE, JPL
+
+9
+00:00:42,558 --> 00:00:44,000
+Horizons and SkyBoT.
+
+10
+00:00:44,000 --> 00:00:50,094
+A Python pipeline does the science, and a
+React and TypeScript app shows it. An
+
+11
+00:00:50,094 --> 00:00:55,571
+index of more than 1.6 million public
+images lets the browser fetch any
+
+12
+00:00:55,571 --> 00:00:57,500
+position, with no server.
+
+13
+00:00:57,500 --> 00:01:03,500
+Here is Barnard’s Star, blinked pass by
+pass: you can see it move.
+
+14
+00:01:03,500 --> 00:01:08,336
+Here is one frame differenced three ways:
+naive, wavelength-matched, and our
+
+15
+00:01:08,336 --> 00:01:13,173
+chromatic template, which predicts the
+frame at its own wavelengths from the
+
+16
+00:01:13,173 --> 00:01:14,000
+other passes.
+
+17
+00:01:14,000 --> 00:01:19,809
+Click any star for its spectrum. And here
+an asteroid crosses, right under its
+
+18
+00:01:19,809 --> 00:01:21,000
+predicted label.
+
+19
+00:01:21,000 --> 00:01:25,780
+What is distinctive: we publish the
+measurements. At the same false-alarm
+
+20
+00:01:25,780 --> 00:01:30,429
+rate, the template finds moving sources
+1.2 to 1.8 times fainter than a
+
+21
+00:01:30,429 --> 00:01:32,000
+wavelength-matched pair.
+
+22
+00:01:32,000 --> 00:01:37,039
+We started on the twelfth of November,
+before the on-site event, as the
+
+23
+00:01:37,039 --> 00:01:43,000
+organizers allowed. An SI coding assistant
+helped; we directed and checked its work.
+
+24
+00:01:43,000 --> 00:01:48,890
+The hard part was honesty. Bright stars
+saturate, parallax is not measured, and
+
+25
+00:01:48,890 --> 00:01:51,500
+this is not a Planet Nine detector.
+
+26
+00:01:51,500 --> 00:01:55,000
+ParallaX is open source. Thank you.
+

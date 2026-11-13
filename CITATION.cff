@@ -1,0 +1,62 @@
+cff-version: 1.2.0
+message: >-
+  If you use ParallaX, please cite it using the metadata in this file, and
+  cite the SPHEREx data and the NASA/IPAC Infrared Science Archive as described
+  in the README.
+type: software
+title: "ParallaX: chromatic difference imaging for the SPHEREx sky"
+abstract: >-
+  ParallaX is a web tool and Python pipeline that plays SPHEREx Level-2
+  spectral images of any patch of sky as a time sequence. Because every SPHEREx
+  exposure has its own per-pixel wavelength, it predicts the static sky at each
+  frame's wavelengths from the other survey passes (a chromatic template),
+  subtracts it, and reports a reproducible three-way comparison with naive and
+  wavelength-gated pair differencing, including injection-recovery tests on
+  real frames. Entry of team ZENITH LABS to the NASA Space Apps Challenge 2026,
+  challenge "Planet X and SPHEREx". Not affiliated with or endorsed by NASA.
+authors:
+  - family-names: Jaafir
+    given-names: Abed El Rahmane
+    affiliation: Saint Joseph University of Beirut
+  - family-names: Alayli
+    given-names: Mohamad
+    affiliation: Lebanese American University
+version: 1.0.0
+license: Apache-2.0
+repository-code: "https://github.com/abed-r-j/parallax-spherex"
+url: "https://abed-r-j.github.io/parallax-spherex/"
+keywords:
+  - astronomy
+  - SPHEREx
+  - infrared
+  - time-domain
+  - moving objects
+  - difference imaging
+  - citizen science
+  - NASA Space Apps
+references:
+  - type: data
+    title: "SPHEREx Spectral Images, Data Release 1"
+    authors:
+      - name: "SPHEREx Project"
+    doi: 10.26131/IRSA678
+    publisher:
+      name: "NASA/IPAC Infrared Science Archive"
+  - type: data
+    title: "SPHEREx Spectral Images, Quick Release 3"
+    authors:
+      - name: "SPHEREx Project"
+    doi: 10.26131/IRSA662
+    publisher:
+      name: "NASA/IPAC Infrared Science Archive"
+  - type: article
+    title: "The SPHEREx Satellite Mission"
+    authors:
+      - family-names: Bock
+        given-names: J. J.
+      - name: "SPHEREx Science Team"
+    journal: "The Astrophysical Journal"
+    volume: 999
+    start: 139
+    year: 2026
+    doi: 10.3847/1538-4357/ae2be2

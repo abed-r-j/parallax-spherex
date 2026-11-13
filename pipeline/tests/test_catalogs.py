@@ -100,6 +100,26 @@ def test_catwise_never_raises(monkeypatch, tmp_path):
     assert rows == [] and warn.startswith("CatWISE2020 unavailable")
 
 
+def test_catwise_hole_falls_back_to_allwise(monkeypatch, tmp_path):
+    """Real case: CatWISE2020 is empty within 4.8 arcmin of R Draconis.
+
+    The empty CatWISE answer is the recorded one. The AllWISE body is SYNTHETIC (IRSA TAP
+    was timing out when the fixtures were recorded), so this checks the code path only.
+    """
+    allwise = ("designation,ra,dec,w1mpro,w2mpro,pmra,pmdec\n"
+               "J163240.21+664518.0,248.1675,66.7550,-1.9,-2.1,12,-30\n"
+               "J163251.00+664601.2,248.2125,66.7670,11.234,11.301,,\n")
+
+    def request(method, url, params, timeout):
+        return allwise if "allwise_p3as_psd" in params["QUERY"] else fx("catwise_rdra_empty.csv")
+
+    monkeypatch.setattr(catalogs, "_request", request)
+    rows, warn = catalogs.catwise_cone(248.1675, 66.755, 0.03, cache_dir=tmp_path)
+    assert len(rows) == 2 and "AllWISE" in warn
+    assert set(rows[0]) == {"id", "ra", "dec", "w1", "w2", "pmRa", "pmDec"}
+    assert rows[0]["pmDec"] == -30.0 and rows[1]["pmRa"] is None
+
+
 def test_overlays_limited_to_field(monkeypatch, tmp_path):
     net = FakeNet({"esac.esa.int": fx("gaia_esa_barnard.csv"),
                    "irsa.ipac": fx("catwise_barnard.csv")})
@@ -111,6 +131,19 @@ def test_overlays_limited_to_field(monkeypatch, tmp_path):
     assert all(abs(w["dec"] - BARNARD[1]) <= half for w in out["wise"])
     star, dist = catalogs.nearest(out["gaia"], 269.44850, 4.73942)
     assert star["id"] == "4472832130942575872" and dist < 0.1
+
+
+def test_publish_interface(monkeypatch, tmp_path):
+    """parallax.publish calls gaia_dr3 / catwise with a radius in arcsec and expects lists."""
+    net = FakeNet({"esac.esa.int": fx("gaia_esa_barnard.csv"),
+                   "irsa.ipac": httpx.ReadTimeout("slow")})
+    monkeypatch.setattr(catalogs, "_request", net)
+    before = len(catalogs.WARNINGS)
+    gaia = catalogs.gaia_dr3(*BARNARD, 108.0, cache_dir=tmp_path)
+    assert len(gaia) == 73 and "0.03000" in net.calls[0][1]["QUERY"]
+    assert catalogs.catwise(*BARNARD, 108.0, cache_dir=tmp_path) == []
+    assert catalogs.WARNINGS[before:] and "CatWISE2020 unavailable" in catalogs.WARNINGS[-1]
+    del catalogs.WARNINGS[before:]
 
 
 def test_geometry_helpers():

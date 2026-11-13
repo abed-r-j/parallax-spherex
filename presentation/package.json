@@ -1,0 +1,1 @@
+{"name":"parallax-presentation","private":true,"type":"module","license":"Apache-2.0","description":"Build scripts for the ParallaX slide deck and screen footage","dependencies":{"playwright-core":"^1.65.1","pptxgenjs":"^4.0.1"}}

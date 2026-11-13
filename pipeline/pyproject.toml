@@ -24,7 +24,6 @@ dependencies = [
   "numpy>=2.0",
   "scipy>=1.13",
   "astropy>=6.1",
-  "sep>=1.4",
   "httpx>=0.27",
   "pillow>=10.4",
   "fastapi>=0.115",

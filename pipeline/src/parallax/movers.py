@@ -16,6 +16,11 @@ How it works (all steps verified against the live services, November 2026):
    Horizons at the exact time (the hourly table cannot follow the 98-minute parallax
    wobble of a low-Earth-orbit observer, which is several arcsec for a main-belt object).
 
+IRSA's Moving Object Search Tool (MOST) answers the same question in seconds once it is
+given a NAIF id (``most_search``); it agrees image for image with the search above for
+(52) Europa, and is kept as an independent cross-check rather than the main path because
+it needs ids, not names, and reports positions on its own ephemeris.
+
 Two kinds of demo field can be built from the hits:
 
 * a FIXED sky field that the object crosses (``best_fixed_field``): the object is in a
@@ -49,6 +54,7 @@ from .sso import Ephemeris, horizons_at, horizons_range
 
 ARCHIVE_MJD = (60789.0, 61320.0)  # first and last SPHEREx Level-2 image at IRSA (Nov 2026)
 ELONG_WINDOW = (75.0, 135.0)
+MOST_URL = "https://irsa.ipac.caltech.edu/cgi-bin/MOST/nph-most"
 PIXEL_ARCSEC = 6.15
 
 
@@ -226,6 +232,46 @@ def find_images(name: str | int, mjd_start: float = ARCHIVE_MJD[0],
             delta=float(exact.delta[i]), edge_arcsec=round(margin, 1),
         ))
     return hits
+
+
+def parse_ipac_table(text: str) -> list[dict[str, str]]:
+    """Rows of an IPAC ASCII table (fixed-width columns delimited by ``|`` in the header)."""
+    lines = text.splitlines()
+    head = next((ln for ln in lines if ln.startswith("|")), None)
+    if head is None:
+        return []
+    bars = [i for i, ch in enumerate(head) if ch == "|"]
+    names = [head[a + 1:b].strip() for a, b in zip(bars[:-1], bars[1:], strict=True)]
+    rows = []
+    for ln in lines:
+        if ln.strip() and not ln.startswith(("|", "\\")):
+            rows.append({nm: ln[a:b + 1].strip()
+                         for nm, a, b in zip(names, bars[:-1], bars[1:], strict=True)})
+    return rows
+
+
+def most_search(naif_id: int, date_start: str, date_stop: str,
+                cache_dir: Path | None = None) -> list[dict]:
+    """Independent cross-check with IRSA's Moving Object Search Tool (MOST).
+
+    ``naif_id`` is the NAIF id of the body: 20000000 + number for a numbered asteroid
+    (20000052 = (52) Europa); names are often ambiguous for MOST ("Vesta" fails), ids
+    are not. Dates are ``YYYY-MM-DD``. Returns ``[{name, mjd, ra, dec, vmag}]`` (object
+    position at each matching SPHEREx image). MOST answers in seconds; for (52) Europa,
+    1 Aug - 20 Sep 2025, it lists exactly the 136 images that ``find_images`` finds.
+    """
+    params = {"catalog": "spherex", "input_type": "name_input", "obj_name": f"{naif_id}:NID",
+              "obs_begin": date_start, "obs_end": date_stop, "output_mode": "Brief"}
+    text = fetch_text("most", MOST_URL, params, cache_dir=cache_dir, timeout=600.0,
+                      accept=lambda t: "|" in t and "ra_obj" in t)
+    out = []
+    for r in parse_ipac_table(text):
+        out.append({
+            "name": r["uri"].rsplit("/", 1)[-1],
+            "mjd": 0.5 * (float(r["mjd_start"]) + float(r["mjd_end"])),
+            "ra": float(r["ra_obj"]), "dec": float(r["dec_obj"]), "vmag": float(r["vmag"]),
+        })
+    return sorted(out, key=lambda r: (r["mjd"], r["name"]))
 
 
 def best_fixed_field(hits: list[MoverHit], size_pix: int = 61, scale: float = PIXEL_ARCSEC,
