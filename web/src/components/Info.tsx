@@ -91,12 +91,12 @@ export function HowItWorks() {
       <h2>What the chromatic template does</h2>
       <p>
         ParallaX corrects instead of rejecting. For each pixel it collects what that pixel looked like at every colour during the <em>other</em> survey passes: that is the pixel&rsquo;s spectrum.
-        From it, it predicts what an unchanging sky would look like in the new frame, pixel by pixel, at exactly that frame&rsquo;s colours. Subtract the prediction, and far fewer false alarms are left.
+        From it, it predicts what an unchanging sky would look like in the new frame, pixel by pixel, at exactly that frame&rsquo;s colours. Subtract the prediction, and fainter real changes stand out at the same false-alarm rate.
       </p>
       <TemplateFigure />
       <p>
         The <b>Three-way</b> view shows the same frame differenced three ways: against a naive partner, against a colour-matched partner, and against the chromatic template.
-        The <b>Ledger</b> tab gives the measured numbers for each field: how many false detections each method leaves, how many frames it can use, and how faint a new source it can find.
+        The <b>Ledger</b> tab gives the measured numbers for each field: how many frames each method can use, how faint a new source it can find at the same false-alarm rate, and how many false detections it leaves under several noise models.
       </p>
 
       <h2>How to spot something that moved</h2>

@@ -22,7 +22,7 @@ import { SkyCanvas, type PixelPos, type Raster, type View } from './SkyCanvas'
 
 const MODES: { id: Mode; label: string; key: string; about: string }[] = [
   { id: 'image', label: 'Image', key: 'I', about: 'The sky as SPHEREx saw it. Every frame is taken at a different infrared colour.' },
-  { id: 'chroma', label: 'Chromatic difference', key: 'C', about: 'The frame minus what an unchanging sky would look like at exactly this frame’s colours, predicted from the other survey passes. Far fewer false alarms are left; check a residual in the other views before believing it.' },
+  { id: 'chroma', label: 'Chromatic difference', key: 'C', about: 'The frame minus what an unchanging sky would look like at exactly this frame’s colours, predicted from the other survey passes. At the same false-alarm rate this reaches fainter changes; check a residual in the other views before believing it.' },
   { id: 'naive', label: 'Naive pair', key: 'N', about: 'The frame minus the nearest frame from another survey pass in the same detector, ignoring that the two were taken at different colours.' },
   { id: 'gated', label: 'Gated pair', key: 'G', about: 'The frame minus a frame from another pass, used only if their colours agree within half a bandwidth.' },
   { id: 'compare', label: 'Three-way', key: 'T', about: 'The same frame differenced three ways, on one scale. Colour mismatch shows up as false signal on every star in the naive panel.' },

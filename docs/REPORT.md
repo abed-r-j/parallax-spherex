@@ -82,7 +82,7 @@ south, where it was. The square is its saturated core.*
    request.
 2. **A chromatic template.** For every frame, the pipeline predicts what a static sky would
    look like at that frame's own per-pixel wavelength, using the spectrum each pixel showed
-   in the *other* survey passes, and subtracts it. What remains is mostly change, with far fewer false alarms. The template also
+   in the *other* survey passes, and subtracts it. At the same false-alarm rate, fainter changes then stand out. The template also
    carries a measured map of its own error.
 3. **A three-way ledger.** The same real frames are differenced three ways: naive pair,
    wavelength-gated pair, chromatic template. Artificial moving sources are injected into
@@ -116,8 +116,9 @@ site needs no server and works offline for the ready fields.
 * *Chromatic template*: per pixel, a weighted local fit of brightness against wavelength
   over the other passes, with a kernel that starts at half a filter bandwidth and widens
   until enough reference frames are found.
-* *Noise model*: the same background, noise scale and "star noise" term for all three
-  methods, so that the comparison is fair.
+* *Noise model*: the same background and noise scale for all three methods and a fitted
+  "star noise" term; the template also carries its own measured model-error map, which the
+  pairs do not have. Sensitivity is therefore compared at a matched false-alarm rate.
 * *Detection and vetting*: connected residuals above 5 sigma; classes with a stated reason;
   a cosmic-ray veto that uses the exposure taken about two minutes later.
 * *Injection and recovery*: artificial point sources added to real frames, on blank sky and
@@ -126,7 +127,7 @@ site needs no server and works offline for the ready fields.
   ratios at matched wavelength, period scans.
 
 **Software and tools.** Python 3 with NumPy, SciPy, Astropy, HTTPX, FastAPI and Typer;
-TypeScript, React and Vite for the site; pytest and Vitest (120 Python and 55 TypeScript
+TypeScript, React and Vite for the site; pytest and Vitest (130 Python and 55 TypeScript
 tests, all offline); GitHub Actions and GitHub Pages. The FITS reader, the coordinate code
 and the charts in the browser are our own, and fonts are bundled, so the site makes no
 outside request for the ready fields. Hardware: one laptop. An SI coding assistant was used
@@ -141,8 +142,8 @@ four minutes per field. Definitions and caveats are in `docs/RESULTS.md`.
 
 | Field | Method | Usable frames | Depth (microJy) | False detections per frame | Flux found half the time, blank sky (microJy) |
 |---|---|---|---|---|---|
-| Barnard's Star | naive | 93.6% | 38.9 | 4.64 | 1457 |
-| | gated | 96.4% | 33.8 | 2.44 | 1025 |
+| Barnard's Star | naive | 93.6% | 38.9 | 4.44 | 1427 |
+| | gated | 96.4% | 33.8 | 2.40 | 1003 |
 | | **chromatic** | **100%** | **30.5** | **0.99** | **563** |
 | Epsilon Indi B | naive | 100% | 28.4 | 2.51 | 955 |
 | | gated | 99.3% | 25.3 | 2.34 | 808 |
@@ -151,7 +152,7 @@ four minutes per field. Definitions and caveats are in `docs/RESULTS.md`.
 | | gated | 99.4% | 30.2 | 2.54 | 1150 |
 | | **chromatic** | **100%** | **25.8** | **1.28** | **593** |
 | WISE 0855-0714 | naive | 100% | 27.5 | 3.54 | 2193 |
-| | gated | 98.8% | 19.1 | 2.22 | 859 |
+| | gated | 98.8% | 19.1 | 2.21 | 859 |
 | | **chromatic** | **99.6%** | **18.0** | **1.64** | **707** |
 | R Draconis | naive | 100% | 147.4 | 0.49 | 1793 |
 | | gated | 79.0% | 106.8 | 0.58 | 1743 |
@@ -162,9 +163,22 @@ the known target, per usable frame. The last column is measured at a threshold t
 every method gives 0.5 false detections per frame. Depth is over all pixels; the app's
 Ledger panel shows it on faint sky only.
 
-* The template is 3 to 15% deeper than the gated pair in every field.
-* At the same false-alarm rate it finds moving sources 1.2 to 1.9 times fainter on blank sky.
-* It has fewer false detections than the gated pair in four of five fields.
+* The template is 3 to 15% deeper than the gated pair in every field in quoted noise, and 17
+  to 25% deeper in the measured scatter of blank-sky residuals.
+* At the same false-alarm rate (0.5 per frame) it finds moving sources 1.2 to 1.9 times
+  fainter on blank sky (Barnard's field: 563 against 1003 microJy) and 1.1 to 1.6 times
+  fainter next to a star. For rates of 0.2 to 1 per frame the blank-sky factor is 1.1 to 2.0
+  and the ranking never flips; next to a star the advantage is gone at 0.2 per frame.
+* The false-detection column is not like for like. The template's low count comes from its
+  measured model-error map; with one purely statistical sigma for all three it floods as
+  much as the pairs (Barnard's field: 27.55 / 31.38 / 32.98 per frame). At 5 sigma it gives
+  fewer false detections than the gated pair in Barnard's and RW Aurigae's fields under
+  every calibration we tried; in Epsilon Indi and WISE 0855 it depends on the noise model;
+  in R Draconis it has slightly more.
+* A stronger simple baseline, the weighted mean of all wavelength-matched frames, does not
+  beat the template (733 / 821 / 894 against 563 / 593 / 707 microJy in three fields).
+* The shortcut used for the injection test was checked against a full re-run: peak S/N 0.98
+  of the shortcut's, completeness within 0 to 4 percentage points.
 
 ![Fraction of injected moving sources recovered, Barnard's field](img/fig-barnard-completeness.png)
 
@@ -175,16 +189,20 @@ made by the pipeline from real frames with artificial sources added.*
 
 | Target | What we measured | Reference |
 |---|---|---|
-| Barnard's Star | 10.21 +- 0.26 arcsec/yr at 356.3 +- 1.5 deg (1.65 pixels over 3 passes, from the wings of a saturated star; fit with a free annual term, one degree of freedom) | 10.36 at 355.6 deg (Gaia DR3) |
+| Barnard's Star | 10.2 +- 0.5 arcsec/yr (scatter between the six detectors) at 356.3 +- 1.5 deg (1.65 pixels over 3 passes, from the wings of a saturated star; fit with a free annual term, one degree of freedom) | 10.36 at 355.6 deg (Gaia DR3) |
 | Epsilon Indi B | 4.64 +- 0.09 arcsec/yr at 122.6 +- 1.3 deg (1.02 pixels over 4 passes) | 4.70 at 122.7 deg |
-| WISE 0855-0714 | moving source at S/N 6.6 in pass-difference stacks of detectors 5 and 6 only, stacked along the catalogue track (395 +- 69 microJy), 1.5 arcsec from the prediction; 7.81 +- 1.57 arcsec/yr with the catalogue parallax assumed (independent centroid fit: 6.2 +- 1.1) | 8.15 arcsec/yr |
+| WISE 0855-0714 | moving source with a combined statistic of 6.6 in pass-difference stacks of detectors 5 and 6 only, stacked along the catalogue track (not a Gaussian sigma: random tracks scatter by 0.6 and 0 of 200 searched tracks reach it; 395 +- 69 microJy), 1.5 arcsec from the prediction; 7.81 +- 1.57 arcsec/yr with the catalogue parallax assumed (independent centroid fit: 6.2 +- 1.1) | 8.15 arcsec/yr |
 | RW Aurigae | in Sep 2025, compared with Sep 2026: 0.37 +- 0.14 mag fainter at 0.75-1.1 micron, 0.76 +- 0.03 mag brighter at 4.4-5.0 micron; control star shows no change (0.00 +- 0.02 mag) | irregular variable |
-| R Draconis | periodic change in 22 of 43 wavelength bins, median peak-to-peak 1.18 mag; free period 250 d over 2.1 cycles | Mira, about 246 d |
+| R Draconis | periodic change in 22 of 43 wavelength bins, median peak-to-peak 1.18 mag; free period 250 d (244 to 258 d, 95%, bootstrap; each bin spans 1.2 to 1.8 cycles) | Mira, about 246 d |
 
 **Real moving objects.** The asteroid (52) Europa crosses one of our fields in ten hours and
 is in 24 of 111 frames (detectors 3 and 6 only); Pluto drifts 12 pixels in 6.4 days and is
 in 18 of 46 frames (detector 2 only). In single exposures their measured centres agree with
-the Horizons prediction, on average, to 0.05 +- 0.04 pixel and 0.03 +- 0.10 pixel.
+the Horizons prediction, on average, to 0.05 +- 0.04 pixel and 0.03 +- 0.10 pixel. Without
+the ephemeris, the classifier itself calls 21 of Europa's 24 detections a mover and the
+linker recovers its track blind (28.3 arcsec per hour at position angle 89.2 deg; ephemeris
+28.5 at 89.1). Pluto moves 0.7 arcsec per hour, too slowly for a blind track: the classifier
+calls 8 of its 18 detections a mover and 8 a variable, and only the ephemeris names it.
 
 ![Pluto in real SPHEREx frames, with predicted positions](img/fig-pluto-quicklook.png)
 
@@ -236,16 +254,21 @@ open code under Apache-2.0, open data, and a method others can reuse.
 **Process.** We began with research: the official challenge text, the rules, the archive
 interfaces, the literature and existing tools, with every claim marked verified or not. We
 then built in small parts with a fixed data format between pipeline and website, tested each
-part offline, and ran everything on real data before writing any claim.
+part offline, and ran everything on real data before writing any claim. The work then went
+through an independent adversarial review that re-ran the code. It found, among other
+things, that our "plain noise" comparison did not give the three methods the same noise
+model, and that the classifier called only 2 of the asteroid's 24 detections a mover without
+the ephemeris. Both were fixed; the numbers in this report are the corrected ones.
 
 **Challenges.**
 
 * *A browser cannot query the archive* (no cross-origin access), but it can read the public
   bucket. Hence the static index of every image.
 * *Colour is not the largest noise term; pixel sampling is.* The peak pixel of a bright star
-  scatters by 23 to 27% at fixed wavelength. A purely statistical noise model gave 28.70
-  false detections per frame for the naive pair in Barnard's field. We had to measure and
-  model this.
+  scatters by 23 to 27% at fixed wavelength. A purely statistical noise model gives 28 to 33
+  false detections per frame in Barnard's field for all three methods, ours included. We had
+  to measure and model this; the template's measured model-error map is what brings its
+  count down.
 * *Our first expectation was wrong.* We expected gating to waste most frames. It wastes 1 to
   4% in ordinary fields. We changed the claim to what the data support.
 * *Saturation.* Barnard's Star and R Draconis are saturated in 99% and 97% of frames; we
@@ -268,7 +291,11 @@ part offline, and ran everything on real data before writing any claim.
   detection sits next to the saturated core and is classed an artifact in 85% of frames),
   and RW Aurigae's change exceeds 5 sigma in 39% of template frames against 86% for the
   gated pair.
-* The WISE 0855 significance of 6.6 is moderately optimistic.
+* The WISE 0855 statistic of 6.6 is not a Gaussian sigma; we calibrated it on random tracks.
+* The false-alarm tail is dominated by artefacts of saturated stars and by transients the
+  archive did not flag, so the thresholds at a matched rate are 8 to 12 sigma.
+* Registration is good within a pass (0.16 arcsec rms), but pass-to-pass offsets of up to 0.1
+  pixel are not corrected in the differencing.
 * Live fields in the browser have no template, ledger or overlays.
 * Injected test sources are simple achromatic point sources.
 
@@ -277,8 +304,8 @@ part offline, and ran everything on real data before writing any claim.
 * *Why correct instead of gate?* Because the wavelength of every pixel is known, and each
   pixel has been observed at many wavelengths in other passes. The information to predict
   the frame exists; discarding it costs depth.
-* *Why a ledger?* Because a difference image always looks convincing. Only a count of false
-  detections and a recovery test on real frames can show whether a method is better.
+* *Why a ledger?* Because a difference image always looks convincing. Only a recovery test
+  on real frames, at a matched false-alarm rate, can show whether a method is better.
 * *Why a static site?* Because a public tool for volunteers should not depend on a server
   that someone must pay for and keep alive after the hackathon.
 * *Why publish the limits?* Because a tool for discovery is only useful if its users know

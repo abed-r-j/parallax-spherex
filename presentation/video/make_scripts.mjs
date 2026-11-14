@@ -24,7 +24,7 @@ const S30 = {
   cues: [
     [0.0, 3.0, A, `${CAM}: both members, side by side. Abed speaks, Mohamad waves.`, 'We are Abed and Mohamad, team ZENITH LABS.'],
     [3.0, 7.0, M, `${CAM}: both members. Mohamad speaks.`, 'Pluto was found by blinking two photos. We blink SPHEREx.'],
-    [7.0, 11.5, A, 'SCREEN: shot_01_type_coordinates.mp4 (from 3.0 s: typing the coordinates, landing on the field). Text over the first second: "ParallaX: chromatic difference imaging for the SPHEREx sky".', 'This is ParallaX: fewer false alarms in the infrared sky.'],
+    [7.0, 11.5, A, 'SCREEN: shot_01_type_coordinates.mp4 (from 3.0 s: typing the coordinates, landing on the field). Text over the first second: "ParallaX: chromatic difference imaging for the SPHEREx sky".', 'This is ParallaX: it finds fainter changes in the infrared sky.'],
     [11.5, 15.5, M, 'SCREEN: shot_03_time_wavelength.mp4 (2 s), then shot_04_naive_false_alarms.mp4 (2 s).', 'SPHEREx never repeats a colour, so stars become false alarms.'],
     [15.5, 20.5, A, 'SCREEN: shot_05_three_way.mp4 (from 2.5 s, where the naive panel glows and the template panel does not). Text: "SPHEREx data: NASA/IPAC IRSA".', 'From NASA’s open data, we predict each frame’s own colours, and subtract.'],
     [20.5, 25.0, M, 'SCREEN: shot_11_live_fetch.mp4 (the progress bar and the picture arriving, sped up 2x), or shot_12_asteroid_europa.mp4.', 'Next: anyone types coordinates and explores the changing sky.'],
@@ -46,7 +46,7 @@ const S120 = {
     ['', M, 'SCREEN: shot_05_three_way.mp4 (whole clip).', 'Here is one frame differenced three ways: naive, wavelength-matched, and our chromatic template, which predicts the frame at its own wavelengths from the other passes.'],
     ['', M, 'SCREEN: shot_07_click_spectrum.mp4, then shot_12_asteroid_europa.mp4.', 'Click any star for its spectrum. And here an asteroid crosses, right under its predicted label.'],
     ['What makes it distinctive', A, 'SCREEN: shot_09_ledger.mp4. Text: "1.2 to 1.9 times fainter than the gated pair, at a matched false-detection rate (blank sky)".', 'What is distinctive: we publish the measurements. On blank sky, at the same false-alarm rate, the template finds moving sources 1.2 to 1.9 times fainter than a wavelength-matched pair.'],
-    ['Development process, challenges and limitations', M, `${CAM}: Mohamad.`, 'We started on the twelfth and thirteenth of November, before the on-site event, as the organizers allowed. An SI coding assistant helped; we directed and checked its work.'],
+    ['Development process, challenges and limitations', M, `${CAM}: Mohamad.`, 'We started on the twelfth and thirteenth of November, before the on-site event, as the organizers allowed. An SI coding assistant helped; we directed and checked its work, and an independent review re-ran the code.'],
     ['', A, `${CAM}: Abed. Optional cut-away: shot_08_subtract_passes.mp4.`, 'The hard part was honesty. Bright stars saturate, parallax is not measured, and this is not a Planet Nine detector.'],
     ['', A, `${CAM}: both members.`, 'ParallaX is open source. Thank you.'],
   ],

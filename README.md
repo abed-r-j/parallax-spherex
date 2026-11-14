@@ -84,13 +84,15 @@ URL parameters (from `web/src/lib/urlstate.ts`):
    another one. For each frame ParallaX predicts the static sky at that frame's per-pixel
    wavelength, from the spectrum each pixel showed in the other survey passes, and subtracts
    it. Against the usual fix (compare only pairs whose wavelengths match) this is 3 to 15%
-   deeper in all five test fields and, at the same false-alarm rate, finds moving sources 1.2
-   to 1.9 times fainter on blank sky (Barnard's field: 563 against 1025 microJy).
+   deeper in all five test fields and, at the same false-alarm rate (0.5 per frame), finds
+   moving sources 1.2 to 1.9 times fainter on blank sky (Barnard's field: 563 against 1003
+   microJy) and 1.1 to 1.6 times fainter next to a star.
 2. **It publishes a reproducible false-alarm ledger.** Naive pair, wavelength-gated pair and
    chromatic template are run on the same real frames, with artificial sources injected and
-   searched for again. In Barnard's field the false detections per frame are 4.64, 2.44 and
-   0.99. The limits we measured are published next to the results
-   ([docs/RESULTS.md](docs/RESULTS.md), section 2.2).
+   searched for again, and compared at a matched false-alarm rate. The limits we measured are
+   published next to the results ([docs/RESULTS.md](docs/RESULTS.md), section 2.2). The work
+   went through an independent adversarial review that re-ran the code; the published numbers
+   are the corrected ones.
 3. **Any coordinates, in the browser, with no server.** A 45.6 MB index of all 1,628,230
    public SPHEREx Level-2 images ships with the site. The page looks up which images cover
    your position and reads only the pixels it needs from the public archive bucket: 55 images
@@ -165,12 +167,21 @@ Three ways to difference two dates (Barnard's Star field, 357 frames):
 
 | Method | Usable frames | Depth (microJy) | False detections per frame | Flux found half the time, blank sky (microJy) |
 |---|---|---|---|---|
-| Naive pair | 93.6% | 38.9 | 4.64 | 1457 |
-| Wavelength-gated pair | 96.4% | 33.8 | 2.44 | 1025 |
+| Naive pair | 93.6% | 38.9 | 4.44 | 1427 |
+| Wavelength-gated pair | 96.4% | 33.8 | 2.40 | 1003 |
 | **Chromatic template** | **100%** | **30.5** | **0.99** | **563** |
 
-Across the five fields the template is 3 to 15% deeper than the gated pair and has fewer
-false detections in four of five. R Draconis is the exception and is not a clean test.
+The last column, taken at a matched false-alarm rate of 0.5 per frame, is the like-for-like
+comparison: across the five fields the template reaches 1.2 to 1.9 times fainter than the
+gated pair on blank sky (1.1 to 2.0 for rates of 0.2 to 1 per frame). It is 3 to 15% deeper
+in quoted noise and 17 to 25% deeper in the measured scatter of blank-sky residuals.
+
+The false-detection column is **not** like for like. The template's low count comes from its
+measured model-error map, which the pairs do not have; with one purely statistical sigma for
+all three, the template floods as much as the pairs (33 per frame here, against 28 and 31).
+At |S/N| > 5 it gives fewer false detections than the gated pair in Barnard's and RW
+Aurigae's fields under every calibration we tried; in Epsilon Indi and WISE 0855 the answer
+depends on the noise model, and in R Draconis (not a clean test) it has slightly more.
 Depth here is over all pixels; the app's Ledger panel shows it on faint sky only (35.9 / 31.8 /
 28.0 microJy for this field).
 
@@ -178,19 +189,25 @@ The five challenge targets:
 
 | Target | Measured | Reference |
 |---|---|---|
-| Barnard's Star | 10.21 +- 0.26 arcsec/yr at 356.3 +- 1.5 deg (1.65 pixels over 3 passes, from the wings of a saturated star; fit with a free annual term, one degree of freedom) | 10.36 arcsec/yr at 355.6 deg (Gaia DR3) |
+| Barnard's Star | 10.2 +- 0.5 arcsec/yr (scatter between the six detectors) at 356.3 +- 1.5 deg (1.65 pixels over 3 passes, from the wings of a saturated star; fit with a free annual term, one degree of freedom) | 10.36 arcsec/yr at 355.6 deg (Gaia DR3) |
 | Epsilon Indi B | 4.64 +- 0.09 arcsec/yr at 122.6 +- 1.3 deg (1.02 pixels over 4 passes) | 4.70 arcsec/yr at 122.7 deg |
-| WISE 0855-0714 | moving source at S/N 6.6 in pass-difference stacks of detectors 5 and 6 only, stacked along the catalogue track (395 +- 69 microJy); 7.81 +- 1.57 arcsec/yr at 278.2 +- 4.3 deg with the catalogue parallax assumed (independent centroid fit: 6.2 +- 1.1) | 8.15 arcsec/yr at 274.8 deg |
+| WISE 0855-0714 | moving source with a combined statistic of 6.6 in pass-difference stacks of detectors 5 and 6 only, stacked along the catalogue track (not a Gaussian sigma: random tracks in the same maps scatter by 0.6, and 0 of 200 searched tracks reach it; 395 +- 69 microJy); 7.81 +- 1.57 arcsec/yr at 278.2 +- 4.3 deg with the catalogue parallax assumed (independent centroid fit: 6.2 +- 1.1) | 8.15 arcsec/yr at 274.8 deg |
 | RW Aurigae | in Sep 2025, compared with Sep 2026: 0.37 +- 0.14 mag fainter at 0.75-1.1 micron and 0.76 +- 0.03 mag brighter at 4.4-5.0 micron; a control star shows no change (0.00 +- 0.02 mag) | irregular T Tauri variable |
-| R Draconis | periodic change in 22 of 43 wavelength bins, median peak-to-peak 1.18 mag; free period 250 d over 2.1 cycles | Mira, catalogued period about 246 d |
+| R Draconis | periodic change in 22 of 43 wavelength bins, median peak-to-peak 1.18 mag; free period 250 d (244 to 258 d, 95%, bootstrap; each wavelength bin spans 1.2 to 1.8 cycles) | Mira, catalogued period about 246 d |
 
-The WISE 0855 significance is moderately optimistic (non-independent pass differences, about
-59 trial positions). Parallax is not measured reliably. See [Limits](#limits).
+The WISE 0855 statistic is calibrated on random tracks, not read as a Gaussian sigma.
+Parallax is not measured reliably. See [Limits](#limits).
 
 Known moving objects as ground truth: asteroid (52) Europa appears in 24 of 111 frames
 (detectors 3 and 6 only) and Pluto in 18 of 46 (detector 2 only), each where JPL Horizons,
 with the SPHEREx spacecraft as the observer, predicts it: on average the measured centre
 differs from the prediction by 0.05 +- 0.04 pixel for Europa and 0.03 +- 0.10 pixel for Pluto.
+Without the ephemeris, the classifier itself calls 21 of Europa's 24 detections a mover and
+the linker recovers its track blind (28.3 arcsec per hour at position angle 89.2 deg; the
+ephemeris says 28.5 at 89.1). Before a fix made after the independent review it called only
+2 of 24 a mover. Pluto moves too slowly (0.7 arcsec per hour) for a blind track: the
+classifier calls 8 of its 18 detections a mover and 8 a variable, and only the ephemeris
+names it.
 
 ![Pluto in a single SPHEREx frame, under the label predicted from JPL Horizons](docs/img/pluto.png)
 
@@ -298,13 +315,13 @@ data/                     local working data (git-ignored)
 ## Testing
 
 ```bash
-cd pipeline && uv run pytest -q     # 120 passed, 2 skipped (network tests; set PARALLAX_NETWORK=1 to run them)
+cd pipeline && uv run pytest -q     # 130 passed, 2 skipped (network tests; set PARALLAX_NETWORK=1 to run them)
 cd pipeline && uv run ruff check src scripts tests
 cd web && npm test                  # vitest: 55 passed
 cd web && npm run lint && npm run build
 ```
 
-All 175 default tests run offline, on synthetic data and on recorded real service responses.
+All 185 default tests run offline, on synthetic data and on recorded real service responses.
 Counts as run on 14 November 2026.
 
 ## Data sources and acknowledgements
@@ -369,8 +386,16 @@ after the local organizers allowed early preparation.
 * **Planet X is the motivation, not a claim.** A real Planet Nine would be far too faint for
   single SPHEREx frames. ParallaX shows the method on objects that are there: fast stars,
   variables, and known solar-system objects.
-* **The template wins on depth and false alarms, not on rescued frames.** 96 to 99% of frames
-  already find a wavelength-matched partner in ordinary fields.
+* **The template wins on depth and on sensitivity at a matched false-alarm rate, not on
+  rescued frames.** 96 to 99% of frames already find a wavelength-matched partner in ordinary
+  fields. Next to a star, at a strict rate of 0.2 false alarms per frame, it has no advantage.
+* **A raw count of false alarms is not a fair comparison.** The template's low count rests on
+  its measured model-error map; under one statistical sigma it floods like the pairs.
+* **The false-alarm tail is not Gaussian noise**: artefacts of saturated stars and
+  transients the archive did not flag dominate it, so the matched-rate thresholds are 8 to 12
+  sigma.
+* **Registration** is good within a pass (0.16 arcsec rms) but pass-to-pass offsets of up to
+  0.1 pixel are not corrected in the differencing.
 * **For a star that shifts one or two pixels, a pair or a per-pass stack shows the motion
   better than the template.** Both lobes exceed 5 sigma in 69% of Barnard frames for the
   gated pair against 17% for the template. The app therefore defaults to blinking per-pass
@@ -387,6 +412,6 @@ after the local organizers allowed early preparation.
 * **Live fields are simpler than pipeline packs:** one sky level per frame, no flag masking,
   no chromatic template, ledger, candidates or catalogue overlays.
 * **WISE 0855-0714 is invisible in single frames**; it appears only in stacks of detectors 5
-  and 6, and its significance is moderately optimistic.
+  and 6, with a statistic calibrated on random tracks.
 
 Contributions and false-alarm reports are welcome: [CONTRIBUTING.md](CONTRIBUTING.md).

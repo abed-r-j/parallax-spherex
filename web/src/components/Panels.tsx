@@ -214,10 +214,12 @@ export function LedgerPanel({ pack }: { pack: Pack }) {
   const rows: [string, (m: string) => ReactNode][] = [
     ['Frames with a usable difference', (m) => `${fmt(dig(modes, m, 'usableFrames'))} of ${fmt(led.nFrames)} (${fmt((asNum(dig(modes, m, 'usableFraction')) ?? NaN) * 100)}%)`],
     ['False detections per square degree', (m) => fmt(dig(modes, m, 'false', 'perDeg2'))],
-    ['False detections per frame', (m) => fmt(dig(modes, m, 'false', 'perFrame'))],
-    ['Same, with plain noise only', (m) => fmt(dig(modes, m, 'falsePlain', 'perFrame'))],
+    ['False detections per frame (each method’s own noise model)', (m) => fmt(dig(modes, m, 'false', 'perFrame'))],
+    ['Same, with one statistical sigma for all three', (m) => fmt(dig(modes, m, 'falsePlain', 'perFrame'))],
+    ['Same, template with exactly the pairs’ calibration', (m) => fmt(dig(modes, m, 'falsePairCalibration', 'perFrame') ?? dig(modes, m, 'false', 'perFrame'))],
+    ['Same, every S/N rescaled to unit width', (m) => fmt(dig(modes, m, 'falseUnitMad', 'perFrame'))],
     ['Depth, 1 sigma on faint sky (µJy per pixel)', (m) => fmt(dig(modes, m, 'depthUJy', 'faint'))],
-    ['Flux found half the time, moving source (µJy)', (m) => fmt(f50(m))],
+    ['Flux found half the time at the same false-alarm rate, moving source on blank sky (µJy)', (m) => fmt(f50(m))],
     ['Known target recovered', (m) => {
       const k = dig(modes, m, 'knownSignal')
       if (!isObj(k) || k.kind == null) return '–'
@@ -248,6 +250,10 @@ export function LedgerPanel({ pack }: { pack: Pack }) {
               </tbody>
             </table>
           </div>
+          <p className="muted">
+            The false-detection rows are not like for like: the template&rsquo;s first count uses its own measured model-error map, which the pairs do not have; with one
+            statistical sigma for all three it floods as much as they do. The fair comparison is the flux found half the time at the same false-alarm rate.
+          </p>
           <p className="muted">
             {led.target ? `Detections within ${fmt(led.excludedRadiusPix)} pixels of ${String(led.target)} are not counted as false. ` : ''}
             Threshold {fmt(led.threshold)} sigma, at least {fmt(led.minAreaPix)} pixels; field area {fmt(led.areaDeg2)} square degrees; template mode: {fmt(led.templateMode)}.

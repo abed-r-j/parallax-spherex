@@ -108,9 +108,9 @@ def table(html: str, number: int) -> str:
         head = r"Field & Images & Passes & Size & Target core saturated \\"
     elif number == 2:
         env, spec, label = "table*", "@{}llcccccc@{}", "tab:ledger"
-        head = (r"Field & Method & Usable & Depth & False detections & Same, statistical & "
+        head = (r"Field & Method & Usable & Depth & False detections & Same, one statistical & "
                 r"$f_{50}$, blank sky & $f_{50}$, next to a star \\" "\n"
-                r" & & frames (\%) & ($\mu$Jy) & per frame & noise only & ($\mu$Jy) & "
+                r" & & frames (\%) & ($\mu$Jy) & per frame & sigma for all & ($\mu$Jy) & "
                 r"($\mu$Jy) \\")
     else:
         env, spec, label = "table*", r"@{}p{0.13\textwidth}p{0.57\textwidth}p{0.26\textwidth}@{}", \

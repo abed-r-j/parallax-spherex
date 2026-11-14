@@ -35,7 +35,7 @@ The problem: SPHEREx never photographs the same spot in the same colour twice. E
 
 Our solution:
 1. Type any coordinates and get the "little video" in the browser, with no server, straight from NASA's public archive.
-2. For our prepared fields we predict, for each picture, what an unchanging sky would look like in that picture's own colours, and subtract it. Far fewer false alarms are left.
+2. For our prepared fields we predict, for each picture, what an unchanging sky would look like in that picture's own colours, and subtract it. Fainter real changes then stand out.
 3. We measure how well this works against the simpler methods, on real data, and publish the numbers and the limits.
 
 Planet X is the motivation, not a claim.
@@ -80,7 +80,7 @@ Methods:
 - Inject artificial moving sources into real pictures and count how many each method finds.
 - Measure the five targets against catalogues.
 
-Software: Python (NumPy, SciPy, Astropy), TypeScript and React. 120 Python and 55 TypeScript tests. Open source, Apache-2.0.
+Software: Python (NumPy, SciPy, Astropy), TypeScript and React. 130 Python and 55 TypeScript tests. Open source, Apache-2.0.
 ```
 
 ## 5. Idea validation (due Saturday 20:30)
@@ -89,18 +89,20 @@ Software: Python (NumPy, SciPy, Astropy), TypeScript and React. 120 Python and 5
 ParallaX: validation on real SPHEREx data, with caveats.
 
 Three ways to difference, Barnard's Star field (357 pictures):
-- False detections per picture: naive 4.64, matched pair 2.44, ours 0.99.
-- Faintest moving source found half the time, at equal false alarms: 1457, 1025, 563 microJy.
-Across five fields ours is 3 to 15% deeper and has fewer false detections in four.
+- Faintest moving source found half the time, at equal false alarms: naive 1427, matched pair 1003, ours 563 microJy.
+Across five fields ours goes 1.2 to 1.9 times fainter on blank sky and is 3 to 15% deeper.
 
-Targets against catalogues:
-- Barnard's Star: 10.21 +- 0.26 arcsec/yr (Gaia: 10.36).
+Targets:
+- Barnard's Star: 10.2 +- 0.5 arcsec/yr (Gaia: 10.36).
 - Epsilon Indi B: 4.64 +- 0.09 (catalogue: 4.70).
-- WISE 0855: found only in stacks, signal-to-noise 6.6, which is moderately optimistic.
-- RW Aurigae and R Draconis: brightness changes measured.
+- WISE 0855: found only in stacks.
+- RW Aurigae, R Draconis: brightness changes measured.
+- Asteroid (52) Europa: track recovered with no ephemeris.
 
 Caveats we publish:
-- Matched pairs lose only 1 to 4% of pictures in ordinary fields. Our gain is depth and false alarms, not rescued pictures.
+- A raw count of false alarms is not a fair comparison: ours is low thanks to a measured error map the pairs lack. With plain noise all three flood.
+- Matched pairs lose only 1 to 4% of pictures. Our gain is sensitivity, not rescued pictures.
+- An independent review re-ran the code; these are the corrected numbers.
 - For a star that moves one or two pixels, a simple blink of per-pass stacks shows the motion better than our method.
 - Parallax is not measured reliably. Bright stars saturate. R Draconis is not a clean test.
 - We do not claim Planet X.
@@ -160,7 +162,7 @@ ParallaX: final summary.
 
 What it is: a public web tool that plays NASA's SPHEREx infrared images of any patch of sky as a little video, in the browser and without a server, so anyone can look for things that move or vary.
 
-What is new: SPHEREx sees every revisit in a different colour. For prepared fields we predict the unchanging sky in each picture's own colours and subtract it, and we publish a measured comparison with the simpler methods (Barnard's field: 0.99 false detections per picture against 2.44 and 4.64).
+What is new: SPHEREx sees every revisit in a different colour. For prepared fields we predict the unchanging sky in each picture's own colours and subtract it, and we publish a measured comparison with the simpler methods (at equal false alarms it finds moving sources 1.2 to 1.9 times fainter on blank sky).
 
 Impact: classrooms and citizen scientists need only a browser, in Lebanon and anywhere else. Researchers get a quick look at any position and a reproducible false-alarm benchmark. It costs nothing to run and updates with new data in a few commands.
 

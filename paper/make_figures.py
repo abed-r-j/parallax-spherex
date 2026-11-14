@@ -46,8 +46,10 @@ def fig_ledger() -> None:
                              gridspec_kw={"width_ratios": [1.0, 1.0, 1.0]})
     ax = axes[0]
     x = np.arange(3)
-    for k, (key, hatch, lab) in enumerate((("falsePlain", "////", "statistical noise only"),
-                                           ("false", "", "with star-noise term"))):
+    # falsePlain: one purely statistical sigma for all three; false: each method's own noise
+    # model (star-noise term; the template also has its model-error map)
+    for k, (key, hatch, lab) in enumerate((("falsePlain", "////", "one statistical sigma for all"),
+                                           ("false", "", "each method's noise model"))):
         vals = [led["modes"][m][key]["perDeg2"] for m in MODES]
         bars = ax.bar(x + (k - 0.5) * 0.4, vals, 0.36, color=[COL[m] for m in MODES],
                       hatch=hatch, edgecolor="white", linewidth=0.5,

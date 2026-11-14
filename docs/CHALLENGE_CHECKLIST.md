@@ -30,11 +30,11 @@ and repository are to be published at <https://abed-r-j.github.io/parallax-spher
 | A5 | Users enter coordinates as Right Ascension and declination | Met | Search box on every page (`web/src/lib/coords.ts`); also `?ra=&dec=` in the URL | Decimal degrees and sexagesimal both parse; headless-browser check of four typed strings |
 | A6 | A series of images of that patch "like a little video" | Met | Player: play, pause, step, speed, loop; sequence by survey pass or every frame in time order (`web/src/components/Player.tsx`, `Viewer.tsx`) | `docs/img/pass-blink.png`; keyboard checks (Space, arrows) pass |
 | A7 | Easy to spot moving objects | Met | Per-pass stack blink with 4x smooth display; Subtract; chromatic difference; catalogue-position marker; per-pass measured positions; known-object labels | `docs/img/subtract.png` shows the two-lobe signature of Barnard's Star; `docs/img/europa52.png` and `docs/img/pluto.png` show an asteroid and Pluto under their predicted positions (fields `europa52`, `pluto`). Limit stated in the app: the test stars move only 1 to 2 pixels |
-| A8 | Tested on Barnard's Star | Met | Field `barnard`, 357 frames, 3 passes | Proper motion 10.21 +- 0.26 arcsec/yr at 356.3 +- 1.5 deg against 10.36 at 355.6 (Gaia DR3). Core saturated in 99% of frames; measured from the wings, with a free annual term (one degree of freedom) |
+| A8 | Tested on Barnard's Star | Met | Field `barnard`, 357 frames, 3 passes | Proper motion 10.2 +- 0.5 arcsec/yr (scatter between detectors) at 356.3 +- 1.5 deg against 10.36 at 355.6 (Gaia DR3). Core saturated in 99% of frames; measured from the wings, with a free annual term (one degree of freedom) |
 | A9 | Tested on Epsilon Indi B | Met | Field `epsindi`, 454 frames, 4 passes | 4.64 +- 0.09 arcsec/yr at 122.6 +- 1.3 deg against 4.70 at 122.7 |
-| A10 | Tested on WISE 0855 at RA 08h55m10.831s, Dec -7d14m42.53s; accepts that notation | Met | Field `wise0855`, 258 frames, 3 passes, 8.3 arcmin wide so that it holds both the 2010 challenge position and today's position 2 arcmin west | The exact string `08h55m10.831s -7d14m42.53s` parses to 133.7951292, -7.2451472 and opens the field. Invisible in single frames; moving source at S/N 6.6 in pass-difference stacks of detectors 5 and 6 along the catalogue track (moderately optimistic, see RESULTS.md) |
+| A10 | Tested on WISE 0855 at RA 08h55m10.831s, Dec -7d14m42.53s; accepts that notation | Met | Field `wise0855`, 258 frames, 3 passes, 8.3 arcmin wide so that it holds both the 2010 challenge position and today's position 2 arcmin west | The exact string `08h55m10.831s -7d14m42.53s` parses to 133.7951292, -7.2451472 and opens the field. Invisible in single frames; moving source with a combined statistic of 6.6 in pass-difference stacks of detectors 5 and 6 along the catalogue track (not a Gaussian sigma; calibrated on random tracks, see RESULTS.md) |
 | A11 | Tested on variable star RW Aurigae | Met | Field `rwaur`, 332 frames, 3 passes | In Sep 2025, compared with Sep 2026: 0.37 +- 0.14 mag fainter at 0.75-1.1 micron and 0.76 +- 0.03 mag brighter at 4.4-5.0 micron; control star shows no change (0.00 +- 0.02 mag). Core saturated in 39% of frames |
-| A12 | Tested on variable star R Draconis | Met | Field `rdra`, 590 of 2,493 available images | Periodic change significant in 22 of 43 wavelength bins, median peak-to-peak 1.18 mag; free period 250 d over 2.1 cycles against a catalogued period of about 246 d. Saturated in 97% of frames: relative wing photometry only; detector 3 excluded |
+| A12 | Tested on variable star R Draconis | Met | Field `rdra`, 590 of 2,493 available images | Periodic change significant in 22 of 43 wavelength bins, median peak-to-peak 1.18 mag; free period 250 d (244 to 258 d, 95%, bootstrap; each bin spans 1.2 to 1.8 cycles) against a catalogued period of about 246 d. Saturated in 97% of frames: relative wing photometry only |
 
 ## B. Optional considerations
 
@@ -70,7 +70,7 @@ and repository are to be published at <https://abed-r-j.github.io/parallax-spher
 * **Depth of the "moving object" demonstration**: the three test stars move 1 to 2 pixels.
   The tool shows it best with per-pass stacks and Subtract, not with the chromatic template.
 * **Parallax**, named in the challenge background, is not measured reliably.
-* **WISE 0855** is recovered only in stacks, at a significance we call moderately optimistic.
+* **WISE 0855** is recovered only in stacks along its catalogue track, with a statistic calibrated on random tracks.
 * **Live fields** lack overlays, flags and the chromatic template.
 
 Not affiliated with or endorsed by NASA.

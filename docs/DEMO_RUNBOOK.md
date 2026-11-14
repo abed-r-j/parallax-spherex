@@ -16,7 +16,7 @@ Do all of this on the laptop that will be on stage, with the same Windows accoun
 - [ ] `cd web` then `npm install` (if not done) and `npm run build`. `web\dist\index.html`
       must exist.
 - [ ] `cd pipeline` then `uv sync` (if not done). `.venv\Scripts\parallax.exe` must exist.
-- [ ] `.venv\Scripts\python.exe -m pytest -q` prints `120 passed, 2 skipped`.
+- [ ] `.venv\Scripts\python.exe -m pytest -q` prints `130 passed, 2 skipped`.
 - [ ] In `web`: `npx vitest run` prints `55 passed`.
 - [ ] `.venv\Scripts\parallax.exe targets` lists the five challenge fields with their
       cutout counts.
@@ -100,10 +100,10 @@ object.
 | 0:00 | Tab 1, the home page. | "Pluto, the original Planet X, was found by blinking two photographs. The challenge asks for a web tool that lets anyone do that with SPHEREx. This is ParallaX." |
 | 0:15 | Type `08h55m10.831s -7d14m42.53s` in the box, press Enter. The WISE 0855 field opens. Then go to tab 2. | "You type coordinates, in any usual notation, and get the little video. These are the challenge's own coordinates." |
 | 0:30 | Tab 2. Press Space to play: three stacks of Barnard's Star, six months apart. | "Here is the fastest star in the sky. Each picture is one survey pass. It moves north, by less than two pixels. SPHEREx pixels are big." |
-| 0:45 | Tab 3 (Subtract). | "Subtract the first pass from the latest. Stars that stayed vanish. Barnard's Star leaves a bright lobe where it is and a dark lobe where it was. We measure 10.21 arcseconds per year, give or take 0.26; the Gaia catalogue says 10.36." |
+| 0:45 | Tab 3 (Subtract). | "Subtract the first pass from the latest. Stars that stayed vanish. Barnard's Star leaves a bright lobe where it is and a dark lobe where it was. We measure 10.2 arcseconds per year, give or take 0.5; the Gaia catalogue says 10.36." |
 | 1:00 | Point at the dot map on the right. | "Now the catch. Every dot is one picture; height is its colour. No two visits share a colour, because SPHEREx sees each star through a filter that changes across the detector. Subtract two dates naively and every star lights up as a false alarm." |
 | 1:15 | Tab 4 (Three-way). Point at the captions under the panels. | "Same frame, three ways. Naive: the partner is seven bandwidths off in colour. Gated: the usual fix, keep only matching pairs. Ours: predict what a static sky looks like at this frame's own colours from the other passes, and subtract that." |
-| 1:35 | Tab 5 (Ledger). Point at the false-detection row, then the curves. | "And we measured it, on real frames, with test sources injected. False detections per frame here: 4.6, 2.4, 1.0. At equal false alarms we find moving sources about 1.8 times fainter than gating in this field. The limits are published next to the wins." If someone points at the row "Known target recovered: no" under our method: "Yes. Next to the saturated core the classifier calls the star an artifact; for a star that moves one pixel a pass blink is the better tool, and we say so." |
+| 1:35 | Tab 5 (Ledger). Point at the false-detection row, then the curves. | "And we measured it, on real frames, with test sources injected. At equal false alarms we find moving sources about 1.8 times fainter than gating in this field: 563 against 1003 microjansky. The raw false-detection counts above it are not like for like: ours is low thanks to a measured error map. The limits are published next to the wins." If someone points at the row "Known target recovered: no" under our method: "Yes. Next to the saturated core the classifier calls the star an artifact; for a star that moves one pixel a pass blink is the better tool, and we say so." |
 | 1:55 | Stay on the Ledger. | "Planet X is the motivation, not a claim. What we claim is a tool anyone can open, and a number anyone can reproduce." |
 
 ### The 5-minute demo
@@ -113,7 +113,7 @@ Do the 2-minute path, slower, and add these after the Ledger.
 | Time | Do | Say |
 |---|---|---|
 | 2:10 | Tab 6 (RW Aurigae). Click the star if no spectrum shows. Point at the three colours of dots in the spectrum. | "Spectra on the fly. Click any pixel and you get its spectrum from every picture, coloured by pass. This young star changed: one way at short wavelengths, the other way at long ones, while a control star showed no change." |
-| 2:40 | Tab 7 (WISE 0855). | "Honesty slide. This brown dwarf is the coldest known, and in a single frame it is not there. We recover it only by stacking detectors 5 and 6, at a signal-to-noise of about 6.6, which we call moderately optimistic. And the challenge coordinates are its 2010 position: it has moved two arcminutes west." |
+| 2:40 | Tab 7 (WISE 0855). | "Honesty slide. This brown dwarf is the coldest known, and in a single frame it is not there. We recover it only by stacking detectors 5 and 6, with a statistic of 6.6 that we calibrated on random tracks: none of 200 reaches it. And the challenge coordinates are its 2010 position: it has moved two arcminutes west." |
 | 3:05 | Tab 2 again, open the **Overlays** panel, tick Gaia and pixel flags. | "Overlays: Gaia stars moved to the date of the picture, WISE sources, contamination flags, and known asteroids predicted as seen from the spacecraft itself." |
 | 3:25 | Tab 8 (live M51), if the network is up. Watch the progress bar; frames appear. | "Any other coordinates. There is no server behind this. The site carries a 46-megabyte index of all 1.6 million public SPHEREx images, and the browser reads just the pixels it needs from the public archive. Fifty-five images in about ten seconds on a good connection." |
 | 4:00 | Click the **Share** button, show the link and the embed code. Switch to tab 9. | "Every view is a link, and one parameter turns it into something you can embed in a class page or another project." |
@@ -121,9 +121,10 @@ Do the 2-minute path, slower, and add these after the Ledger.
 | 4:40 | End on the Ledger or the three-way view. | "What it does not do: it does not find Planet Nine, it does not measure parallax reliably, and for a star that moves one pixel a simple pass blink still shows the motion best. We say so in the app." |
 
 Numbers you may quote, all from `docs/RESULTS.md`: 357 frames and 3 passes for Barnard's
-field; 4.64 / 2.44 / 0.99 false detections per frame; 1457 / 1025 / 563 microJy; 10.21 +-
-0.26 against 10.36 arcsec/yr; 1,628,230 images in 45.6 MB; 55 images in 10 to 12 seconds on a
-fast connection; 120 + 55 tests. Do not round any of them into something stronger.
+field; 1427 / 1003 / 563 microJy at 0.5 false alarms per frame (4.44 / 2.40 / 0.99 false
+detections per frame at 5 sigma, which are not like for like); 10.2 +- 0.5 against 10.36
+arcsec/yr; 1,628,230 images in 45.6 MB; 55 images in 10 to 12 seconds on a fast connection;
+130 + 55 tests. Do not round any of them into something stronger.
 
 ## 5. Fallbacks
 

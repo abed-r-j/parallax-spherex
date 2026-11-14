@@ -106,9 +106,9 @@ flowchart TB
 | **Ship an index of every image with the site** | A browser cannot query IRSA: its services send no CORS headers. The public bucket does allow cross-origin range reads, but a bucket cannot answer "which files cover this position". The index answers that without a server. |
 | **Correct colour with a template instead of gating pairs** | Gating needs a partner frame at nearly the same wavelength; the template needs none and uses every other-pass frame near that wavelength, so it averages down noise (about 5 to 6 effective references) and uses 97 to 100% of frames. |
 | **Template built only from other passes** | A source that is present in the frame's own pass must not be subtracted from itself. Single-pass fields fall back to leaving out the frame's own visit. |
-| **Empirical model error, measured within each reference pass** | SPHEREx pixels under-sample the image, so a bright star's pixel values scatter by 23 to 27% at fixed wavelength. A purely statistical noise model floods with false detections (Barnard's field: 28.70 per frame for the naive pair). Measuring the scatter within a pass keeps real pass-to-pass change visible. |
-| **Give every method the same "star noise" term in the ledger** | Otherwise the comparison would flatter the template. The plain-noise numbers are published too. |
-| **Compare at a matched false-detection rate** | "How faint can you go" only means something at equal false alarms; each method's threshold is tuned to 0.5 false detections per frame. |
+| **Empirical model error, measured within each reference pass** | SPHEREx pixels under-sample the image, so a bright star's pixel values scatter by 23 to 27% at fixed wavelength. A purely statistical noise model floods with false detections for all three methods (Barnard's field: 27.55 / 31.38 / 32.98 per frame); the template's low count in the ledger comes from this map. Measuring the scatter within a pass keeps real pass-to-pass change visible. |
+| **Give every method a "star noise" term in the ledger, and publish the plain numbers** | The pairs get the fitted term; the template gets the larger of that term and its own model-error map. The two false-detection columns are therefore not like for like, and the ledger also stores one purely statistical sigma for all three (`falsePlain`), the template with exactly the pairs' calibration, and every S/N rescaled to unit width. |
+| **Compare at a matched false-detection rate** | "How faint can you go" only means something at equal false alarms; each method's threshold is tuned to 0.5 false detections per frame (0.2 and 1.0 are stored too). This is the like-for-like comparison. |
 | **Do not mask the archive's OUTLIER flag** | The flag marks real movers: on asteroid (52) Europa 757 of 1500 box pixels carry it. Masking it would erase the objects the tool is for. |
 | **Positions of known objects as seen from SPHEREx, rates geocentric** | Horizons supports the spacecraft as an observer; predicted and measured positions agree to 0.05 pixel for (52) Europa. The rate seen from the spacecraft wobbles with its 98-minute orbit, so the stable geocentric rate is stored. |
 | **Default to per-pass stack blink for nearby stars** | Their shift is one to two pixels; stacks are cleaner than single frames and a pair shows the two-lobe signature better than the template. |
@@ -132,7 +132,7 @@ flowchart TB
 | Agreement of browser and pipeline | resampled pixels within 2e-4 relative; wavelength within 5e-6 micron; TAN-SIP positions within 1e-6 pixel of Astropy |
 | Data pack size | 10.2 to 17.8 MB of pixels per challenge field |
 | Web bundle | about 357 kB of JavaScript before compression |
-| Tests | 120 Python and 55 TypeScript, all offline |
+| Tests | 130 Python and 55 TypeScript, all offline |
 
 ## 6. Failure modes and what happens
 

@@ -26,13 +26,13 @@ If the form allows a subtitle or a longer name: `ParallaX: chromatic difference 
 About 150 words.
 
 ```
-ParallaX is a public web tool that plays NASA's SPHEREx infrared images of any patch of sky as a little video, so anyone can spot things that move or change. Type coordinates and the browser fetches the images itself from the public archive; no server is needed. SPHEREx never photographs the same spot in the same colour twice, so blinking or subtracting two dates makes ordinary stars look like false alarms. For seven prepared fields ParallaX also predicts what an unchanging sky would look like at each frame's own colours and subtracts it; fields fetched live show the frames, stacks, spectra and simple pair differences. On five real fields the prediction sees 3 to 15% fainter than the usual fix and cuts false detections in four of them. We publish the measurements, the limits, and the code to reproduce them. Planet X is the motivation, not a claim.
+ParallaX is a public web tool that plays NASA's SPHEREx infrared images of any patch of sky as a little video, so anyone can spot things that move or change. Type coordinates and the browser fetches the images itself from the public archive; no server is needed. SPHEREx never photographs the same spot in the same colour twice, so blinking or subtracting two dates makes ordinary stars look like false alarms. For seven prepared fields ParallaX also predicts what an unchanging sky would look like at each frame's own colours and subtracts it; fields fetched live show the frames, stacks, spectra and simple pair differences. On five real fields, at the same false-alarm rate, this finds moving sources 1.2 to 1.9 times fainter than the usual fix on blank sky. We publish the measurements, the limits, and the code to reproduce them. Planet X is the motivation, not a claim.
 ```
 
-Shorter version (about 60 words):
+Shorter version (about 65 words):
 
 ```
-ParallaX plays NASA's SPHEREx infrared images of any patch of sky as a little video, in the browser, so anyone can spot things that move or change. Because SPHEREx sees every revisit in a different colour, for its prepared fields it predicts the unchanging sky at each frame's own colours and subtracts it, and it publishes measured, reproducible false-alarm numbers on five real fields.
+ParallaX plays NASA's SPHEREx infrared images of any patch of sky as a little video, in the browser, so anyone can spot things that move or change. Because SPHEREx sees every revisit in a different colour, for its prepared fields it predicts the unchanging sky at each frame's own colours and subtracts it, and it publishes a measured, reproducible comparison with simpler methods on five real fields.
 ```
 
 ## 3. Link to Project Demo
@@ -74,7 +74,7 @@ before pasting it.
 
 ## 5. Detailed Project Description
 
-About 580 words.
+About 670 words.
 
 ```
 WHAT IT DOES
@@ -85,23 +85,23 @@ SPHEREx never photographs the same spot in the same colour twice. Each exposure 
 
 HOW IT WORKS
 1. Any coordinates, no server. The site ships a 45.6 MB index of all 1,628,230 public SPHEREx Level-2 images. The browser looks up which images cover your position and reads only the pixels it needs from the public archive bucket: 55 images of M51 in 10 to 12 seconds on a fast connection.
-2. A chromatic template, for the prepared fields. For every frame, a Python pipeline predicts what a static sky would look like at that frame's own per-pixel wavelength, from the spectrum each pixel showed in the other survey passes, and subtracts it. Far fewer false alarms are left. Fields fetched live in the browser show frames, stacks, spectra and simple pair differences instead.
+2. A chromatic template, for the prepared fields. For every frame, a Python pipeline predicts what a static sky would look like at that frame's own per-pixel wavelength, from the spectrum each pixel showed in the other survey passes, and subtracts it. At the same false-alarm rate, fainter changes then stand out. Fields fetched live in the browser show frames, stacks, spectra and simple pair differences instead.
 3. A published three-way ledger. The same real frames are differenced three ways (naive pair, wavelength-matched pair, chromatic template), with artificial moving sources injected and searched for again.
 
 RESULTS, WITH THEIR LIMITS
-In Barnard's Star field, false detections per frame are 4.64 (naive), 2.44 (matched pair) and 0.99 (ours); at an equal false-alarm rate we find moving sources down to 563 microJy against 1025. Across five fields the template is 3 to 15% deeper and has fewer false detections in four. We measured Barnard's Star at 10.21 +- 0.26 arcsec/yr (Gaia: 10.36) and Epsilon Indi B at 4.64 +- 0.09 (catalogue: 4.70), recovered the cold brown dwarf WISE 0855 only in stacks (S/N 6.6, moderately optimistic), and saw RW Aurigae and R Draconis vary. We also publish what did not work: for stars that shift one or two pixels a simple blink of per-pass stacks shows the motion better than our template; parallax is not measured reliably; bright targets saturate; R Draconis is not a clean test. Planet X is the motivation, not a claim: a real Planet Nine would be too faint for single SPHEREx frames.
+At an equal false-alarm rate (0.5 per frame) the template finds moving sources 1.2 to 1.9 times fainter than the matched pair on blank sky in five fields (Barnard's Star field: 563 microJy against 1003) and 1.1 to 1.6 times fainter next to a star; it is 3 to 15% deeper in quoted noise. We measured Barnard's Star at 10.2 +- 0.5 arcsec/yr (Gaia: 10.36) and Epsilon Indi B at 4.64 +- 0.09 (catalogue: 4.70), recovered the cold brown dwarf WISE 0855 only in stacks (a statistic of 6.6, calibrated on random tracks), and saw RW Aurigae and R Draconis vary. An asteroid, (52) Europa, is found in 24 of 24 frames and its track is recovered without any ephemeris. The work went through an independent adversarial review that re-ran the code; these are the corrected numbers. We also publish what did not work: a raw count of false alarms is not a fair comparison, because our low count rests on a measured error map that the pairs do not have, and with a purely statistical noise model our method floods like the others; for stars that shift one or two pixels a simple blink of per-pass stacks shows the motion better than our template; parallax is not measured reliably; bright targets saturate; R Draconis is not a clean test. Planet X is the motivation, not a claim: a real Planet Nine would be too faint for single SPHEREx frames.
 
 BENEFITS AND GOALS
 Anyone with a browser can explore SPHEREx in time, including classrooms and citizen scientists. Researchers get a quick look at any position and a reproducible false-alarm benchmark. The site is static, so it costs nothing to run, and updating to a new data release takes a few commands.
 
 TOOLS
-Python 3 (NumPy, SciPy, Astropy, HTTPX, FastAPI, Typer), TypeScript, React, Vite, Vitest, pytest, GitHub Actions and GitHub Pages. Hardware: one laptop. 120 Python and 55 TypeScript tests. Open source, Apache-2.0. Development began on 12-13 November 2026, before the on-site event, after the local organizers allowed early preparation. Not affiliated with or endorsed by NASA.
+Python 3 (NumPy, SciPy, Astropy, HTTPX, FastAPI, Typer), TypeScript, React, Vite, Vitest, pytest, GitHub Actions and GitHub Pages. Hardware: one laptop. 130 Python and 55 TypeScript tests. Open source, Apache-2.0. Development began on 12-13 November 2026, before the on-site event, after the local organizers allowed early preparation. Not affiliated with or endorsed by NASA.
 ```
 
 Shorter version (about 150 words), if a limit applies:
 
 ```
-ParallaX plays SPHEREx images of any patch of sky as a little video. Enter RA and Dec; the browser finds the images in a 45.6 MB index of all 1,628,230 public Level-2 images and reads only the pixels it needs from the public archive, with no server. You can blink survey passes, add or subtract images, get spectra on the fly, overlay Gaia DR3, WISE and known asteroids, and share or embed any view by URL. Because SPHEREx sees every revisit at a different wavelength, a Python pipeline predicts the static sky at each frame's own per-pixel wavelength and subtracts it. On five real fields this is 3 to 15% deeper than wavelength-matched pairs and has fewer false detections in four (Barnard's field: 0.99 against 2.44 per frame). All five challenge targets are measured against catalogues, and the limits are published. Python, TypeScript, React. Apache-2.0. Planet X is the motivation, not a claim.
+ParallaX plays SPHEREx images of any patch of sky as a little video. Enter RA and Dec; the browser finds the images in a 45.6 MB index of all 1,628,230 public Level-2 images and reads only the pixels it needs from the public archive, with no server. You can blink survey passes, add or subtract images, get spectra on the fly, overlay Gaia DR3, WISE and known asteroids, and share or embed any view by URL. Because SPHEREx sees every revisit at a different wavelength, a Python pipeline predicts the static sky at each frame's own per-pixel wavelength and subtracts it. On five real fields, at the same false-alarm rate, this finds moving sources 1.2 to 1.9 times fainter than wavelength-matched pairs on blank sky (Barnard's field: 563 against 1003 microJy). All five challenge targets are measured against catalogues, and the limits are published. Python, TypeScript, React. Apache-2.0. Planet X is the motivation, not a claim.
 ```
 
 ## 6. Use of Super Intelligence (SI)

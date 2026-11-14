@@ -62,7 +62,9 @@ q = 0                                             no data
 q = 1 + round( (asinh(v / soft) - lo) / (hi - lo) * 65534 )     otherwise (uint16)
 ```
 
-so `v = soft * sinh(lo + (q - 1) / 65534 * (hi - lo))`.
+so `v = soft * sinh(lo + (q - 1) / 65534 * (hi - lo))`. `lo` and `hi` are the asinh of the
+true minimum and maximum of the finite pixels, so no finite value is clipped (an earlier
+version clipped the faint end at a percentile).
 1 MJy/sr = 889.86 microJy per 6.15 arcsec pixel.
 
 ### Sections of cube.bin
@@ -117,7 +119,11 @@ Sections other than `img`, `flags` and `stack` may be absent; the app must cope.
   `snrCorr`. `cls` is `mover`, `variable`, `motion-dipole`, `chromatic`, `star-residual` or
   `artifact`; `known` is the name of a matching catalogued solar-system object or null;
   `npix` is the number of connected pixels above the detection threshold; `evidence` is a
-  short sentence saying why the class was given.
+  short sentence saying why the class was given. A positive detection within 2.5 pixels of
+  a predicted object brighter than V 17.5 gets `known` set and `cls: "mover"`; if the
+  classifier alone had said something else, `evidence` ends with
+  `"; named from the ephemeris (classifier alone: <class>)"`, so what the pipeline found
+  blind is never lost.
 * `candidates[]`: linked or grouped detections: `{ id, cls, frames: [], ra: [], dec: [],
   mjd: [], rate: arcsec/h or null, pa: deg or null, known, note, chance }`.
   * Linked movers have `cls: "mover"`, a fitted `rate` and `pa`, and `chance`, the expected
@@ -138,9 +144,36 @@ degree, usable-frame yield, depth, injection-recovery curves).
 The ledger's per-method results sit under `ledger.modes.<mode>` with the mode keys `naive`,
 `gated` and **`corrected`**. `corrected` is the chromatic template; readers should accept
 `chromatic` as a synonym and label both "Chromatic template". Each mode holds
-`usableFraction`, `depthUJy`, `false`, `falsePlain`, `thresholdAtFixedRate`, `knownSignal`,
-`starNoiseGain` and `detectionsByClassPerFrame`; the injection-recovery curves are under
+`usableFraction`, `usableFrames`, `depthUJy`, `depthPlainUJy`, `false`, `falsePlain`,
+`snrWidth`, `falseUnitMad`, `thresholdAtFixedRate`, `knownSignal`, `starNoiseGain` and
+`detectionsByClassPerFrame`; the injection-recovery curves are under
 `ledger.injection.atThreshold5` and `ledger.injection.atFixedRate`.
+
+* Every rate block (`false`, `falsePlain`, `falseUnitMad`, `falsePlainModelError`,
+  `falsePairCalibration`) is `{ perFrame, positivePerFrame, perDeg2, pixelFraction }`:
+  detections at |S/N| > `ledger.threshold` per usable frame outside the excluded radius;
+  `positivePerFrame` counts positive detections only. Frames without a result are left out
+  of both the count and the denominator.
+* `false`: each method's own noise model. The pairs get the fitted star-noise term; the
+  template gets the larger of that term and its model-error map. Not like for like.
+* `falsePlain`: **one purely statistical sigma for all three methods** (no star-noise term,
+  and no model-error map for the template). Under it the template floods like the pairs.
+* `falsePlainModelError` (`corrected` only): statistical sigma plus the template's
+  model-error map. An earlier version published this number as `falsePlain`.
+* `falsePairCalibration` and `depthPairCalibrationUJy` (`corrected` only): the template
+  with exactly the pairs' calibration (star-noise term, no model-error map); the depth is
+  `{ all, faint }` like `depthUJy`.
+* `snrWidth`: `{ faint, mid, bright }`, the robust width (1.4826 MAD) of the S/N outside the
+  target mask on pixels whose static sky is below 3, 3 to 10 and above 10 sigma (classes
+  defined on the chromatic template); 1.0 means a calibrated sigma.
+* `falseUnitMad`: the rate after dividing each class of each method's S/N by that width.
+* `ledger.rateScan`: `{ rates: [0.2, 0.5, 1.0], byMode: { <mode>: { "<rate>": { threshold,
+  f50Blank, f50Star } } } }`: the S/N threshold that gives that many false detections per
+  frame and the flux (microJy) at which half of the injected movers are recovered on blank
+  sky and next to a star; `null` where 50% is not reached. Present only when the injection
+  test was run (the two mover fields do not have it). It sits beside `injection`, not inside
+  it, because the app lists every entry of `injection` as a set of curves.
+* `ledger.notes` repeats these definitions in words; the app prints them.
 
 ## Fields built in the browser (`meta.live`)
 

@@ -81,7 +81,7 @@ The row of tabs above the picture chooses the view. Each has a keyboard shortcut
 | View (key) | What it shows | Use it to |
 |---|---|---|
 | **Image** (I) | The sky as SPHEREx saw it | Blink and watch |
-| **Chromatic difference** (C) | The picture minus what an unchanging sky would look like at exactly this picture's colours, predicted from the other survey passes | See what changed with far fewer false alarms; this is the method ParallaX adds |
+| **Chromatic difference** (C) | The picture minus what an unchanging sky would look like at exactly this picture's colours, predicted from the other survey passes | See fainter changes at the same false-alarm rate; this is the method ParallaX adds |
 | **Naive pair** (N) | The picture minus the nearest picture from another pass in the same detector, ignoring colour | See the problem: stars leave false signal |
 | **Gated pair** (G) | The picture minus a picture from another pass whose colour agrees within half a bandwidth | See the usual fix |
 | **Three-way** (T) | The same picture differenced all three ways on one scale | Compare the methods directly |
@@ -115,8 +115,8 @@ Take Barnard's Star.
 ![Subtract: pass 3 minus pass 1 of Barnard's Star in detector 2](img/subtract.png)
 
 That two-lobe pattern, bright on one side and dark on the other, is the signature of
-motion. The pipeline measures the shift: 1.65 pixels over three passes, which gives 10.21 +-
-0.26 arcseconds per year against the catalogue's 10.36.
+motion. The pipeline measures the shift: 1.65 pixels over three passes, which gives 10.2 +-
+0.5 arcseconds per year against the catalogue's 10.36.
 
 ## 6. How to see a star change brightness
 
