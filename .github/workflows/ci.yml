@@ -1,4 +1,5 @@
-# Tests for the pipeline and the web app, and deployment of the static site to GitHub Pages.
+# Tests for the pipeline and the web app. The site itself is published from the gh-pages branch
+# (the contents of web/dist), so that it never depends on a CI run.
 # SI disclosure: written with the help of an SI coding assistant (Claude), checked by the team.
 name: CI
 
@@ -47,21 +48,3 @@ jobs:
           npm run lint
           npm test
           npm run build
-      - uses: actions/upload-pages-artifact@v3
-        if: github.ref == 'refs/heads/main'
-        with:
-          path: web/dist
-
-  deploy:
-    if: github.ref == 'refs/heads/main'
-    needs: [pipeline, web]
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
