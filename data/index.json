@@ -1,0 +1,97 @@
+{
+ "generated": "2026-11-14T01:19:10Z",
+ "pipeline": "1.0.0",
+ "fields": [
+  {
+   "key": "barnard",
+   "name": "Barnard's Star",
+   "kind": "motion",
+   "ra": 269.446288,
+   "dec": 4.767983,
+   "n": 61,
+   "scale": 6.15,
+   "nFrames": 357,
+   "nCampaigns": 3,
+   "blurb": "The fastest-moving star in the sky: 10.4 arcsec per year, about 1.7 SPHEREx pixels.",
+   "thumb": "barnard/thumb.png"
+  },
+  {
+   "key": "epsindi",
+   "name": "Epsilon Indi B",
+   "kind": "motion",
+   "ra": 331.096052,
+   "dec": -56.801033,
+   "n": 61,
+   "scale": 6.15,
+   "nFrames": 454,
+   "nCampaigns": 4,
+   "blurb": "A pair of brown dwarfs 12 light-years away, moving 4.7 arcsec per year.",
+   "thumb": "epsindi/thumb.png"
+  },
+  {
+   "key": "wise0855",
+   "name": "WISE 0855-0714",
+   "kind": "motion",
+   "ra": 133.768533,
+   "dec": -7.242937,
+   "n": 81,
+   "scale": 6.15,
+   "nFrames": 258,
+   "nCampaigns": 3,
+   "blurb": "The coldest known brown dwarf (about 250 K), moving 8.1 arcsec per year. The challenge coordinates are its 2010 WISE position; by 2026 it is 2 arcmin further west.",
+   "thumb": "wise0855/thumb.png"
+  },
+  {
+   "key": "rwaur",
+   "name": "RW Aurigae",
+   "kind": "variable",
+   "ra": 76.956417,
+   "dec": 30.401417,
+   "n": 61,
+   "scale": 6.15,
+   "nFrames": 332,
+   "nCampaigns": 3,
+   "blurb": "A young T Tauri binary with deep, irregular dimming events.",
+   "thumb": "rwaur/thumb.png"
+  },
+  {
+   "key": "rdra",
+   "name": "R Draconis",
+   "kind": "variable",
+   "ra": 248.1675,
+   "dec": 66.755,
+   "n": 61,
+   "scale": 6.15,
+   "nFrames": 590,
+   "nCampaigns": 3,
+   "blurb": "A Mira variable with a 246-day period, close to the north ecliptic pole where SPHEREx returns very often.",
+   "thumb": "rdra/thumb.png"
+  },
+  {
+   "key": "europa52",
+   "name": "Asteroid (52) Europa crossing",
+   "kind": "mover",
+   "ra": 54.84575,
+   "dec": 11.20935,
+   "n": 61,
+   "scale": 6.15,
+   "nFrames": 111,
+   "nCampaigns": 3,
+   "blurb": "Main-belt asteroid (52) Europa, magnitude 12.2, crosses this patch of sky in ten hours on 20-21 August 2025: it is in 24 frames and absent from the other 87. Detectors 3 and 6 only (1.6-2.4 and 4.4-5.0 micron).",
+   "thumb": "europa52/thumb.png"
+  },
+  {
+   "key": "pluto",
+   "name": "Pluto drifting",
+   "kind": "mover",
+   "ra": 304.1695,
+   "dec": -23.61175,
+   "n": 61,
+   "scale": 6.15,
+   "nFrames": 46,
+   "nCampaigns": 3,
+   "blurb": "Pluto, magnitude 14.5, creeps 12 pixels across this patch between 4 and 10 October 2025 (18 frames) and is gone in the other survey passes: what a slow, distant solar-system body looks like to SPHEREx. Detector 2 only (1.1-1.7 micron).",
+   "thumb": "pluto/thumb.png"
+  }
+ ]
+}
