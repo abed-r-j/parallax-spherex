@@ -3,6 +3,8 @@
 A *field* is one patch of sky. The pipeline writes one folder per field; the web app only
 reads these files, so the site is fully static and works offline.
 
+SI disclosure: drafted with the help of an SI coding assistant (Claude, by Anthropic), checked by the team.
+
 ```
 web/public/data/
   index.json                 list of fields

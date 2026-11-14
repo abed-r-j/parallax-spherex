@@ -135,7 +135,7 @@ export default function App() {
 
   let body
   if (s.page === 'how') body = <HowItWorks />
-  else if (s.page === 'about') body = <About index={index} dois={dois.length ? dois : ['10.26131/IRSA678']} />
+  else if (s.page === 'about') body = <About index={index} dois={dois.length > 1 ? dois : ['10.26131/IRSA678', '10.26131/IRSA662']} />
   else if (viewing && key) {
     if (pack) body = <Viewer key={pack.meta.key + pack.base} pack={pack} s={s} update={update} notice={notice} />
     else if (current?.error)

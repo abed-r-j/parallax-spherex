@@ -85,13 +85,13 @@ export function HowItWorks() {
       <p>
         The classic way to find something that changed is to blink two pictures, or subtract one from the other. With SPHEREx, the two pictures were taken in two colours.
         Every star is a little brighter in one colour than in the other, so the subtraction lights up everywhere, and real changes drown in false ones.
-        The usual fix is to compare only pairs whose colours happen to match, and throw the rest away.
+        The usual fix is to compare only pairs whose colours match. That loses few frames, but each difference is as noisy as a single partner frame.
       </p>
 
       <h2>What the chromatic template does</h2>
       <p>
         ParallaX corrects instead of rejecting. For each pixel it collects what that pixel looked like at every colour during the <em>other</em> survey passes: that is the pixel&rsquo;s spectrum.
-        From it, it predicts what an unchanging sky would look like in the new frame, pixel by pixel, at exactly that frame&rsquo;s colours. Subtract the prediction, and what is left is change.
+        From it, it predicts what an unchanging sky would look like in the new frame, pixel by pixel, at exactly that frame&rsquo;s colours. Subtract the prediction, and far fewer false alarms are left.
       </p>
       <TemplateFigure />
       <p>
@@ -103,7 +103,7 @@ export function HowItWorks() {
       <ol>
         <li>Open a field and press play. For nearby stars, start with the sequence &ldquo;By survey pass&rdquo;: it blinks one clean stack per pass, six months apart.</li>
         <li>Watch the star against its neighbours. The amber marker shows where the catalogue says it should be on that date; the coloured dots show where it was measured in each pass.</li>
-        <li>Switch to <b>Subtract</b> or <b>Chromatic difference</b>. A star that moved leaves a bright lobe where it is now and a dark lobe where it used to be.</li>
+        <li>Switch to <b>Subtract</b> (or <b>Gated pair</b>). A star that moved leaves a bright lobe where it is now and a dark lobe where it used to be. For a shift of one or two pixels these show the two lobes better than the chromatic difference.</li>
         <li>Click the star. Its spectrum is built on the spot from every frame, and the light curve shows whether it also changed in brightness.</li>
       </ol>
 
@@ -113,7 +113,8 @@ export function HowItWorks() {
         <li>The star images are sharper than the pixels, so a star&rsquo;s pixel values change with its exact position even when nothing else does. The pipeline measures that effect and includes it in its noise.</li>
         <li>Very faint objects, such as the brown dwarf WISE 0855&minus;0714, cannot be seen in one frame. Only the stacks of a whole pass go deep enough.</li>
         <li>The brightest stars saturate; their cores are blank.</li>
-        <li>A solar-system object shows in one frame and is gone in the next. Known asteroids are marked when the field carries them.</li>
+        <li>A solar-system object is still there in the exposure two minutes later, but has moved on by the next visit hours later. Known asteroids are marked when the field carries them.</li>
+        <li>Parallax (distance) is not measured reliably, and Planet X is the motivation, not a claim.</li>
       </ul>
     </article>
   )
@@ -178,7 +179,8 @@ export function About({ index, dois }: { index: PackIndex | null; dois: string[]
         <li>Star positions and proper motions: Gaia Data Release 3, European Space Agency (ESA) Gaia mission, processed by the Gaia Data Processing and Analysis Consortium.</li>
         <li>Infrared sources: CatWISE2020 catalogue, from WISE and NEOWISE data.</li>
         <li>Known solar-system objects: SkyBoT, IMCCE, Observatoire de Paris (Berthier et al. 2006).</li>
-        <li>Ephemerides and small-body identification: JPL Solar System Dynamics (Horizons and the Small-Body Identification service), queried by the offline pipeline, not by this page.</li>
+        <li>Ephemerides: NASA/JPL Solar System Dynamics. Data retrieved on 13 November 2026. Horizons System. https://ssd.jpl.nasa.gov. Queried by the offline pipeline, not by this page.</li>
+        <li>Mission paper: Bock et al. 2026, The SPHEREx Satellite Mission, ApJ 999, 139, doi:10.3847/1538-4357/ae2be2.</li>
         <li>Pipeline built with Astropy, NumPy and SciPy.</li>
       </ul>
 
@@ -206,7 +208,12 @@ export function About({ index, dois }: { index: PackIndex | null; dois: string[]
       </p>
 
       <h2>Use of SI</h2>
-      <p>The code was written with the help of an SI coding assistant; science, checks and decisions by the team. Every number shown comes from the published SPHEREx data and can be reproduced with the pipeline.</p>
+      <p>
+        The team chose the challenge, the goal and the direction: a comparison of SPHEREx dates that accounts for the changing wavelength. The specific method
+        (a per-pixel chromatic template checked against two baselines) was worked out with an SI assistant (Claude, by Anthropic), which also surveyed existing tools,
+        wrote the code and drafted the documents under the team&rsquo;s direction. The team reviewed the work, ran it and is responsible for it.
+        Every number shown is computed by the project&rsquo;s own code from the published SPHEREx data and can be reproduced with the pipeline. No SI-generated images are used.
+      </p>
 
       <h2>Licence</h2>
       <p>Code: Apache-2.0. Fonts: IBM Plex (SIL Open Font License 1.1), bundled with the site.</p>

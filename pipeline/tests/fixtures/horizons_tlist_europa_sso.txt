@@ -190,6 +190,6 @@ Computations by ...
                   command-line   telnet ssd.jpl.nasa.gov 6775
                   e-mail/batch   https://ssd.jpl.nasa.gov/ftp/ssd/horizons_batch.txt
                   scripts        https://ssd.jpl.nasa.gov/ftp/ssd/SCRIPTS
-    Inquiries   : Jon.D.Giorgini@jpl.nasa.gov
+    Inquiries   : (address removed from this recorded response)
 
 ***********************************************************************************************************************************************************************

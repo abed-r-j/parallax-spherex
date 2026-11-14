@@ -2,7 +2,7 @@
 
     parallax targets                     list the built-in fields
     parallax fetch barnard               download SPHEREx cutouts for a built-in field
-    parallax fetch --ra 10.68 --dec 41.27 --key m31 --name "M31"   ... or for any position
+    parallax fetch m31 --ra 10.68 --dec 41.27 --name "M31"   ... or for any position
     parallax publish                     rebuild every data pack for the web app
     parallax serve                       run the web app + live engine on this computer
 
@@ -23,7 +23,7 @@ import typer
 from .publish import all_targets, publish, repo_root
 from .targets import Target
 
-app = typer.Typer(add_completion=False, help="ParallaX: the SPHEREx sky in motion.")
+app = typer.Typer(add_completion=False, help="ParallaX: chromatic difference imaging for the SPHEREx sky.")
 
 
 def _data() -> Path:

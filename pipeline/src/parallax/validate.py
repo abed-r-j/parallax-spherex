@@ -159,8 +159,18 @@ def validate_motion(key: str, field: Field) -> dict:
     target = TARGETS[key]
     notes: list[str] = []
     if key == "wise0855":
-        motion = mo.faint_detection(field, target)
+        motion = mo.faint_detection(field, target, null_test=True)
         motion["mode"] = "faint"
+        nt = motion.get("nullTest")
+        if nt and "pFixed" in nt:
+            notes.append(
+                f"The combined statistic ({nt['best']:.1f}; {nt['atTrack']:.1f} at the catalogue "
+                "position without a search) is not a Gaussian sigma: on random tracks in the "
+                f"same maps it scatters by {nt['fixedStd']:.2f}. Empirical false-alarm "
+                f"probability: {nt['fixedExceed']} of {nt['nFixed']} random tracks reach the "
+                f"value at the catalogue position, {nt.get('searchExceed', 0)} of "
+                f"{nt.get('nSearch', 0)} reach the maximum of the {nt['searchRadiusPix']:.0f}-pixel "
+                f"zero-point search. Reversed track: {nt['reversedTrack']:.1f}.")
         positions = motion.get("track") or []
         which = "psf"
     else:
@@ -277,21 +287,57 @@ def _period_block(key: str, name: str, phot: ph.Photometry, which: str) -> dict 
     out = lc.phase_analysis(curves, period, epoch_max=epoch)
     out.update(source=source, epochMaxMjd=epoch, binDays=5.0,
                spanDays=float(np.ptp(phot.mjd)), cycles=float(np.ptp(phot.mjd) / period))
+    # No detector is excluded: every wavelength bin that is sampled well enough counts.
+    out["excludedDetectors"] = []
+    out["byDetector"] = {
+        str(d): {"significant": sum(1 for r in out["bins"] if r["det"] == d
+                                    and r["significance"] >= 3.0),
+                 "bins": sum(1 for r in out["bins"] if r["det"] == d)}
+        for d in sorted({r["det"] for r in out["bins"]})}
     trial = np.arange(120.0, 500.1, 2.0)
-    chi, used = np.zeros_like(trial), 0
+    chi, scans, spans = np.zeros_like(trial), [], []
     for c in curves:
         if len(c["mjd"]) >= 6 and np.ptp(c["mjd"]) >= 0.6 * period:
             s = lc.period_scan(c["mjd"], c["mag"], c["magErr"], trial)
             if np.isfinite(s["chi2"]).all():
                 chi += s["chi2"]
-                used += 1
-    if used:
+                scans.append(s["chi2"])
+                spans.append(float(np.ptp(c["mjd"])))
+    if scans:
         j = int(np.argmin(chi))
         dof = max(sum(len(c["mjd"]) - 3 for c in curves if len(c["mjd"]) >= 6), 1)
         inside = trial[chi <= chi[j] + max(chi[j] / dof, 1.0)]
         out["scan"] = {"periods": trial, "chi2": chi, "best": float(trial[j]),
-                       "lo": float(inside.min()), "hi": float(inside.max()), "nBins": used}
+                       "lo": float(inside.min()), "hi": float(inside.max()),
+                       "nBins": len(scans)}
+        out["scan"].update(period_bootstrap(trial, np.array(scans)))
+        cyc = np.array(spans) / float(trial[j])
+        out["scan"]["binSpanCycles"] = {"min": float(cyc.min()), "median": float(np.median(cyc)),
+                                        "max": float(cyc.max())}
+        out["scan"]["note"] = (
+            "lo/hi is the formal chi-square range and is too narrow (the sinusoid is a poor "
+            "formal fit); boot68/boot95 resample the wavelength bins and are the ranges to "
+            "quote. No single bin covers the whole data span: see binSpanCycles.")
     return out
+
+
+def period_bootstrap(trial: np.ndarray, scans: np.ndarray, n_boot: int = 1000,
+                     seed: int = 20261114) -> dict:
+    """Uncertainty of the summed-chi-square period from resampling the wavelength bins.
+
+    ``scans`` holds one chi-square curve per wavelength bin (rows) over the trial periods.
+    Each bootstrap draw sums a random sample (with replacement) of the bins and takes the
+    period of its minimum; the 68% and 95% ranges of those periods are returned. This
+    measures how much the answer depends on which bins happen to be in the sample, which
+    the formal chi-square range does not.
+    """
+    rng = np.random.default_rng(seed)
+    n = len(scans)
+    best = np.array([trial[int(np.argmin(scans[rng.integers(n, size=n)].sum(axis=0)))]
+                     for _ in range(n_boot)])
+    p = np.percentile(best, [2.5, 16.0, 50.0, 84.0, 97.5])
+    return {"bootMedian": float(p[2]), "boot68": [float(p[1]), float(p[3])],
+            "boot95": [float(p[0]), float(p[4])], "nBoot": n_boot, "bootSeed": seed}
 
 
 def validate_variable(key: str, field: Field) -> dict:
@@ -357,16 +403,26 @@ def motion_verdict(name: str, m: dict) -> str:
                     f"5-sigma limit {_f(m.get('upperLimit5SigmaUJy'), 0)} microJy; {truth}")
         flux = (f"{meas['fluxUJy']:.0f} +- {meas['fluxErrUJy']:.0f} microJy"
                 if meas and "fluxUJy" in meas else f"{_f(m.get('fluxUJy'), 0)} microJy (direct)")
-        head = (f"{name}: moving source detected in D5+D6 pass-difference stacks at S/N "
-                f"{_f(zp.get('combinedSnr'), 1)} ({flux}), {_f(zp.get('offsetArcsec'), 1)} "
-                "arcsec from the catalogue prediction")
+        nt = m.get("nullTest") or {}
+        null = ""
+        if "pFixed" in nt:
+            null = (f"; not a Gaussian sigma: random tracks scatter by {nt['fixedStd']:.2f}, "
+                    f"{nt['fixedExceed']}/{nt['nFixed']} reach it at a fixed position and "
+                    f"{nt.get('searchExceed', 0)}/{nt.get('nSearch', 0)} with the search")
+        head = (f"{name}: moving source detected in D5+D6 pass-difference stacks, combined "
+                f"statistic {_f(zp.get('combinedSnr'), 1)}{null} ({flux}), "
+                f"{_f(zp.get('offsetArcsec'), 1)} arcsec from the catalogue prediction")
         if not meas:
             return head + f"; no motion fit; {truth}"
         return (f"{head}; measured {meas['total']:.2f} +- {meas['eTotal']:.2f} arcsec/yr at PA "
                 f"{meas['pa']:.1f} +- {meas['ePa']:.1f} vs {truth}")
     if not meas:
         return f"{name}: fewer than two usable passes, no motion; {truth}"
-    return (f"{name}: measured {meas['total']:.2f} +- {meas['eTotal']:.2f} arcsec/yr at PA "
+    err = ""
+    if meas.get("errorSource") == "detector scatter":
+        err = (f" (scatter between {meas['nDetectorsForError']} detectors; formal "
+               f"{meas['eTotalFormal']:.2f})")
+    return (f"{name}: measured {meas['total']:.2f} +- {meas['eTotal']:.2f} arcsec/yr{err} at PA "
             f"{meas['pa']:.1f} +- {meas['ePa']:.1f} vs {truth} "
             f"({m['residual']['nSigma']:.1f} sigma, {m['nPasses']} passes, "
             f"shift {m['displacementPix']:.2f} px"
@@ -384,7 +440,12 @@ def variable_verdict(name: str, b: dict) -> str:
                 f"significant in {per['nSignificant']}/{per['nBins']} wavelength bins, median "
                 f"peak-to-peak {per['medianPeakToPeak']:.2f} mag, maximum near MJD "
                 f"{per['tMaxMean']:.0f}; free period {_f(scan.get('best'), 0)} d "
-                f"({_f(scan.get('lo'), 0)}-{_f(scan.get('hi'), 0)}) over {per['cycles']:.1f} cycles")
+                + (f"({scan['boot95'][0]:.0f}-{scan['boot95'][1]:.0f} d, 95%, bootstrap over "
+                   f"{scan['nBins']} wavelength bins; each bin spans "
+                   f"{scan['binSpanCycles']['min']:.1f} to {scan['binSpanCycles']['max']:.1f} "
+                   f"cycles, the whole data set {per['cycles']:.1f})" if "boot95" in scan else
+                   f"({_f(scan.get('lo'), 0)}-{_f(scan.get('hi'), 0)}) over "
+                   f"{per['cycles']:.1f} cycles"))
     rows = a["ratio"]
     if not rows:
         return f"{name}: {sat}; fewer than two groups with usable photometry"

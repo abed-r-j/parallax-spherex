@@ -1,4 +1,7 @@
-"""Download cutouts for built-in targets.  usage: fetch_targets.py DATA_DIR MIRROR key [key ...]"""
+"""Download cutouts for built-in targets.  usage: fetch_targets.py DATA_DIR MIRROR key [key ...]
+
+SI disclosure: written with the help of an SI coding assistant (Claude), checked by the team.
+"""
 
 import json
 import sys

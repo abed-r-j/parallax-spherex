@@ -60,7 +60,7 @@ cd pipeline
 ```
 
 It prints `ParallaX is running at http://127.0.0.1:8000  (Ctrl+C to stop)`. Wait about ten
-seconds, then open <http://127.0.0.1:8000>. The home page shows the five fields. Leave the
+seconds, then open <http://127.0.0.1:8000>. The home page shows the seven fields. Leave the
 terminal open and minimised.
 
 If port 8000 is taken: `.\.venv\Scripts\parallax.exe serve --port 8010` and use that port in
@@ -88,7 +88,7 @@ page of your build (they were published on 14 November):
 `http://127.0.0.1:8000/?field=pluto&seq=frames&ov=sso`. Step with the Right arrow: the
 object moves from picture to picture under its green label. Say: "This is Pluto, the
 original Planet X, in single SPHEREx frames, exactly where JPL Horizons predicts it as seen
-from the spacecraft: within 0.03 pixel." Check the night before that the label sits on the
+from the spacecraft: within 0.03 pixel on average." Check the night before that the label sits on the
 object.
 
 ## 4. What to click and what to say
@@ -103,7 +103,7 @@ object.
 | 0:45 | Tab 3 (Subtract). | "Subtract the first pass from the latest. Stars that stayed vanish. Barnard's Star leaves a bright lobe where it is and a dark lobe where it was. We measure 10.21 arcseconds per year, give or take 0.26; the Gaia catalogue says 10.36." |
 | 1:00 | Point at the dot map on the right. | "Now the catch. Every dot is one picture; height is its colour. No two visits share a colour, because SPHEREx sees each star through a filter that changes across the detector. Subtract two dates naively and every star lights up as a false alarm." |
 | 1:15 | Tab 4 (Three-way). Point at the captions under the panels. | "Same frame, three ways. Naive: the partner is seven bandwidths off in colour. Gated: the usual fix, keep only matching pairs. Ours: predict what a static sky looks like at this frame's own colours from the other passes, and subtract that." |
-| 1:35 | Tab 5 (Ledger). Point at the false-detection row, then the curves. | "And we measured it, on real frames, with test sources injected. False detections per frame here: 4.6, 2.4, 1.0. At equal false alarms we find moving sources about 1.8 times fainter than gating in this field. The limits are published next to the wins." |
+| 1:35 | Tab 5 (Ledger). Point at the false-detection row, then the curves. | "And we measured it, on real frames, with test sources injected. False detections per frame here: 4.6, 2.4, 1.0. At equal false alarms we find moving sources about 1.8 times fainter than gating in this field. The limits are published next to the wins." If someone points at the row "Known target recovered: no" under our method: "Yes. Next to the saturated core the classifier calls the star an artifact; for a star that moves one pixel a pass blink is the better tool, and we say so." |
 | 1:55 | Stay on the Ledger. | "Planet X is the motivation, not a claim. What we claim is a tool anyone can open, and a number anyone can reproduce." |
 
 ### The 5-minute demo
@@ -112,18 +112,18 @@ Do the 2-minute path, slower, and add these after the Ledger.
 
 | Time | Do | Say |
 |---|---|---|
-| 2:10 | Tab 6 (RW Aurigae). Click the star if no spectrum shows. Point at the three colours of dots in the spectrum. | "Spectra on the fly. Click any pixel and you get its spectrum from every picture, coloured by pass. This young star changed: one way at short wavelengths, the other way at long ones, while a control star stayed constant to half a percent." |
+| 2:10 | Tab 6 (RW Aurigae). Click the star if no spectrum shows. Point at the three colours of dots in the spectrum. | "Spectra on the fly. Click any pixel and you get its spectrum from every picture, coloured by pass. This young star changed: one way at short wavelengths, the other way at long ones, while a control star showed no change." |
 | 2:40 | Tab 7 (WISE 0855). | "Honesty slide. This brown dwarf is the coldest known, and in a single frame it is not there. We recover it only by stacking detectors 5 and 6, at a signal-to-noise of about 6.6, which we call moderately optimistic. And the challenge coordinates are its 2010 position: it has moved two arcminutes west." |
 | 3:05 | Tab 2 again, open the **Overlays** panel, tick Gaia and pixel flags. | "Overlays: Gaia stars moved to the date of the picture, WISE sources, contamination flags, and known asteroids predicted as seen from the spacecraft itself." |
 | 3:25 | Tab 8 (live M51), if the network is up. Watch the progress bar; frames appear. | "Any other coordinates. There is no server behind this. The site carries a 46-megabyte index of all 1.6 million public SPHEREx images, and the browser reads just the pixels it needs from the public archive. Fifty-five images in about ten seconds on a good connection." |
 | 4:00 | Click the **Share** button, show the link and the embed code. Switch to tab 9. | "Every view is a link, and one parameter turns it into something you can embed in a class page or another project." |
-| 4:20 | Tab 1, or the About page. | "Updating to a new data release is three commands, and the site costs nothing to run because it is static. Built with an SI coding assistant under our direction; every number comes from our own code on real SPHEREx data." |
+| 4:20 | Tab 1, or the About page. | "Updating to a new data release takes a few commands, and the site costs nothing to run because it is static. Built with an SI coding assistant under our direction; every number comes from our own code on real SPHEREx data." |
 | 4:40 | End on the Ledger or the three-way view. | "What it does not do: it does not find Planet Nine, it does not measure parallax reliably, and for a star that moves one pixel a simple pass blink still shows the motion best. We say so in the app." |
 
 Numbers you may quote, all from `docs/RESULTS.md`: 357 frames and 3 passes for Barnard's
 field; 4.64 / 2.44 / 0.99 false detections per frame; 1457 / 1025 / 563 microJy; 10.21 +-
-0.26 against 10.36 arcsec/yr; 1,628,230 images in 45.6 MB; 55 images in 10 to 12 seconds;
-120 + 55 tests. Do not round any of them into something stronger.
+0.26 against 10.36 arcsec/yr; 1,628,230 images in 45.6 MB; 55 images in 10 to 12 seconds on a
+fast connection; 120 + 55 tests. Do not round any of them into something stronger.
 
 ## 5. Fallbacks
 

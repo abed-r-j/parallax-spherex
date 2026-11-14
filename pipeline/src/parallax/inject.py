@@ -119,12 +119,20 @@ def static_sites(f: Field, blank, star, per_pass: int, rng) -> list[tuple[int, f
 
 
 def detection_rate(d: Diff, thresh: float = THRESH, exclude: np.ndarray | None = None,
-                   min_area: int = MIN_AREA) -> float:
-    """Detections per usable frame in the real cube (peaks inside ``exclude`` ignored)."""
+                   min_area: int = MIN_AREA, signs: tuple[float, ...] = (1.0, -1.0),
+                   snr: np.ndarray | None = None) -> float:
+    """Detections per usable frame in the real cube (peaks inside ``exclude`` ignored).
+
+    Only peaks in usable frames are counted, so numerator and denominator refer to the
+    same frames. ``signs=(1.0,)`` counts positive detections only; ``snr`` replaces the
+    cube that is searched (e.g. a rescaled copy of ``d.snr``).
+    """
     nu = int(d.usable.sum())
     if nu == 0:
         return float("nan")
-    p = find_peaks(d.snr, thresh, min_area)
+    p = find_peaks(d.snr if snr is None else snr, thresh, min_area, signs=signs)
+    if len(p):
+        p = p[d.usable[p[:, 0].astype(int)]]
     if exclude is not None and len(p):
         p = p[~exclude[p[:, 0].astype(int), p[:, 1].astype(int), p[:, 2].astype(int)]]
     return len(p) / nu
@@ -214,12 +222,14 @@ def _curves(f, d, sites, fluxes, thresh):
 def injection_recovery(f: Field, diffs: dict[str, Diff], static: np.ndarray,
                        fluxes=FLUXES, per_frame: int = 2, per_pass: int = 4,
                        thresholds: dict[str, float] | None = None,
-                       exclude: np.ndarray | None = None, seed: int = 20261113) -> dict:
+                       exclude: np.ndarray | None = None, seed: int = 20261113,
+                       kinds: tuple[str, ...] = ("mover", "static")) -> dict:
     """Completeness versus flux for every mode in ``diffs``.
 
     ``static`` is the cube that defines blank-sky and near-star sites (the chromatic
     template); the same sites are used for every mode. ``thresholds`` maps a mode to its
-    SNR threshold (default 5 for all). Returns a JSON-safe dict.
+    SNR threshold (default 5 for all). ``kinds`` selects the source kinds that are run
+    (the sites of a kind do not depend on which kinds are run). Returns a JSON-safe dict.
     """
     rng = np.random.default_rng(seed)
     blank, star = site_maps(f, static, exclude)
@@ -227,6 +237,7 @@ def injection_recovery(f: Field, diffs: dict[str, Diff], static: np.ndarray,
         "mover": mover_sites(f, blank, star, per_frame, rng),
         "static": static_sites(f, blank, star, per_pass, rng),
     }
+    sites = {k: v for k, v in sites.items() if k in kinds}
     out: dict = {"fluxUJy": [float(x) for x in fluxes], "seed": seed, "modes": {}}
     for mode, d in diffs.items():
         thr = float((thresholds or {}).get(mode, THRESH))

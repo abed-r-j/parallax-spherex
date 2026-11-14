@@ -4,6 +4,8 @@ This page describes the parts of ParallaX, how data flows between them, why they
 the way they are, how fast they are, and how they fail. Numbers are from
 [RESULTS.md](RESULTS.md) and the build reports; nothing here is an estimate unless it says so.
 
+SI disclosure: drafted with the help of an SI coding assistant (Claude, by Anthropic), checked by the team.
+
 ## 1. The two halves and the contract between them
 
 ```mermaid
@@ -102,7 +104,7 @@ flowchart TB
 | **Static site, no hosted server** | No running cost and nothing to keep alive after the hackathon. We found no free host for a Python API; a static site can be hosted free on GitHub Pages. The precomputed fields make the demo independent of the archive's speed. |
 | **Read pixels by HTTP range request** | A Level-2 image is 65 MB; a 6 arcmin field needs about 0.5 MB of it. Pixels are identical to the IRSA cutout service. |
 | **Ship an index of every image with the site** | A browser cannot query IRSA: its services send no CORS headers. The public bucket does allow cross-origin range reads, but a bucket cannot answer "which files cover this position". The index answers that without a server. |
-| **Correct colour with a template instead of gating pairs** | Gating needs a partner frame at nearly the same wavelength; the template needs none and uses every other-pass frame near that wavelength, so it averages down noise (about 5 to 6 effective references) and uses 100% of frames in ordinary fields. |
+| **Correct colour with a template instead of gating pairs** | Gating needs a partner frame at nearly the same wavelength; the template needs none and uses every other-pass frame near that wavelength, so it averages down noise (about 5 to 6 effective references) and uses 97 to 100% of frames. |
 | **Template built only from other passes** | A source that is present in the frame's own pass must not be subtracted from itself. Single-pass fields fall back to leaving out the frame's own visit. |
 | **Empirical model error, measured within each reference pass** | SPHEREx pixels under-sample the image, so a bright star's pixel values scatter by 23 to 27% at fixed wavelength. A purely statistical noise model floods with false detections (Barnard's field: 28.70 per frame for the naive pair). Measuring the scatter within a pass keeps real pass-to-pass change visible. |
 | **Give every method the same "star noise" term in the ledger** | Otherwise the comparison would flatter the template. The plain-noise numbers are published too. |
@@ -126,7 +128,7 @@ flowchart TB
 | Publish one field without injection | about 45 s |
 | Sky index build | 1,628,230 images; 601 MB of catalogue rows downloaded in about 73 minutes (first time; updates fetch only new days); result 45.6 MB in 1664 shards plus a 92 kB manifest; median shard 22 kB |
 | Sky index query | about 4 shards, about 0.1 MB, at ordinary positions; zero misses against the live archive at six test positions |
-| Live field in the browser | M51, 3 arcmin, detector 3: 55 images, 21.4 MB, 111 requests, 10 to 12 s on a fast connection (viewer usable after 3 to 5 s); COSMOS, detectors 2 and 5: 78 images, 28.2 MB, 11.7 s; one to two minutes on a slow connection |
+| Live field in the browser | M51, 3 arcmin, detector 3: 55 images, 21.4 MB, 111 requests, 10 to 12 s on a fast connection (viewer usable after 3 to 5 s); COSMOS, detectors 2 and 5: 78 images, 28.2 MB, 11.7 s; an estimated one to two minutes on a slow connection (not measured) |
 | Agreement of browser and pipeline | resampled pixels within 2e-4 relative; wavelength within 5e-6 micron; TAN-SIP positions within 1e-6 pixel of Astropy |
 | Data pack size | 10.2 to 17.8 MB of pixels per challenge field |
 | Web bundle | about 357 kB of JavaScript before compression |

@@ -11,6 +11,8 @@ python pipeline/scripts/run_validation.py   # target measurements, writes data/s
 
 Run time is two to four minutes per field on a laptop (i7-11800H).
 
+SI disclosure: drafted with the help of an SI coding assistant (Claude, by Anthropic), checked by the team.
+
 ## 1. Data used
 
 | Field | Images | Survey passes | Field of view | Note |
@@ -21,8 +23,8 @@ Run time is two to four minutes per field on a laptop (i7-11800H).
 | RW Aurigae | 332 | 3 | 6.25 arcmin | core saturated in 39% of frames |
 | R Draconis | 590 of 2,493 available | continuous (deep field) | 6.25 arcmin | core saturated in 97% of frames |
 
-A typical position is seen in about 75 pointings per survey pass, within roughly two weeks,
-each at a different wavelength; passes repeat about every six months.
+In these fields a position is typically seen in 60 to 150 frames per survey pass, spread
+over two to eight weeks, each at a different wavelength; passes repeat about every six months.
 
 ## 2. Three ways to difference two dates
 
@@ -30,7 +32,7 @@ each at a different wavelength; passes repeat about every six months.
   This is what a plain blink comparator does.
 * **Wavelength-gated pair**: a frame minus the other-pass frame closest in wavelength,
   accepted only if they differ by less than half a filter bandwidth. This is the approach
-  taken by the other tools we surveyed.
+  taken by most of the other tools we surveyed.
 * **Chromatic template** (ours): a frame minus a prediction of the static sky at that
   frame's per-pixel wavelength, built from the spectrum each pixel showed in the other passes.
 
@@ -66,11 +68,12 @@ methods; the main column gives every method the same fitted "star noise" term (s
 ### 2.1 What the comparison shows
 
 * The chromatic template is 3 to 15% deeper than the gated pair in every field.
-* At a matched false-detection rate it recovers moving sources 1.2 to 1.8 times fainter than
-  the gated pair on blank sky (Barnard's field: 563 against 1025 microJy).
+* At a matched false-detection rate it recovers moving sources 1.2 to 1.9 times fainter than
+  the gated pair on blank sky (Barnard's field: 563 against 1025 microJy), and 1.1 to 1.6
+  times fainter next to a star.
 * It gives fewer false detections than the gated pair in four of five fields (Barnard's
   field: 0.99 against 2.44 per frame, i.e. 109 against 269 per square degree per frame).
-* It needs no partner frame, so it uses every frame; the gated pair loses 1 to 4% of frames
+* It needs no partner frame, so it uses 97 to 100% of frames; the gated pair loses 1 to 4% of frames
   in ordinary fields and 21% in the R Draconis deep field.
 
 ### 2.2 What it does not show (limits we measured)
@@ -82,7 +85,10 @@ methods; the main column gives every method the same fitted "star noise" term (s
   under-sample the image: the peak pixel of a bright star scatters by 23 to 27% from frame
   to frame at fixed wavelength. This is why pair differences flood with false detections
   under a purely statistical noise model, and why the template carries an empirical
-  model-error map. Frame registration is not the problem (0.16 arcsec rms on 25 stars).
+  model-error map. Frame registration is not the main problem (0.16 arcsec rms on 25 stars
+  within a pass), but it is not perfect either: between passes we measure offsets of up to
+  0.1 pixel (0.6 arcsec, Barnard's field), which the motion fit removes and the differencing
+  does not.
 * **For a star that moves by one or two pixels, a pair shows the two-lobe signature better
   than the template.** Both lobes exceed 5 sigma in 69% of Barnard frames for the gated pair
   against 17% for the template, because a template built from two other passes averages
@@ -91,6 +97,10 @@ methods; the main column gives every method the same fitted "star noise" term (s
 * **R Draconis is not a clean test.** The saturated Mira fills the cutout; depth is three to
   four times worse in every method and the template has slightly more false detections
   (0.61 against 0.58 per frame).
+* **The template does not pass its own known-target test.** In the ledger's "known target
+  recovered" row it scores "no" for Barnard's Star: its detection sits next to the saturated
+  core and is classed an artifact in 85% of frames. RW Aurigae's change exceeds 5 sigma in
+  39% of template frames against 86% for the gated pair, and no method classes it "variable".
 * Injected sources are achromatic Gaussian point sources; the 14-pixel exclusion radius and
   the 0.5-per-frame matched rate are our choices and are recorded in the ledger files.
 
@@ -98,11 +108,11 @@ methods; the main column gives every method the same fitted "star noise" term (s
 
 | Target | What we measured | Reference |
 |---|---|---|
-| Barnard's Star | proper motion 10.21 +- 0.26 arcsec/yr at position angle 356.3 +- 1.5 deg (shift of 1.65 pixels over 3 passes, from the wings of a saturated star) | 10.36 arcsec/yr at 355.6 deg (Gaia DR3) |
+| Barnard's Star | proper motion 10.2 +- 0.5 arcsec/yr (scatter between the six detectors; the formal error of the weighted fit is 0.26) at position angle 356.3 +- 1.5 deg (shift of 1.65 pixels over 3 passes, from the wings of a saturated star; fit with a free annual term, so three passes leave one degree of freedom) | 10.36 arcsec/yr at 355.6 deg (Gaia DR3) |
 | Epsilon Indi B | 4.64 +- 0.09 arcsec/yr at 122.6 +- 1.3 deg (shift of 1.02 pixels over 4 passes) | 4.70 arcsec/yr at 122.7 deg |
-| WISE 0855-0714 | a moving source at S/N 6.6 in stacks of detectors 5 and 6 only (395 +- 69 microJy), 1.5 arcsec from the predicted position; 7.81 +- 1.57 arcsec/yr at 278.2 +- 4.3 deg; absent in detectors 1-4 | 8.15 arcsec/yr at 274.8 deg |
-| RW Aurigae | in September 2025, compared with September 2026, the star was 0.37 +- 0.14 mag fainter at 0.75-1.1 micron and 0.76 +- 0.03 mag brighter at 4.4-5.0 micron; a control star is constant to 0.005 mag | irregular T Tauri variable |
-| R Draconis | periodic change significant in 22 of 43 wavelength bins, median peak-to-peak 1.18 mag (2-3 mag near 0.8 micron, about 1 mag at 4.5 micron); free period 250 d over 2.1 cycles | Mira, catalogued period about 246 d |
+| WISE 0855-0714 | a moving source with a combined statistic of 6.6 in pass-difference stacks of detectors 5 and 6 only, stacked along the catalogue track (not a Gaussian sigma: random tracks in the same maps scatter by 0.6; 1 of 2,000 reaches the value found at the predicted position and 0 of 200 reach the maximum of the 8-pixel search; joint-fit flux 395 +- 69 microJy), 1.5 arcsec from the predicted position; 7.81 +- 1.57 arcsec/yr at 278.2 +- 4.3 deg with the catalogue parallax assumed (an independent centroid fit gives 6.2 +- 1.1); absent in detectors 1-4 | 8.15 arcsec/yr at 274.8 deg |
+| RW Aurigae | in September 2025, compared with September 2026, the star was 0.37 +- 0.14 mag fainter at 0.75-1.1 micron and 0.76 +- 0.03 mag brighter at 4.4-5.0 micron; a control star shows no change (0.00 +- 0.02 mag) | irregular T Tauri variable |
+| R Draconis | periodic change significant in 22 of 43 wavelength bins (amplitudes fitted at the catalogue period), median peak-to-peak 1.18 mag (2-3 mag near 0.8 micron, about 1 mag at 4.5 micron); free period 250 d (244 to 258 d, 95%, bootstrap over 40 wavelength bins; each bin covers 1.2 to 1.8 cycles, the whole data set 2.1) | Mira, catalogued period about 246 d (AAVSO VSX: 246.1 d) |
 
 Caveats that belong with these numbers:
 
@@ -111,13 +121,31 @@ Caveats that belong with these numbers:
 * Parallax is **not** measured reliably: the fitted annual term for Barnard's Star is about
   three times its true parallax. SPHEREx always looks about 90 degrees from the Sun, so any
   Sun-synchronous systematic imitates parallax.
-* The WISE 0855 significance comes from non-independent pass differences and a search over
-  about 59 trial positions; treat 6.6 as moderately optimistic. A static neighbour of 277
-  microJy lies inside the same beam at shorter wavelengths.
+* The WISE 0855 statistic (6.6; 6.5 at the catalogue position without any search) is not a
+  Gaussian sigma, because the three pass differences are not independent. We calibrated it
+  on random tracks in the same maps (the real pass-to-pass displacements, rotated by a
+  random angle and placed at a random zero point): at a fixed position they scatter by 0.6
+  (robust width 0.45) and 1 of 2,000 reaches 6.5; with the full 8-pixel zero-point search
+  0 of 200 reach 6.6 (largest 3.4). Following the track in reverse order gives -4.1, a
+  source standing still at the mean position gives -0.2, and detectors 1-4 give 0.2 on the
+  track (2.7 at best in their own search). A static neighbour of 277 microJy lies inside
+  the same beam at shorter wavelengths.
 * The challenge coordinates of WISE 0855 are its 2010 WISE position; the source is now 2
   arcmin further west, where we find it.
+* The R Draconis amplitudes were fitted with the period fixed at 245.6 d, close to the
+  catalogue value. The formal range of the free period (248 to 252 d) is too narrow; a
+  bootstrap over the 40 wavelength bins gives 246 to 254 d (68%) and 244 to 258 d (95%).
+  No single wavelength bin covers the 2.1 cycles of the whole data set: each spans 1.2 to
+  1.8 cycles with 6 to 12 points, single-bin periods scatter from about 160 to 340 d, and
+  the sinusoid is a poor formal fit (a parabola in time fits better in 15 of 40 bins).
+  The 43 bins come from detectors 1, 3, 4 and 6 (10 of 15, 3 of 10, 2 of 11 and 7 of 7
+  significant); no detector is excluded.
+* Barnard's Star sits a constant 1.35 arcsec north of its catalogue track; we have not
+  explained this offset (wing bias or coordinate zero point).
+* The epoch of the WISE 0855 catalogue position (2010.4) was set after the data showed the
+  source 32 arcsec from the first prediction; it agrees with the date of the WISE survey.
 * R Draconis and Barnard's Star saturate SPHEREx; their fluxes come from the wings and are
-  relative, not absolute. Detector 3 photometry of R Draconis is unreliable and is excluded.
+  relative, not absolute.
 
 ## 4. Known solar-system objects as ground truth
 
@@ -126,11 +154,27 @@ JPL Horizons as seen from the SPHEREx spacecraft. The fields were found by an ob
 search of the archive footprints, which returned the same 136 images as IRSA's own moving
 object tool for (52) Europa.
 
-| Field | Frames | Object present in | Chromatic-difference detections labelled with the object | Median S/N | Measured minus predicted position |
+| Field | Frames | Object present in | Chromatic-difference detections labelled with the object | Median S/N in the chromatic difference | Measured minus predicted position |
 |---|---|---|---|---|---|
-| (52) Europa crossing, 20-21 Aug 2025 (V 12.2, detectors 3 and 6) | 111 | 24 | 24 of 24 | 188 | -0.05 +- 0.04, 0.00 +- 0.07 pixel |
-| Pluto, 4-10 Oct 2025 (V 14.5, detector 2) | 46 | 18 | 18 of 18 | 50 | +0.03 +- 0.10, +0.01 +- 0.04 pixel |
+| (52) Europa crossing, 20-21 Aug 2025 (V 12.2, detectors 3 and 6) | 111 | 24 | 24 of 24 (S/N 111 to 236), matched to the ephemeris within 0.5 pixel; without the ephemeris the classifier calls 21 of the 24 "mover" | 186 | -0.05 +- 0.04, 0.00 +- 0.07 pixel |
+| Pluto, 4-10 Oct 2025 (V 14.5, detector 2) | 46 | 18 | 18 of 18 (S/N 14 to 57), matched to the ephemeris; without the ephemeris the classifier calls 8 "mover", 8 "variable", 1 "star-residual" and 1 "artifact" | 47 | +0.03 +- 0.10, +0.01 +- 0.04 pixel |
 
+* What the pipeline does blind, with no ephemeris (re-run on the cached fields): for
+  (52) Europa the classifier calls 21 of the 24 detections "mover" and the linker joins
+  them into one track of 21 detections at 28.3 arcsec per hour, position angle 89.2 deg
+  (ephemeris: 28.5 at 89.1). The other 3 are called "artifact": 2 lie next to missing
+  pixels and 1 has a TRANSIENT flag within one pixel. Before a fix made during our own
+  review the classifier called only 2 of the 24 "mover" (a source this bright covers more
+  than its former fixed limit of 30 pixels, and 8 detections lay on a faint star), so the
+  earlier "24 of 24" rested on the ephemeris label.
+* In the direct image Pluto is at 83 to 176 sigma in every one of its 18 frames. Blind, the
+  classifier calls 8 of its 18 detections "mover" and 8 "variable" (it moves 0.7 arcsec per
+  hour, so over consecutive frames it stays on the same pixels and looks like a source
+  that brightened), and the linker, which
+  needs at least 1 arcsec per hour, reports no track: Pluto is named only by the ephemeris.
+* The classifier and the linker share a speed limit of about 170 arcsec per hour (one pixel
+  between consecutive exposures 2.15 minutes apart): anything faster is rejected as a
+  cosmic ray by the same-visit check.
 * The asteroid moves about 28 arcsec per hour and crosses the 6 arcmin field in three visits
   ten hours apart; Pluto drifts 12 pixels in 6.4 days.
 * A single-exposure spectrum of (52) Europa from 45 clean frames between 0.79 and 4.97 micron
@@ -151,5 +195,5 @@ object tool for (52) Europa.
 * Sky index: all 1,628,230 public Level-2 images in 45.6 MB; zero misses against the live
   archive at six test positions.
 * In-browser live mode: 55 images of M51 in 10 to 12 seconds, no server (fast connection;
-  one to two minutes on a slow one).
+  an estimated one to two minutes on a slow one).
 * 120 Python tests and 55 TypeScript tests, all offline (2 more Python tests call live services and are skipped unless `PARALLAX_NETWORK=1` is set).

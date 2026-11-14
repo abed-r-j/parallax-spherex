@@ -601,6 +601,8 @@ def measure_motion(field: Field, target: Target, parallax_mas: float | None = No
     meas = _as_mas(_inflate(fits[primary]))
     meas["model"] = ("proper motion + free annual (parallax-like) term" if primary == "free"
                      else "proper motion with the catalogue parallax removed")
+    result["perDetectorMotion"] = _per_detector_motion(field, rows, reg, target, plx)
+    meas = _with_detector_scatter(meas, result["perDetectorMotion"])
     result["measured"] = meas
     result["fits"] = {"annualTermFree": _as_mas(fits["free"]) if "free" in fits else None,
                       "parallaxFixed": _as_mas(fits["fixed"]), "linear": _as_mas(fits["linear"])}
@@ -617,11 +619,54 @@ def measure_motion(field: Field, target: Target, parallax_mas: float | None = No
     result["displacementPix"] = float(np.hypot(last["x"] - first["x"], last["y"] - first["y"]))
     result["baselineYears"] = last["year"] - first["year"]
     result["parallax"] = _parallax_verdict(fits, plx, len(passes), saturated)
-    result["perDetectorMotion"] = _per_detector_motion(field, rows, reg, target, plx)
+    if meas.get("errorSource") == "detector scatter":
+        notes.append(
+            f"The quoted error of the total motion ({meas['eTotal']:.2f} arcsec/yr) is the "
+            f"standard error of {meas['nDetectorsForError']} independent per-detector motions; "
+            f"the formal error of the weighted fit ({meas['eTotalFormal']:.2f}) is smaller "
+            "because it trusts the formal centroid errors of the best detectors.")
     if primary == "fixed":
         notes.append("Only two passes: the catalogue parallax had to be assumed, and the "
                      "motion has no redundancy (zero degrees of freedom).")
     return result
+
+
+MIN_DETECTORS_FOR_SCATTER = 3
+
+
+def _with_detector_scatter(meas: dict, per_detector: dict) -> dict:
+    """Quote the larger of the formal error and the scatter between detectors.
+
+    The estimator is not changed. Every detector seen in two or more passes gives an
+    independent motion (``_per_detector_motion``); the standard error of those values
+    measures what the formal error of the weighted fit cannot: centroid systematics that
+    differ from detector to detector. Both errors are kept (``...Formal``,
+    ``...Detectors``) and the larger one is reported, for the total motion, its position
+    angle and the two components. Needs at least three detectors.
+    """
+    out = dict(meas)
+    keys = ("eTotal", "ePa", "ePmRa", "ePmDec")
+    for k in keys:
+        out[k + "Formal"] = meas[k]
+    fits = per_detector.get("fits", [])
+    out["errorSource"] = "formal"
+    if len(fits) < MIN_DETECTORS_FOR_SCATTER:
+        return out
+    n = len(fits)
+
+    def se(v) -> float:
+        return float(np.std(np.asarray(v, float), ddof=1) / np.sqrt(n))
+
+    dpa = [(f["pa"] - meas["pa"] + 180.0) % 360.0 - 180.0 for f in fits]
+    scatter = {"eTotal": se([f["total"] for f in fits]), "ePa": se(dpa),
+               "ePmRa": se([f["pmRa"] for f in fits]), "ePmDec": se([f["pmDec"] for f in fits])}
+    for k in keys:
+        out[k + "Detectors"] = scatter[k]
+        out[k] = max(float(meas[k]), scatter[k])
+    out["nDetectorsForError"] = n
+    if scatter["eTotal"] > meas["eTotal"]:
+        out["errorSource"] = "detector scatter"
+    return out
 
 
 def _inflate(fit: dict) -> dict:
@@ -786,6 +831,82 @@ def zero_point_search(snr_maps: list[np.ndarray], pred: list[tuple[float, float]
     return best
 
 
+def combined_snr(snr_maps: list[np.ndarray], positions) -> float:
+    """The shift-and-stack statistic at fixed positions: sum of the samples / sqrt(n)."""
+    v = [_sample(m, float(x), float(y)) for m, (x, y) in zip(snr_maps, positions, strict=True)]
+    return float(np.sum(v) / np.sqrt(len(v))) if np.isfinite(v).all() else float("nan")
+
+
+def track_null_test(snr_maps: list[np.ndarray], pred, radius: float, at_track: float,
+                    best: float, n_fixed: int = 2000, n_search: int = 200,
+                    seed: int = 20261114) -> dict:
+    """Empirical null distribution of the shift-and-stack statistic in the same maps.
+
+    The per-pass difference maps are not independent (each is a pass minus the others),
+    so the combined statistic is not a Gaussian sigma. Here the same statistic is
+    evaluated for tracks that cannot contain the target: the real track shape (the
+    pass-to-pass displacements) is rotated by a random angle and placed at a random zero
+    point, away from the real track.
+
+    * ``fixed``: ``n_fixed`` tracks evaluated at their own position, no search (at least
+      10 pixels from the target) - to be compared with ``at_track``, the statistic at the
+      catalogue prediction;
+    * ``search``: ``n_search`` tracks with the full zero-point search of ``radius`` pixels
+      (zero point at least ``radius + 6`` pixels from the target) - to be compared with
+      ``best``, the maximum found by the real search.
+
+    Returned are the scatter of the null and the fraction of null trials that reach the
+    real values (the empirical false-alarm probabilities; with zero exceedances the
+    probability is below about 3 / n at 95% confidence).
+    """
+    rng = np.random.default_rng(seed)
+    pred = np.asarray(pred, float)
+    rel = pred - pred.mean(axis=0)
+    centre = pred.mean(axis=0)
+    n = snr_maps[0].shape[0]
+
+    def draw(margin: float, avoid: float) -> np.ndarray | None:
+        th = rng.uniform(0.0, 2.0 * np.pi)
+        c, s = np.cos(th), np.sin(th)
+        z = rng.uniform(margin, n - 1 - margin, size=2)
+        if np.hypot(*(z - centre)) < avoid:
+            return None
+        return z + rel @ np.array([[c, s], [-s, c]])
+
+    fixed: list[float] = []
+    for _ in range(20 * n_fixed):
+        if len(fixed) >= n_fixed:
+            break
+        p = draw(6.0, 10.0)
+        v = combined_snr(snr_maps, p) if p is not None else np.nan
+        if np.isfinite(v):
+            fixed.append(v)
+    search: list[float] = []
+    for _ in range(20 * n_search):
+        if len(search) >= n_search:
+            break
+        p = draw(radius + 6.0, radius + 6.0)
+        if p is None or not np.isfinite(combined_snr(snr_maps, p)):
+            continue
+        b = zero_point_search(snr_maps, [tuple(q) for q in p], radius)[2]
+        if np.isfinite(b):
+            search.append(b)
+    out: dict = {"seed": seed, "nFixed": len(fixed), "nSearch": len(search),
+                 "atTrack": at_track, "best": best, "searchRadiusPix": radius}
+    if fixed:
+        a = np.array(fixed)
+        out.update(fixedStd=float(a.std()), fixedMadStd=robust_level(a)[1],
+                   fixedP999=float(np.percentile(a, 99.9)), fixedMax=float(a.max()),
+                   fixedExceed=int(np.sum(a >= at_track)), pFixed=float(np.mean(a >= at_track)),
+                   pFixedAbove3=float(np.mean(a >= 3.0)))
+    if search:
+        b = np.array(search)
+        out.update(searchMedian=float(np.median(b)), searchP99=float(np.percentile(b, 99)),
+                   searchMax=float(b.max()), searchExceed=int(np.sum(b >= best)),
+                   pSearch=float(np.mean(b >= best)))
+    return out
+
+
 def fit_moving_source(field: Field, target: Target, data: list[dict], sig: float, plx: float,
                       x0: float, y0: float, half: int = 6) -> dict | None:
     """Joint fit of one moving point source to the pass-minus-mean images.
@@ -884,7 +1005,8 @@ def fit_moving_source(field: Field, target: Target, data: list[dict], sig: float
 
 def faint_detection(field: Field, target: Target, parallax_mas: float | None = None,
                     dets: tuple[int, ...] = (5, 6), zero_point_radius: float = 8.0,
-                    min_frames: int = 4, detect_snr: float = 5.0) -> dict:
+                    min_frames: int = 4, detect_snr: float = 5.0, null_test: bool = False,
+                    control_dets: tuple[int, ...] = (1, 2, 3, 4)) -> dict:
     """Matched-filter search for a faint moving target in per-pass stacks.
 
     For each pass the selected detectors are stacked. Two maps are made: the stack
@@ -895,6 +1017,10 @@ def faint_detection(field: Field, target: Target, parallax_mas: float | None = N
     along the catalogue track for every common offset within ``zero_point_radius``
     pixels. The noise of every map is the robust scatter of the same estimator over the
     field, so it includes confusion by real sources.
+
+    ``null_test=True`` adds ``nullTest``: the same statistic on random tracks in the same
+    maps (``track_null_test``, about a minute), the reversed track and the statistic in
+    ``control_dets``, where the target is expected to be absent.
     """
     plx = PARALLAX_MAS.get(target.key, (0.0, ""))[0] if parallax_mas is None else parallax_mas
     ujy = ujy_per_mjysr(field.scale)
@@ -928,6 +1054,9 @@ def faint_detection(field: Field, target: Target, parallax_mas: float | None = N
         "map": "pass-difference" if key == "diff" else "direct (single pass)",
         "trials": int(np.pi * zero_point_radius**2 / (2 * np.pi * sig**2)),
     }
+    if null_test and len(data) > 1:
+        out["nullTest"] = _null_block(field, target, plx, maps, pred, zero_point_radius, at_cat,
+                                      comb, min_frames, control_dets)
     rows = []
     for d in data:
         x0, y0 = d["predX"] + off[0], d["predY"] + off[1]
@@ -953,6 +1082,30 @@ def faint_detection(field: Field, target: Target, parallax_mas: float | None = N
         _joint_summary(field, target, plx, out,
                        fit_moving_source(field, target, data, sig, plx,
                                          data[0]["predX"] + off[0], data[0]["predY"] + off[1]))
+    return out
+
+
+def _null_block(field: Field, target: Target, plx: float, maps: list, pred: list,
+                radius: float, at_cat: float, comb: float, min_frames: int,
+                control_dets: tuple[int, ...]) -> dict:
+    """Null test of the track statistic plus two controls (reversed track, other detectors)."""
+    out = track_null_test(maps, pred, radius, at_cat, comb)
+    # the same positions visited in the opposite order: a mover gives a negative value,
+    # a static source that merely changed brightness gives the same sign as forward
+    out["reversedTrack"] = combined_snr(maps, pred[::-1])
+    out["staticAtMeanPosition"] = combined_snr(
+        maps, [tuple(np.mean(np.asarray(pred), axis=0))] * len(pred))
+    use = np.isin(field.det, control_dets)
+    if use.any():
+        fwhm = float(np.nanmean(field.psf_fwhm[use]))
+        ctl = _pass_maps(field, target, plx, use, effective_sigma_pix(fwhm, field.scale),
+                         min_frames)
+        if len(ctl) > 1:
+            cmaps = [d["diff"] / d["diffSd"] for d in ctl]
+            cpred = [(d["predX"], d["predY"]) for d in ctl]
+            out["controlDetectors"] = {
+                "detectors": list(control_dets), "atTrack": combined_snr(cmaps, cpred),
+                "best": zero_point_search(cmaps, cpred, radius)[2]}
     return out
 
 

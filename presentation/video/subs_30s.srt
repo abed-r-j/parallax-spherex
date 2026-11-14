@@ -9,8 +9,8 @@ blink SPHEREx.
 
 3
 00:00:07,000 --> 00:00:11,500
-This is ParallaX: see what really moved or
-changed in the infrared.
+This is ParallaX: fewer false alarms in
+the infrared sky.
 
 4
 00:00:11,500 --> 00:00:15,500

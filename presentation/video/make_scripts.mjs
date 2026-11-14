@@ -24,7 +24,7 @@ const S30 = {
   cues: [
     [0.0, 3.0, A, `${CAM}: both members, side by side. Abed speaks, Mohamad waves.`, 'We are Abed and Mohamad, team ZENITH LABS.'],
     [3.0, 7.0, M, `${CAM}: both members. Mohamad speaks.`, 'Pluto was found by blinking two photos. We blink SPHEREx.'],
-    [7.0, 11.5, A, 'SCREEN: shot_01_type_coordinates.mp4 (from 3.0 s: typing the coordinates, landing on the field). Text over the first second: "ParallaX: chromatic difference imaging for the SPHEREx sky".', 'This is ParallaX: see what really moved or changed in the infrared.'],
+    [7.0, 11.5, A, 'SCREEN: shot_01_type_coordinates.mp4 (from 3.0 s: typing the coordinates, landing on the field). Text over the first second: "ParallaX: chromatic difference imaging for the SPHEREx sky".', 'This is ParallaX: fewer false alarms in the infrared sky.'],
     [11.5, 15.5, M, 'SCREEN: shot_03_time_wavelength.mp4 (2 s), then shot_04_naive_false_alarms.mp4 (2 s).', 'SPHEREx never repeats a colour, so stars become false alarms.'],
     [15.5, 20.5, A, 'SCREEN: shot_05_three_way.mp4 (from 2.5 s, where the naive panel glows and the template panel does not). Text: "SPHEREx data: NASA/IPAC IRSA".', 'From NASA’s open data, we predict each frame’s own colours, and subtract.'],
     [20.5, 25.0, M, 'SCREEN: shot_11_live_fetch.mp4 (the progress bar and the picture arriving, sped up 2x), or shot_12_asteroid_europa.mp4.', 'Next: anyone types coordinates and explores the changing sky.'],
@@ -45,8 +45,8 @@ const S120 = {
     ['Demonstration', M, 'SCREEN: shot_02_blink_barnard.mp4.', 'Here is Barnard’s Star, blinked pass by pass: you can see it move.'],
     ['', M, 'SCREEN: shot_05_three_way.mp4 (whole clip).', 'Here is one frame differenced three ways: naive, wavelength-matched, and our chromatic template, which predicts the frame at its own wavelengths from the other passes.'],
     ['', M, 'SCREEN: shot_07_click_spectrum.mp4, then shot_12_asteroid_europa.mp4.', 'Click any star for its spectrum. And here an asteroid crosses, right under its predicted label.'],
-    ['What makes it distinctive', A, 'SCREEN: shot_09_ledger.mp4. Text: "1.2 to 1.8 times fainter than the gated pair, at a matched false-detection rate (blank sky)".', 'What is distinctive: we publish the measurements. At the same false-alarm rate, the template finds moving sources 1.2 to 1.8 times fainter than a wavelength-matched pair.'],
-    ['Development process, challenges and limitations', M, `${CAM}: Mohamad.`, 'We started on the twelfth of November, before the on-site event, as the organizers allowed. An SI coding assistant helped; we directed and checked its work.'],
+    ['What makes it distinctive', A, 'SCREEN: shot_09_ledger.mp4. Text: "1.2 to 1.9 times fainter than the gated pair, at a matched false-detection rate (blank sky)".', 'What is distinctive: we publish the measurements. On blank sky, at the same false-alarm rate, the template finds moving sources 1.2 to 1.9 times fainter than a wavelength-matched pair.'],
+    ['Development process, challenges and limitations', M, `${CAM}: Mohamad.`, 'We started on the twelfth and thirteenth of November, before the on-site event, as the organizers allowed. An SI coding assistant helped; we directed and checked its work.'],
     ['', A, `${CAM}: Abed. Optional cut-away: shot_08_subtract_passes.mp4.`, 'The hard part was honesty. Bright stars saturate, parallax is not measured, and this is not a Planet Nine detector.'],
     ['', A, `${CAM}: both members.`, 'ParallaX is open source. Thank you.'],
   ],
@@ -109,7 +109,8 @@ for (const S of [S30, S120]) {
   md += `* Say the lines as written, or shorter. Do not add numbers: every number here is from \`docs/RESULTS.md\`.\n`
   md += `* Never say that ParallaX found Planet X or measured a parallax.\n`
   md += `* Put this credit as small text over the last seconds (it does not need to be spoken): "SPHEREx data: NASA/IPAC IRSA. Not affiliated with or endorsed by NASA. Made with the help of an SI coding assistant."\n`
-  if (S.file === '2min') md += `* "1.2 to 1.8 times fainter" is against the wavelength-gated pair, on blank sky, with every method tuned to the same false-detection rate (RESULTS.md section 2.1). "More than 1.6 million" is 1,628,230 images. Development began on 12-13 November 2026, before the on-site event, after the local organizers allowed early preparation. The asteroid is (52) Europa on 20-21 August 2025; its label comes from JPL Horizons as seen from SPHEREx.\n`
+  md += `* Paste the two full acknowledgement sentences (SPHEREx and NASA/IPAC IRSA, as in the README) and the SI statement into the video description where the video is hosted.\n`
+  if (S.file === '2min') md += `* "1.2 to 1.9 times fainter" is against the wavelength-gated pair, on blank sky, with every method tuned to the same false-detection rate (RESULTS.md section 2.1). "More than 1.6 million" is 1,628,230 images. Development began on 12-13 November 2026, before the on-site event, after the local organizers allowed early preparation. The asteroid is (52) Europa on 20-21 August 2025; its label comes from JPL Horizons as seen from SPHEREx.\n`
   writeFileSync(join(here, `SCRIPT_${S.file}.md`), md)
 
   let srt = ''

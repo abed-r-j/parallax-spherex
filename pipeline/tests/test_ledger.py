@@ -10,7 +10,7 @@ import json
 import numpy as np
 import pytest
 
-from parallax import diffim, export, ledger
+from parallax import diffim, export, inject, ledger
 from parallax.targets import TARGETS
 from test_template import make_field
 
@@ -60,14 +60,67 @@ def test_ledger_numbers(processed):
         assert e["depthUJy"]["all"] > 0
         assert e["false"]["perDeg2"] == pytest.approx(
             e["false"]["perFrame"] / led["areaDeg2"])
-    # the synthetic sky is static: colour floods the naive pair, not the template
+    # the synthetic sky is static and well sampled: colour floods the naive pair
     assert m["naive"]["falsePlain"]["perFrame"] > 2.0
-    assert m["corrected"]["falsePlain"]["perFrame"] < 0.2
-    assert m["corrected"]["falsePlain"]["perFrame"] <= m["gated"]["falsePlain"]["perFrame"]
     assert m["corrected"]["depthUJy"]["faint"] < m["gated"]["depthUJy"]["faint"]
+    # the "plain" column is ONE purely statistical sigma for all three modes
+    tpl = out["products"]["template"]
+    plain = diffim.plain_modes(f, tpl)
+    none = np.zeros(f.img.shape, bool)
+    for mode, d in plain.items():
+        assert d.info["star_noise"] is False
+        assert m[mode]["falsePlain"]["perFrame"] == pytest.approx(
+            inject.detection_rate(d, 5.0, none))
+    assert plain["corrected"].info["model_error"] is False
+    with_map = diffim.corrected_diff(f, tpl, star_noise=False)
+    ok = np.isfinite(with_map.sigma) & np.isfinite(plain["corrected"].sigma)
+    assert (plain["corrected"].sigma[ok] <= with_map.sigma[ok] * (1 + 1e-5)).all()
+    c = m["corrected"]
+    assert c["falsePlainModelError"]["perFrame"] <= c["falsePlain"]["perFrame"] + 1e-9
+    assert "falsePairCalibration" in c and c["depthPairCalibrationUJy"]["all"] > 0
+    assert "falsePlainModelError" not in m["gated"]
+    for e in m.values():
+        assert set(e["snrWidth"]) == {"faint", "mid", "bright"}
+        assert 0.7 < e["snrWidth"]["faint"] < 1.3
+        assert e["false"]["positivePerFrame"] <= e["false"]["perFrame"]
+        assert e["falseUnitMad"]["perFrame"] >= 0
     inj = led["injection"]
     assert set(inj) == {"atThreshold5", "atFixedRate"}
     assert m["naive"]["thresholdAtFixedRate"] >= 3.0
+    scan = led["rateScan"]
+    assert scan["rates"] == [0.2, 0.5, 1.0]
+    for mode in diffim.MODES:
+        assert set(scan["byMode"][mode]) == {"0.2", "0.5", "1"}
+        assert scan["byMode"][mode]["0.5"]["f50Blank"] == inj["atFixedRate"]["modes"][mode][
+            "mover"]["blank"]["f50"]
+        thr = [scan["byMode"][mode][r]["threshold"] for r in ("0.2", "0.5", "1")]
+        assert thr[0] >= thr[1] >= thr[2]  # a lower false rate needs a higher threshold
+
+
+def test_plain_column_floods_for_every_mode_on_undersampled_stars():
+    # With pixel-phase jitter a purely statistical sigma floods the template as it floods
+    # the pairs; only the template's measured model-error map keeps its count low. The
+    # ledger must show both numbers and not present the second as "the same noise model".
+    f = make_field(per_pass=24, jitter=0.15)
+    led = ledger.compute_ledger(f, with_injection=False)
+    m = led["modes"]
+    assert m["gated"]["falsePlain"]["perFrame"] > 1.0
+    assert m["corrected"]["falsePlain"]["perFrame"] > 1.0
+    assert m["corrected"]["falsePlainModelError"]["perFrame"] < (
+        0.5 * m["corrected"]["falsePlain"]["perFrame"])
+    assert m["gated"]["snrWidth"]["bright"] is None or m["gated"]["snrWidth"]["bright"] > 0
+
+
+def test_detection_rate_counts_only_usable_frames():
+    snr = np.zeros((3, 9, 9), np.float32)
+    snr[0, 4, 4:6] = 8.0
+    snr[1, 4, 4:6] = -8.0
+    snr[2, 4, 4:6] = 8.0  # frame 2 is not usable: its peak must not be counted
+    z = np.zeros_like(snr)
+    d = diffim.Diff("corrected", z, z + 1, snr, z, z, np.full(3, -1), np.array([True, True, False]))
+    assert inject.detection_rate(d, 5.0) == pytest.approx(1.0)
+    assert inject.detection_rate(d, 5.0, signs=(1.0,)) == pytest.approx(0.5)
+    assert inject.detection_rate(d, 5.0, snr=snr / 2) == 0.0
 
 
 def test_single_pass_field_is_reported_honestly():

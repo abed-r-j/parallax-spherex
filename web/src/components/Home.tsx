@@ -130,7 +130,7 @@ export function Home({ index, indexError, update }: { index: PackIndex | null; i
           <h1>Every time SPHEREx looks back at a star, it looks in a different colour.</h1>
           <p className="lede">
             ParallaX plays the SPHEREx infrared sky as a little video, and works out what each frame should have looked like at its own colours,
-            so that what is left is what really moved or changed.
+            so that far fewer false alarms are left.
           </p>
           <CoordBox index={index} update={update} big />
           <p className="hint">Decimal degrees or hours-minutes-seconds, ICRS. A field name works too.</p>

@@ -38,14 +38,22 @@ const TALK = [
   { who: MOHAMAD, text: 'Pluto, the original Planet X, was found by blinking two photographs of the same sky. Today the SPHEREx telescope images the whole sky in the infrared, again and again. The challenge asks for a public tool that shows how that sky changes, so anyone can spot what moves or varies.' },
   { who: ABED, text: 'Here is the catch. SPHEREx never photographs the same spot in the same colour twice. On the left, each dot is one exposure, each at another wavelength. So when you subtract two dates, stars light up as false alarms, as on the right.' },
   { who: ABED, text: 'Our answer is a chromatic template. For every frame, we predict what an unchanging sky would look like at that frame’s own wavelengths, from the spectrum each pixel showed in the other survey passes. Then we subtract. And anyone can type coordinates and watch that sky in the browser, with no server.' },
-  { who: MOHAMAD, text: 'We measured it on real frames, against two baselines. At the same false-alarm rate, the template finds moving sources 1.2 to 1.8 times fainter than a wavelength-matched pair. We also measured all five challenge targets against catalogues: for Barnard’s Star we get 10.2 arcseconds per year, and Gaia says 10.4.' },
+  { who: MOHAMAD, text: 'We measured it on real frames, against two baselines. On blank sky, at the same false-alarm rate, the template finds moving sources 1.2 to 1.9 times fainter than a wavelength-matched pair. We also measured the five challenge targets: for Barnard’s Star we get 10.2 arcseconds per year, and Gaia says 10.4.' },
   { who: MOHAMAD, text: 'Everything runs on open data: SPHEREx images from the NASA/IPAC archive, plus Gaia, CatWISE, JPL Horizons and SkyBoT. We state our limits: this is not a Planet Nine detector, and bright stars saturate. We used an SI coding assistant, and we directed and checked its work.' },
   { who: ABED, text: 'ParallaX lets anyone, from students to researchers, blink the infrared sky and check what they see. The code is open source and every number can be reproduced. Thank you.' },
 ]
-const ELEVATOR = 'Pluto was found by blinking two photographs. SPHEREx photographs the whole infrared sky, but never the same spot in the same colour twice, so a simple blink fills with false alarms. ParallaX predicts each frame at its own colours and subtracts it, so what is left really moved or changed. Type any coordinates and watch, in your browser. It is built on NASA open data, and it is open source.'
+const ELEVATOR = 'Pluto was found by blinking two photographs. SPHEREx photographs the whole infrared sky, but never the same spot in the same colour twice, so a simple blink fills with false alarms. ParallaX predicts each frame at its own colours and subtracts it, so far fewer false alarms are left. Type any coordinates and watch, in your browser. It is built on NASA open data, and it is open source.'
 const words = (t) => t.split(/\s+/).filter((w) => /[A-Za-z0-9]/.test(w)).length
 
 // ---- helpers --------------------------------------------------------------------------------
+const ALT = {
+  'app_threeway.png': 'Screenshot of the ParallaX web app: one frame of Barnard’s Star differenced three ways',
+  'app_home.png': 'Screenshot of the ParallaX home page',
+  'time_wavelength.png': 'Map of every exposure of the Barnard’s Star field: time against wavelength',
+  'diff_naive.png': 'Naive pair difference of one frame of Barnard’s Star',
+  'diff_chromatic.png': 'Chromatic template difference of the same frame',
+  'chart_f50.png': 'Bar chart: faintest moving source found by each of the three methods in five fields',
+}
 function pngSize(file) {
   const b = readFileSync(file)
   return [b.readUInt32BE(16), b.readUInt32BE(20)]
@@ -58,7 +66,8 @@ function fit(slide, file, x, y, w, h, { align = 'center', valign = 'middle', fra
   const ih = ph * s
   const ix = align === 'left' ? x : align === 'right' ? x + w - iw : x + (w - iw) / 2
   const iy = valign === 'top' ? y : valign === 'bottom' ? y + h - ih : y + (h - ih) / 2
-  slide.addImage({ path: file, x: ix, y: iy, w: iw, h: ih })
+  // altText: without it the library stores the full local file path in the picture description
+  slide.addImage({ path: file, x: ix, y: iy, w: iw, h: ih, altText: ALT[file.split(/[\\/]/).pop()] ?? 'ParallaX picture' })
   if (frame) slide.addShape('rect', { x: ix, y: iy, w: iw, h: ih, fill: { type: 'none' }, line: { color: C.line, width: 1 } })
   return { x: ix, y: iy, w: iw, h: ih }
 }
@@ -93,7 +102,7 @@ const body = (extra = {}) => ({ fontFace: SANS, fontSize: 18, color: C.ink, marg
   mark(s, M, 1.02, 0.86)
   s.addText('ParallaX', { x: M + 1.1, y: 0.86, w: 5.2, h: 1.15, fontFace: HEAD, fontSize: 66, color: C.ink, margin: 0, valign: 'middle' })
   s.addText('Chromatic difference imaging for the SPHEREx sky', { x: M, y: 2.2, w: 5.9, h: 1.1, fontFace: SANS, fontSize: 28, color: C.accent, margin: 0, valign: 'top' })
-  s.addText('See what really moved or changed in the infrared sky: any coordinates, in your browser.', { x: M, y: 3.42, w: 5.7, h: 0.95, fontFace: SANS, fontSize: 19, color: C.ink, margin: 0, valign: 'top' })
+  s.addText('See what moved or changed in the infrared sky, with fewer false alarms: any coordinates, in your browser.', { x: M, y: 3.42, w: 5.7, h: 0.95, fontFace: SANS, fontSize: 19, color: C.ink, margin: 0, valign: 'top' })
   s.addShape('line', { x: M, y: 4.62, w: 5.6, h: 0, line: { color: C.line, width: 1 } })
   s.addText([
     { text: 'TEAM  ', options: { fontFace: MONO, fontSize: 14, color: C.muted } },
@@ -139,9 +148,9 @@ const body = (extra = {}) => ({ fontFace: SANS, fontSize: 18, color: C.ink, marg
   const b = fit(s, A('diff_naive.png'), bx, 1.85, 3.31, 3.31, { align: 'left', valign: 'top' })
   s.addText([
     { text: 'Subtract two dates naively', options: { fontFace: HEAD, fontSize: 18, color: C.naive, breakLine: true } },
-    { text: 'The star lights up as a false alarm. Only the colour of the exposure changed.', options: { fontSize: 16, color: C.ink } },
+    { text: 'The star’s halo lights up. Most of that is the colour mismatch, not motion.', options: { fontSize: 16, color: C.ink } },
   ], { x: b.x + b.w + 0.25, y: 1.85, w: bw - b.w - 0.25, h: 3.75, fontFace: SANS, margin: 0, valign: 'top', paraSpaceAfter: 6 })
-  s.addText('Same field, one frame minus a frame 191 days apart, colour off by 9 bandwidths (real data).', { x: b.x, y: 5.3, w: bw, h: 0.6, fontFace: SANS, fontSize: 14, color: C.muted, margin: 0, valign: 'top' })
+  s.addText('Same field, one frame minus a frame taken 191 days apart in a very different colour (real data).', { x: b.x, y: 5.3, w: bw, h: 0.6, fontFace: SANS, fontSize: 14, color: C.muted, margin: 0, valign: 'top' })
   s.addShape('rect', { x: M, y: 6.42, w: W - 2 * M, h: 0.68, fill: { color: C.panel }, line: { color: C.line, width: 1 } })
   s.addText([
     { text: 'And the pixels are coarse (6.15 arcsec): ', options: { color: C.muted } },
@@ -160,7 +169,7 @@ const body = (extra = {}) => ({ fontFace: SANS, fontSize: 18, color: C.ink, marg
   const boxes = [
     ['1  OTHER PASSES', 'The spectrum that every pixel showed before', C.blue],
     ['2  TEMPLATE', 'The static sky, predicted at this frame’s own wavelengths', C.chroma],
-    ['3  SUBTRACT', 'What is left has really moved or changed', C.accent],
+    ['3  SUBTRACT', 'What is left is mostly real change', C.accent],
   ]
   boxes.forEach(([k, t, col], i) => {
     const x = M + i * (bw + gap)
@@ -195,13 +204,13 @@ const body = (extra = {}) => ({ fontFace: SANS, fontSize: 18, color: C.ink, marg
   const s = base(5, 'PROOF', 'Measured on real frames, against two baselines')
   s.addText('Faintest moving source found (lower is better)', { x: M, y: 1.72, w: 6.5, h: 0.36, fontFace: HEAD, fontSize: 18, color: C.ink, margin: 0 })
   const r = fit(s, A('chart_f50.png'), M, 2.1, 6.5, 3.85, { align: 'left', valign: 'top', frame: false })
-  s.addText('Flux at which half of the artificial moving sources added to real frames are recovered, on blank sky, with every method tuned to the same false-detection rate (0.5 per frame).', { x: M, y: r.y + r.h + 0.08, w: 6.5, h: 0.95, fontFace: SANS, fontSize: 14, color: C.muted, margin: 0, valign: 'top' })
+  s.addText('Brightness at which half of the artificial moving sources added to real frames are found again, on blank sky, with every method set to the same false-alarm rate. The “usual fix” is the wavelength-gated pair: compare only frames of matching colour.', { x: M, y: r.y + r.h + 0.08, w: 6.5, h: 0.95, fontFace: SANS, fontSize: 14, color: C.muted, margin: 0, valign: 'top' })
   const x = 7.55
   const w = W - M - x
   const nums = [
-    ['1.2–1.8×', 'fainter moving sources than the gated pair'],
-    ['3–15%', 'deeper than the gated pair, in every field'],
-    ['4 of 5', 'fields with fewer false detections than the gated pair'],
+    ['1.2–1.9×', 'fainter moving sources found than with the usual fix, on blank sky'],
+    ['3–15%', 'fainter sky reached than with the usual fix, in every field'],
+    ['4 of 5', 'fields with fewer false alarms than the usual fix'],
   ]
   nums.forEach(([n, t], i) => {
     const y = 1.72 + i * 0.66
@@ -213,16 +222,16 @@ const body = (extra = {}) => ({ fontFace: SANS, fontSize: 18, color: C.ink, marg
   const targets = [
     ['Barnard’s Star', '10.21 ± 0.26 arcsec/yr (Gaia: 10.36)'],
     ['Epsilon Indi B', '4.64 ± 0.09 arcsec/yr (catalogue: 4.70)'],
-    ['WISE 0855−0714', 'found in stacks, S/N 6.6 (optimistic)'],
-    ['RW Aurigae', '0.76 mag brighter at 4.4–5.0 µm'],
-    ['R Draconis', 'period 250 d (catalogue: about 246 d)'],
+    ['WISE 0855−0714', 'in stacks only; S/N 6.6 is optimistic'],
+    ['RW Aurigae', '0.76 mag change at 4.4–5 µm in a year'],
+    ['R Draconis', '≈250 d from 2.1 cycles (cat.: 246 d)'],
   ]
   const rowsT = targets.map(([a, b]) => [
     { text: a, options: { fontFace: HEAD, fontSize: 14, color: C.ink, margin: [2, 4, 2, 0] } },
     { text: b, options: { fontFace: SANS, fontSize: 14, color: C.ink, margin: [2, 0, 2, 4] } },
   ])
   s.addTable(rowsT, { x, y: 4.22, w, colW: [1.75, w - 1.75], rowH: 0.35, border: { type: 'none' }, valign: 'middle' })
-  if (MOVERS_VERIFIED_IN_PUBLISHED_PACKS) s.addText('Asteroid (52) Europa and Pluto: found where JPL Horizons predicts, to 0.05 pixel.', { x, y: 6.08, w, h: 0.5, fontFace: SANS, fontSize: 14, color: C.ink, margin: 0, valign: 'top' })
+  if (MOVERS_VERIFIED_IN_PUBLISHED_PACKS) s.addText('Asteroid (52) Europa and Pluto: found where JPL Horizons predicts, to 0.05 pixel on average.', { x, y: 6.08, w, h: 0.5, fontFace: SANS, fontSize: 14, color: C.ink, margin: 0, valign: 'top' })
   s.addText('Limits: 1–2 pixel motion shows better in a per-pass blink; parallax is not measured; bright stars saturate.', { x, y: 6.62, w, h: 0.55, fontFace: SANS, fontSize: 14, color: C.muted, margin: 0, valign: 'top' })
 }
 
@@ -236,14 +245,12 @@ const body = (extra = {}) => ({ fontFace: SANS, fontSize: 18, color: C.ink, marg
       'JPL Horizons and IMCCE SkyBoT for known solar-system objects',
     ]],
     ['THE STACK', C.chroma, [
-      'Pipeline: Python with NumPy, SciPy and Astropy; 87 tests',
-      'Web app: React, TypeScript and Vite; a static site, 55 tests',
-      'Reads only the pixels it needs: about 0.5 MB per image instead of the 65 MB file',
+      'Pipeline: Python with NumPy, SciPy and Astropy; 120 tests',
+      'Web app: React and TypeScript; a static site, 55 tests',
       'Licence: Apache-2.0',
     ]],
     ['HOW IT WAS BUILT', C.accent, [
-      'Research first: the official text, the archive, existing approaches',
-      'Then pipeline, three-way ledger, web app and live mode',
+      'Research first, then pipeline, three-way comparison, web app and live mode',
       'Development began on 12–13 November 2026, before the on-site event; the local organizers allowed early preparation',
     ]],
   ]
@@ -261,8 +268,8 @@ const body = (extra = {}) => ({ fontFace: SANS, fontSize: 18, color: C.ink, marg
   ], { x: M, y: 5.55, w: W - 2 * M, h: 0.66, fontFace: SANS, fontSize: 15, margin: 0, valign: 'top' })
   s.addText([
     { text: 'SI use  ', options: { fontFace: HEAD, color: C.accent } },
-    { text: 'Software, documents and figures were produced with an SI coding assistant (Claude, by Anthropic) directed by the team, who reviewed and ran everything. All results are computed by our own code from real SPHEREx data. No SI-generated images, video, voices or faces.', options: { color: C.ink } },
-  ], { x: M, y: 6.25, w: W - 2 * M, h: 0.9, fontFace: SANS, fontSize: 15, margin: 0, valign: 'top' })
+    { text: 'The team chose the goal and the direction. The specific method was worked out with an SI assistant (Claude, by Anthropic), which also wrote the code and drafted the documents under the team’s direction; the team reviewed and ran everything. All results come from our own code on real SPHEREx data. No SI-generated images, video, voices or faces.', options: { color: C.ink } },
+  ], { x: M, y: 6.25, w: W - 2 * M, h: 1.0, fontFace: SANS, fontSize: 14, margin: 0, valign: 'top' })
 }
 
 // ---- 7. Impact, next, links, credits -----------------------------------------------------------
@@ -321,9 +328,10 @@ ${TALK.map((t, i) => `| ${i + 1}. ${TITLES[i]} | ${t.who} | ${words(t.text)} | $
 TALK.forEach((t, i) => { md += `## Slide ${i + 1}: ${TITLES[i]} (${t.who}, ${words(t.text)} words)\n\n${t.text}\n\n` })
 md += `## Notes for the speakers
 
-* Every number spoken is from \`docs/RESULTS.md\`: 1.2 to 1.8 times fainter than the gated pair at a matched false-detection rate (section 2.1); Barnard's Star 10.21 +- 0.26 arcsec/yr against 10.36 from Gaia DR3 (section 3), spoken as "10.2" and "10.4".
+* Every number spoken is from \`docs/RESULTS.md\`: 1.2 to 1.9 times fainter than the gated pair on blank sky at a matched false-detection rate (section 2.1; next to a star it is 1.1 to 1.6); Barnard's Star 10.21 +- 0.26 arcsec/yr against 10.36 from Gaia DR3 (section 3), spoken as "10.2" and "10.4".
 * Do not say that ParallaX found Planet X or that it measures parallax. If asked: a real Planet Nine would be far too faint for single SPHEREx frames, and parallax is not reliably measured.
-* If asked about the name: it comes from the blink-and-shift idea, not from a parallax measurement.
+* If asked about the name: parallax is the apparent shift of a nearby object when the observer moves, which the challenge text describes; the X is from Planet X. We do not measure parallax reliably.
+* If asked whose idea it was: the team chose the goal and the direction; the specific method was worked out with the SI assistant (see \`docs/SI_DISCLOSURE.md\`).
 * If asked what "wavelength-matched pair" means: subtracting only two exposures whose colours agree within half a filter bandwidth.
 * Timeline, if asked: development began on 12-13 November 2026, before the on-site event, after the local organizers allowed early preparation.
 

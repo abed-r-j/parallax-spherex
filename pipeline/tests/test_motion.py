@@ -176,3 +176,51 @@ def test_faint_detection_finds_offset_mover_and_ignores_static():
     g = moving_field(0.0, 0.02, dets=(5, 6), per=20, seed=6)
     none = mo.faint_detection(g, TARGET, parallax_mas=0.0)
     assert not none["detected"] and none["upperLimit5SigmaUJy"] > 0
+
+
+def test_error_is_the_larger_of_formal_and_detector_scatter():
+    meas = {"total": 10.2, "pa": 356.0, "eTotal": 0.26, "ePa": 1.5, "ePmRa": 260.0, "ePmDec": 260.0}
+    fits = [{"det": d, "total": t, "pa": p, "pmRa": -500.0 + 100 * d, "pmDec": 1e3 * t}
+            for d, t, p in zip(range(1, 7), (9.75, 7.42, 10.16, 10.95, 10.19, 10.33),
+                               (353.6, 357.0, 359.2, 357.7, 356.2, 358.7), strict=True)]
+    out = mo._with_detector_scatter(meas, {"fits": fits})
+    assert out["eTotalFormal"] == 0.26 and out["eTotalDetectors"] == pytest.approx(0.494, abs=0.01)
+    assert out["eTotal"] == out["eTotalDetectors"] and out["errorSource"] == "detector scatter"
+    assert out["ePa"] == 1.5 and out["ePaDetectors"] < 1.5  # the formal one is larger here
+    assert out["total"] == 10.2 and out["pa"] == 356.0  # the estimator is untouched
+    # position angles that straddle north do not blow up the scatter
+    wrap = [dict(f, pa=p) for f, p in zip(fits, (359.0, 1.0, 0.5, 359.5, 0.0, 358.5), strict=True)]
+    assert mo._with_detector_scatter(dict(meas, pa=0.0), {"fits": wrap})["ePaDetectors"] < 1.0
+    # fewer than three detectors: formal error only
+    two = mo._with_detector_scatter(meas, {"fits": fits[:2]})
+    assert two["eTotal"] == 0.26 and two["errorSource"] == "formal" and "eTotalDetectors" not in two
+    # and the full measurement carries both
+    r = mo.measure_motion(moving_field(60.0, 0.004), TARGET, parallax_mas=0.0)
+    m = r["measured"]
+    assert m["eTotal"] == max(m["eTotalFormal"], m["eTotalDetectors"])
+    assert m["nDetectorsForError"] == 6
+
+
+def test_track_null_test_calibrates_the_combined_statistic():
+    f = moving_field(0.25, 0.02, dets=(5, 6), per=20, seed=5)
+    r = mo.faint_detection(f, TARGET, parallax_mas=0.0)
+    assert "nullTest" not in r  # off by default: it costs about a minute on a real field
+    use = np.isin(f.det, (5, 6))
+    sig = ph.effective_sigma_pix(float(np.nanmean(f.psf_fwhm[use])), f.scale)
+    data = mo._pass_maps(f, TARGET, 0.0, use, sig, 4)
+    maps = [d["diff"] / d["diffSd"] for d in data]
+    pred = [(d["predX"], d["predY"]) for d in data]
+    at = mo.combined_snr(maps, pred)
+    assert at == pytest.approx(r["zeroPoint"]["combinedSnrAtCatalogue"])
+    assert mo.combined_snr(maps, pred[::-1]) < 0 < at  # a mover: reversed order is negative
+    nt = mo.track_null_test(maps, pred, 4.0, at, r["zeroPoint"]["combinedSnr"], n_fixed=300,
+                            n_search=12)
+    assert nt["nFixed"] == 300 and nt["nSearch"] == 12
+    assert 0.2 < nt["fixedStd"] < 2.0
+    assert nt["pFixed"] < 0.02 and nt["fixedExceed"] == round(nt["pFixed"] * 300)
+    assert nt["searchMedian"] > 0  # a maximum over many offsets is biased positive
+    assert nt["pSearch"] <= 0.1
+    again = mo.track_null_test(maps, pred, 4.0, at, r["zeroPoint"]["combinedSnr"], n_fixed=300,
+                               n_search=0)
+    assert again["fixedStd"] == nt["fixedStd"]  # fixed seed
+    assert np.isnan(mo.combined_snr(maps, [(-5.0, 2.0)] * len(maps)))

@@ -23,7 +23,9 @@ The same three calibration steps are applied to every mode, so that none is favo
    statistical sigma a naive subtraction would quote.
 
 For the corrected mode the star-noise term is combined with the per-pixel empirical
-model error of the template.
+model error of the template (the larger of the two is used). The pair modes have no such
+map, so this is an extra term only the template gets; ``plain_modes`` and
+``corrected_diff(model_error=False)`` give the comparisons without it.
 
 SI disclosure: written with the help of an SI coding assistant (Claude), checked by the team.
 """
@@ -216,19 +218,36 @@ def gated_diff(f: Field, gate: float = GATE, **kw) -> Diff:
     return pair_difference(f, gated_partners(f, gate), "gated", **kw)
 
 
-def corrected_diff(f: Field, tpl: Template | None = None, **kw) -> Diff:
-    """Frame minus chromatic template; sigma includes the empirical model error."""
+def corrected_diff(f: Field, tpl: Template | None = None, model_error: bool = True,
+                   **kw) -> Diff:
+    """Frame minus chromatic template; sigma includes the empirical model error.
+
+    ``model_error=False`` leaves the template's per-pixel model-error map out of sigma, so
+    that the mode is calibrated exactly like the pair modes (with ``star_noise=False``
+    this is the purely statistical sigma).
+    """
     tpl = tpl or build_template(f)
     resid = f.img - tpl.pred
     var_stat = f.var + tpl.var
     # each reference sample scatters by model_err around the fit, and so does the target
-    with np.errstate(all="ignore"):
-        local = tpl.model_err**2 * (1.0 + 1.0 / np.maximum(tpl.n_eff, 1.0))
+    local = None
+    if model_error:
+        with np.errstate(all="ignore"):
+            local = tpl.model_err**2 * (1.0 + 1.0 / np.maximum(tpl.n_eff, 1.0))
     partner = np.full(len(f), -1, dtype=np.int32)
     d = calibrate(f, "corrected", resid, var_stat, tpl.pred, tpl.nearest, partner,
                   tpl.usable(), local_var=local, **kw)
     d.info["template_mode"] = tpl.mode
+    d.info["model_error"] = model_error
     return d
+
+
+def plain_modes(f: Field, tpl: Template | None = None) -> dict[str, Diff]:
+    """All three modes with ONE purely statistical sigma: no star-noise term for anyone
+    and no model-error map for the template. This is the like-for-like "plain" baseline."""
+    tpl = tpl or build_template(f)
+    return {"naive": naive_diff(f, star_noise=False), "gated": gated_diff(f, star_noise=False),
+            "corrected": corrected_diff(f, tpl, model_error=False, star_noise=False)}
 
 
 def difference(f: Field, mode: str, tpl: Template | None = None, **kw) -> Diff:

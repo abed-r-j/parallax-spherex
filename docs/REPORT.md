@@ -82,7 +82,7 @@ south, where it was. The square is its saturated core.*
    request.
 2. **A chromatic template.** For every frame, the pipeline predicts what a static sky would
    look like at that frame's own per-pixel wavelength, using the spectrum each pixel showed
-   in the *other* survey passes, and subtracts it. What remains is change. The template also
+   in the *other* survey passes, and subtracts it. What remains is mostly change, with far fewer false alarms. The template also
    carries a measured map of its own error.
 3. **A three-way ledger.** The same real frames are differenced three ways: naive pair,
    wavelength-gated pair, chromatic template. Artificial moving sources are injected into
@@ -159,10 +159,11 @@ four minutes per field. Definitions and caveats are in `docs/RESULTS.md`.
 
 False detections are residuals above 5 sigma with at least two pixels, outside 14 pixels of
 the known target, per usable frame. The last column is measured at a threshold tuned so that
-every method gives 0.5 false detections per frame.
+every method gives 0.5 false detections per frame. Depth is over all pixels; the app's
+Ledger panel shows it on faint sky only.
 
 * The template is 3 to 15% deeper than the gated pair in every field.
-* At the same false-alarm rate it finds moving sources 1.2 to 1.8 times fainter on blank sky.
+* At the same false-alarm rate it finds moving sources 1.2 to 1.9 times fainter on blank sky.
 * It has fewer false detections than the gated pair in four of five fields.
 
 ![Fraction of injected moving sources recovered, Barnard's field](img/fig-barnard-completeness.png)
@@ -174,16 +175,16 @@ made by the pipeline from real frames with artificial sources added.*
 
 | Target | What we measured | Reference |
 |---|---|---|
-| Barnard's Star | 10.21 +- 0.26 arcsec/yr at 356.3 +- 1.5 deg (1.65 pixels over 3 passes, from the wings of a saturated star) | 10.36 at 355.6 deg (Gaia DR3) |
+| Barnard's Star | 10.21 +- 0.26 arcsec/yr at 356.3 +- 1.5 deg (1.65 pixels over 3 passes, from the wings of a saturated star; fit with a free annual term, one degree of freedom) | 10.36 at 355.6 deg (Gaia DR3) |
 | Epsilon Indi B | 4.64 +- 0.09 arcsec/yr at 122.6 +- 1.3 deg (1.02 pixels over 4 passes) | 4.70 at 122.7 deg |
-| WISE 0855-0714 | moving source at S/N 6.6 in stacks of detectors 5 and 6 only (395 +- 69 microJy), 1.5 arcsec from the prediction; 7.81 +- 1.57 arcsec/yr | 8.15 arcsec/yr |
-| RW Aurigae | in Sep 2025, compared with Sep 2026: 0.37 +- 0.14 mag fainter at 0.75-1.1 micron, 0.76 +- 0.03 mag brighter at 4.4-5.0 micron; control star constant to 0.005 mag | irregular variable |
+| WISE 0855-0714 | moving source at S/N 6.6 in pass-difference stacks of detectors 5 and 6 only, stacked along the catalogue track (395 +- 69 microJy), 1.5 arcsec from the prediction; 7.81 +- 1.57 arcsec/yr with the catalogue parallax assumed (independent centroid fit: 6.2 +- 1.1) | 8.15 arcsec/yr |
+| RW Aurigae | in Sep 2025, compared with Sep 2026: 0.37 +- 0.14 mag fainter at 0.75-1.1 micron, 0.76 +- 0.03 mag brighter at 4.4-5.0 micron; control star shows no change (0.00 +- 0.02 mag) | irregular variable |
 | R Draconis | periodic change in 22 of 43 wavelength bins, median peak-to-peak 1.18 mag; free period 250 d over 2.1 cycles | Mira, about 246 d |
 
 **Real moving objects.** The asteroid (52) Europa crosses one of our fields in ten hours and
-is in 24 of 111 frames; Pluto drifts 12 pixels in 6.4 days and is in 18 of 46 frames. In
-single exposures their measured centres agree with the Horizons prediction to 0.05 +- 0.04
-pixel and 0.03 +- 0.10 pixel.
+is in 24 of 111 frames (detectors 3 and 6 only); Pluto drifts 12 pixels in 6.4 days and is
+in 18 of 46 frames (detector 2 only). In single exposures their measured centres agree with
+the Horizons prediction, on average, to 0.05 +- 0.04 pixel and 0.03 +- 0.10 pixel.
 
 ![Pluto in real SPHEREx frames, with predicted positions](img/fig-pluto-quicklook.png)
 
@@ -198,7 +199,7 @@ images to 2e-4 in pixel value.
 
 ## 6. What makes it distinctive
 
-1. **Correction instead of rejection.** The tools we surveyed either ignore the wavelength
+1. **Correction instead of rejection.** Most tools we surveyed either ignore the wavelength
    change or discard mismatched pairs. ParallaX models it per pixel and subtracts it.
 2. **A measured, reproducible ledger.** The benefit is a published number on real frames,
    with injection tests and with our choices stated.
@@ -223,7 +224,7 @@ images to 2e-4 in pixel value.
   the same definitions, three methods, and code to rerun it.
 
 **Sustainability.** The site is static and reads public data, so it has no running cost: no
-server, no database, no accounts. Updating to a new SPHEREx release is three commands.
+server, no database, no accounts. Updating to a new SPHEREx release takes a few commands.
 
 **How it could grow.** A vetting queue in which volunteers confirm or reject candidates;
 the same per-pixel-wavelength correction for other spectral surveys that never repeat a
@@ -263,6 +264,10 @@ part offline, and ran everything on real data before writing any claim.
 * Parallax is not measured reliably: the fitted annual term for Barnard's Star is about
   three times its true parallax.
 * R Draconis is not a clean test; there the template has slightly more false detections.
+* In the ledger's own known-target test the template scores "no" for Barnard's Star (its
+  detection sits next to the saturated core and is classed an artifact in 85% of frames),
+  and RW Aurigae's change exceeds 5 sigma in 39% of template frames against 86% for the
+  gated pair.
 * The WISE 0855 significance of 6.6 is moderately optimistic.
 * Live fields in the browser have no template, ledger or overlays.
 * Injected test sources are simple achromatic point sources.
@@ -331,9 +336,11 @@ SPHEREx data.
 ## 12. SI-use statement
 
 NASA Space Apps 2026 calls AI "Super Intelligence (SI)" and requires disclosure. The
-software, documents and figures of this project were produced with the help of an SI coding
-assistant (Claude, by Anthropic), directed by the team. The team defined the problem and the
-approach and reviewed and ran everything. All results are computed by the project's own code
+team chose the challenge, the goal and the direction: a comparison of SPHEREx dates that
+accounts for the changing wavelength. The specific method (a per-pixel chromatic template
+checked against two baselines) was worked out with the SI assistant (Claude, by Anthropic),
+which also surveyed existing tools, wrote the code and drafted the documents under the team's
+direction. The team reviewed the work, ran it and is responsible for it. All results are computed by the project's own code
 from real SPHEREx data. No SI-generated images, video, voices or faces are used, and the
 tool itself contains no machine-learning model. Outputs of ParallaX are its own and are not
 NASA products. Details: `docs/SI_DISCLOSURE.md`.

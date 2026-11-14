@@ -147,7 +147,7 @@ def write_pack(
     finite = f.img[np.isfinite(f.img)]
     sigma = np.sqrt(np.nanmedian(f.var.reshape(len(f), -1), axis=1))
     soft = float(max(np.nanmedian(sigma), 1e-4))
-    lo = float(np.arcsinh(np.percentile(finite, 0.01) / soft))
+    lo = float(np.arcsinh(finite.min() / soft))  # the true minimum: nothing finite is clipped
     hi = float(np.arcsinh(finite.max() / soft))
     sections: dict[str, np.ndarray] = {
         "img": encode_brightness(f.img, soft, lo, hi),

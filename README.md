@@ -85,7 +85,7 @@ URL parameters (from `web/src/lib/urlstate.ts`):
    wavelength, from the spectrum each pixel showed in the other survey passes, and subtracts
    it. Against the usual fix (compare only pairs whose wavelengths match) this is 3 to 15%
    deeper in all five test fields and, at the same false-alarm rate, finds moving sources 1.2
-   to 1.8 times fainter on blank sky (Barnard's field: 563 against 1025 microJy).
+   to 1.9 times fainter on blank sky (Barnard's field: 563 against 1025 microJy).
 2. **It publishes a reproducible false-alarm ledger.** Naive pair, wavelength-gated pair and
    chromatic template are run on the same real frames, with artificial sources injected and
    searched for again. In Barnard's field the false detections per frame are 4.64, 2.44 and
@@ -126,8 +126,8 @@ Optional considerations:
 
 ## How it works
 
-SPHEREx maps the whole sky every six months, and a typical position is seen in about 75
-pointings per pass, each at a different wavelength. The pipeline asks the archive which
+SPHEREx maps the whole sky every six months, and a position is typically seen in 60 to 150
+frames per pass, each at a different wavelength. The pipeline asks the archive which
 images cover a position and downloads only the needed pixels by HTTP range request (about
 0.5 MB instead of a 65 MB file). It aligns them into one north-up cube and keeps the
 wavelength of every pixel of every frame. From the other survey passes it fits, per pixel,
@@ -171,24 +171,26 @@ Three ways to difference two dates (Barnard's Star field, 357 frames):
 
 Across the five fields the template is 3 to 15% deeper than the gated pair and has fewer
 false detections in four of five. R Draconis is the exception and is not a clean test.
+Depth here is over all pixels; the app's Ledger panel shows it on faint sky only (35.9 / 31.8 /
+28.0 microJy for this field).
 
 The five challenge targets:
 
 | Target | Measured | Reference |
 |---|---|---|
-| Barnard's Star | 10.21 +- 0.26 arcsec/yr at 356.3 +- 1.5 deg (1.65 pixels over 3 passes, from the wings of a saturated star) | 10.36 arcsec/yr at 355.6 deg (Gaia DR3) |
+| Barnard's Star | 10.21 +- 0.26 arcsec/yr at 356.3 +- 1.5 deg (1.65 pixels over 3 passes, from the wings of a saturated star; fit with a free annual term, one degree of freedom) | 10.36 arcsec/yr at 355.6 deg (Gaia DR3) |
 | Epsilon Indi B | 4.64 +- 0.09 arcsec/yr at 122.6 +- 1.3 deg (1.02 pixels over 4 passes) | 4.70 arcsec/yr at 122.7 deg |
-| WISE 0855-0714 | moving source at S/N 6.6 in stacks of detectors 5 and 6 only (395 +- 69 microJy); 7.81 +- 1.57 arcsec/yr at 278.2 +- 4.3 deg | 8.15 arcsec/yr at 274.8 deg |
-| RW Aurigae | in Sep 2025, compared with Sep 2026: 0.37 +- 0.14 mag fainter at 0.75-1.1 micron and 0.76 +- 0.03 mag brighter at 4.4-5.0 micron; a control star is constant to 0.005 mag | irregular T Tauri variable |
+| WISE 0855-0714 | moving source at S/N 6.6 in pass-difference stacks of detectors 5 and 6 only, stacked along the catalogue track (395 +- 69 microJy); 7.81 +- 1.57 arcsec/yr at 278.2 +- 4.3 deg with the catalogue parallax assumed (independent centroid fit: 6.2 +- 1.1) | 8.15 arcsec/yr at 274.8 deg |
+| RW Aurigae | in Sep 2025, compared with Sep 2026: 0.37 +- 0.14 mag fainter at 0.75-1.1 micron and 0.76 +- 0.03 mag brighter at 4.4-5.0 micron; a control star shows no change (0.00 +- 0.02 mag) | irregular T Tauri variable |
 | R Draconis | periodic change in 22 of 43 wavelength bins, median peak-to-peak 1.18 mag; free period 250 d over 2.1 cycles | Mira, catalogued period about 246 d |
 
 The WISE 0855 significance is moderately optimistic (non-independent pass differences, about
 59 trial positions). Parallax is not measured reliably. See [Limits](#limits).
 
-Known moving objects as ground truth: asteroid (52) Europa appears in 24 of 111 frames and
-Pluto in 18 of 46, each where JPL Horizons, with the SPHEREx spacecraft as the observer,
-predicts it: the measured centre differs from the prediction by 0.05 +- 0.04 pixel for
-Europa and 0.03 +- 0.10 pixel for Pluto.
+Known moving objects as ground truth: asteroid (52) Europa appears in 24 of 111 frames
+(detectors 3 and 6 only) and Pluto in 18 of 46 (detector 2 only), each where JPL Horizons,
+with the SPHEREx spacecraft as the observer, predicts it: on average the measured centre
+differs from the prediction by 0.05 +- 0.04 pixel for Europa and 0.03 +- 0.10 pixel for Pluto.
 
 ![Pluto in a single SPHEREx frame, under the label predicted from JPL Horizons](docs/img/pluto.png)
 
@@ -342,9 +344,11 @@ cite: [CITATION.cff](CITATION.cff).
 ## Use of SI
 
 NASA Space Apps 2026 calls AI "Super Intelligence (SI)" and asks for disclosure. The
-software, documents and figures of this project were produced with the help of an SI coding
-assistant (Claude, by Anthropic), directed by the team. The team defined the problem and the
-approach and reviewed and ran everything. All results are computed by the project's own code
+team chose the challenge, the goal and the direction: a comparison of SPHEREx dates that
+accounts for the changing wavelength. The specific method (a per-pixel chromatic template
+checked against two baselines) was worked out with the SI assistant (Claude, by Anthropic),
+which also surveyed existing tools, wrote the code and drafted the documents under the team's
+direction. The team reviewed the work, ran it and is responsible for it. All results are computed by the project's own code
 from real SPHEREx data. No SI-generated images, video, voices or faces are used. Details:
 [docs/SI_DISCLOSURE.md](docs/SI_DISCLOSURE.md).
 
@@ -376,6 +380,10 @@ after the local organizers allowed early preparation.
 * **Parallax is not measured reliably**, and bright targets saturate (Barnard's Star in 99%
   of frames, R Draconis in 97%, RW Aurigae in 39%); their fluxes are relative.
 * **R Draconis is not a clean test** of the differencing methods.
+* **The template does not pass its own known-target test.** In the ledger's "known target
+  recovered" row it scores "no" for Barnard's Star: its detection sits next to the saturated
+  core and is classed an artifact in 85% of frames. RW Aurigae's change exceeds 5 sigma in
+  39% of template frames against 86% for the gated pair.
 * **Live fields are simpler than pipeline packs:** one sky level per frame, no flag masking,
   no chromatic template, ledger, candidates or catalogue overlays.
 * **WISE 0855-0714 is invisible in single frames**; it appears only in stacks of detectors 5

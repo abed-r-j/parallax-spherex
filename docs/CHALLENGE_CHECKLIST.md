@@ -5,6 +5,8 @@ published on 13 November 2026). Items A1 to A12 are what the Objectives require;
 are the optional "Potential Considerations"; C1 to C6 come from the Resources tab. Status is
 one of **Met**, **Partial** or **Pending**, and anything short of fully met says why.
 
+SI disclosure: drafted with the help of an SI coding assistant (Claude, by Anthropic), checked by the team.
+
 State of the audit: 14 November 2026, on the local build (`parallax serve`). The public site
 and repository are to be published at <https://abed-r-j.github.io/parallax-spherex/> and
 <https://github.com/abed-r-j/parallax-spherex>.
@@ -28,10 +30,10 @@ and repository are to be published at <https://abed-r-j.github.io/parallax-spher
 | A5 | Users enter coordinates as Right Ascension and declination | Met | Search box on every page (`web/src/lib/coords.ts`); also `?ra=&dec=` in the URL | Decimal degrees and sexagesimal both parse; headless-browser check of four typed strings |
 | A6 | A series of images of that patch "like a little video" | Met | Player: play, pause, step, speed, loop; sequence by survey pass or every frame in time order (`web/src/components/Player.tsx`, `Viewer.tsx`) | `docs/img/pass-blink.png`; keyboard checks (Space, arrows) pass |
 | A7 | Easy to spot moving objects | Met | Per-pass stack blink with 4x smooth display; Subtract; chromatic difference; catalogue-position marker; per-pass measured positions; known-object labels | `docs/img/subtract.png` shows the two-lobe signature of Barnard's Star; `docs/img/europa52.png` and `docs/img/pluto.png` show an asteroid and Pluto under their predicted positions (fields `europa52`, `pluto`). Limit stated in the app: the test stars move only 1 to 2 pixels |
-| A8 | Tested on Barnard's Star | Met | Field `barnard`, 357 frames, 3 passes | Proper motion 10.21 +- 0.26 arcsec/yr at 356.3 +- 1.5 deg against 10.36 at 355.6 (Gaia DR3). Core saturated in 99% of frames; measured from the wings |
+| A8 | Tested on Barnard's Star | Met | Field `barnard`, 357 frames, 3 passes | Proper motion 10.21 +- 0.26 arcsec/yr at 356.3 +- 1.5 deg against 10.36 at 355.6 (Gaia DR3). Core saturated in 99% of frames; measured from the wings, with a free annual term (one degree of freedom) |
 | A9 | Tested on Epsilon Indi B | Met | Field `epsindi`, 454 frames, 4 passes | 4.64 +- 0.09 arcsec/yr at 122.6 +- 1.3 deg against 4.70 at 122.7 |
-| A10 | Tested on WISE 0855 at RA 08h55m10.831s, Dec -7d14m42.53s; accepts that notation | Met | Field `wise0855`, 258 frames, 3 passes, 8.3 arcmin wide so that it holds both the 2010 challenge position and today's position 2 arcmin west | The exact string `08h55m10.831s -7d14m42.53s` parses to 133.7951292, -7.2451472 and opens the field. Invisible in single frames; moving source at S/N 6.6 in stacks of detectors 5 and 6 (moderately optimistic, see RESULTS.md) |
-| A11 | Tested on variable star RW Aurigae | Met | Field `rwaur`, 332 frames, 3 passes | In Sep 2025, compared with Sep 2026: 0.37 +- 0.14 mag fainter at 0.75-1.1 micron and 0.76 +- 0.03 mag brighter at 4.4-5.0 micron; control star constant to 0.005 mag. Core saturated in 39% of frames |
+| A10 | Tested on WISE 0855 at RA 08h55m10.831s, Dec -7d14m42.53s; accepts that notation | Met | Field `wise0855`, 258 frames, 3 passes, 8.3 arcmin wide so that it holds both the 2010 challenge position and today's position 2 arcmin west | The exact string `08h55m10.831s -7d14m42.53s` parses to 133.7951292, -7.2451472 and opens the field. Invisible in single frames; moving source at S/N 6.6 in pass-difference stacks of detectors 5 and 6 along the catalogue track (moderately optimistic, see RESULTS.md) |
+| A11 | Tested on variable star RW Aurigae | Met | Field `rwaur`, 332 frames, 3 passes | In Sep 2025, compared with Sep 2026: 0.37 +- 0.14 mag fainter at 0.75-1.1 micron and 0.76 +- 0.03 mag brighter at 4.4-5.0 micron; control star shows no change (0.00 +- 0.02 mag). Core saturated in 39% of frames |
 | A12 | Tested on variable star R Draconis | Met | Field `rdra`, 590 of 2,493 available images | Periodic change significant in 22 of 43 wavelength bins, median peak-to-peak 1.18 mag; free period 250 d over 2.1 cycles against a catalogued period of about 246 d. Saturated in 97% of frames: relative wing photometry only; detector 3 excluded |
 
 ## B. Optional considerations

@@ -8,17 +8,17 @@ yet", it says so.
 ## Impact
 
 **1. Did you find Planet X?**
-No, and we do not claim to. A Planet Nine at 300 to 700 astronomical units would be several
-magnitudes fainter than what a single SPHEREx frame can show, and earlier WISE searches
+No, and we do not claim to. At the roughly 500 astronomical units of current orbit fits, a
+Planet Nine would be two to five magnitudes fainter than SPHEREx's depth, and earlier WISE searches
 already cover the brightest models. Planet X is the motivation: Pluto was found by blinking
 two photographs. What we show is that the method works on real moving objects: Barnard's
 Star measured at 10.21 +- 0.26 arcsec/yr against 10.36 in Gaia, and an asteroid and Pluto
-found within 0.05 pixel of where JPL Horizons predicts them as seen from SPHEREx.
+found, on average, within 0.05 pixel of where JPL Horizons predicts them as seen from SPHEREx.
 
 **2. Who would actually use this?**
 Three groups. Citizen scientists and classrooms, who need only a browser, including in
 Lebanon and the Arab region where a research computing setup is rare. Survey scientists who
-want a quick look at any position: 55 images in 10 to 12 seconds. And people who build
+want a quick look at any position: 55 images in 10 to 12 seconds on a fast connection. And people who build
 transient searches on SPHEREx, who get a reproducible false-alarm benchmark on five fields.
 
 **3. What is the single most useful thing you produced?**
@@ -32,7 +32,7 @@ Nothing. The site is static files and reads public data. There is no server, no 
 no account. The whole index of 1,628,230 images is 45.6 MB.
 
 **5. What happens when new data arrives?**
-Three commands. `parallax fetch` downloads only images that are not on disk yet,
+A few commands. `parallax fetch` downloads only images that are not on disk yet,
 `parallax publish` rebuilds the data packs, and `build_sky_index.py` fetches only the days
 that are missing. The first full index download took about 73 minutes; an update
 downloads only the new days. Pushing to the repository tests and redeploys the site.
@@ -42,7 +42,8 @@ Possibly variable stars and unusual movers, but we are careful here. Almost ever
 SPHEREx can see moving in a single frame is a known asteroid, and the tool labels those. Its
 value for volunteers is that a residual comes with evidence: the three-way view, the
 two-minute repeat exposure, and the known-object overlay. A vetting queue for volunteers is
-on the roadmap, not built.
+on the roadmap, not built. The Candidates tab is a list of things to look at, not of
+discoveries: in Barnard's field its 16 groups all sit in the halo of the saturated star.
 
 ## Creativity
 
@@ -52,12 +53,16 @@ wavelengths match. We correct instead of rejecting: for each frame we predict th
 at that frame's own per-pixel wavelength from the other survey passes and subtract the
 prediction. Then we measure all three approaches on the same frames and publish the result,
 including where ours loses. We did not find a published false-alarm comparison of this kind
-for SPHEREx blinking.
+for SPHEREx blinking. (If asked which tools: public viewers for this challenge and for WISE;
+we describe approaches and do not name or rank anyone's project.)
 
 **8. Is the chromatic template your own idea, or the SI's?**
-Ours. The team chose the problem (colour differs at every visit) and the approach (correct
-with a per-pixel spectrum, then prove it with a three-way comparison). The SI assistant
-wrote most of the code under that direction. Template subtraction itself is standard in
+Both had a part, and we say so. The team chose the challenge, the goal and the direction: a
+comparison of SPHEREx dates that accounts for the changing wavelength. The specific method
+(a per-pixel chromatic template checked against two baselines) was worked out with the SI
+assistant (Claude, by Anthropic), which also surveyed existing tools, wrote the code and
+drafted the documents under our direction. We reviewed the work, ran it and are responsible
+for it. Template subtraction itself is standard in
 astronomy; what is new here is building the template along the wavelength axis, because
 SPHEREx never repeats a wavelength.
 
@@ -83,7 +88,7 @@ tint over pair differences, and a three-way view of one frame on one scale.
 
 **12. How do you know the detections are real?**
 Four checks. (1) Known answers: two proper motions within one sigma of the catalogue, and an
-asteroid and Pluto within 0.05 pixel of the prediction. (2) Injection and recovery:
+asteroid and Pluto within 0.05 pixel of the prediction on average. (2) Injection and recovery:
 artificial sources are added to real frames and searched for again. (3) A physical veto: a
 "mover" that is absent in the exposure of the same detector two minutes later is a cosmic
 ray; this removed 14 of 17 single-frame movers in the first 202 Barnard frames. (4) Labels
@@ -116,14 +121,17 @@ in the ledger files.
 R Draconis: the saturated star fills the cutout, and the template has slightly more false
 detections than the gated pair (0.61 against 0.58 per frame). The two-lobe signature of
 moving stars (question 13). And RW Aurigae's change is caught in fewer frames by the template
-than by the gated pair.
+than by the gated pair (39% against 86%). The Ledger tab shows this openly: under "Known
+target recovered" the template says "no" for Barnard's Star, because its detection sits next
+to the saturated core and the classifier calls it an artifact in 85% of frames.
 
 **17. You say you detect WISE 0855. How sure are you?**
 Moderately. It is invisible in single frames. In stacks of detectors 5 and 6 a moving source
 appears at signal-to-noise 6.6 (395 +- 69 microJy), 1.5 arcsec from the predicted position,
 moving at 7.81 +- 1.57 arcsec/yr against a catalogue 8.15; it is absent in detectors 1 to 4,
-as expected for so cold an object. But the pass differences are not independent and we
-searched about 59 trial positions, so 6.6 is optimistic. We say that wherever we quote it.
+as expected for so cold an object. But the stack follows the catalogue track, the fit
+assumes the catalogue parallax (an independent centroid fit gives 6.2 +- 1.1), the pass
+differences are not independent and we searched about 59 trial positions, so 6.6 is optimistic. We say that wherever we quote it.
 
 **18. Can you measure distance by parallax, as the challenge text suggests?**
 Not reliably. SPHEREx always looks about 90 degrees from the Sun, so any systematic effect
@@ -189,9 +197,10 @@ works on live fields.
 ## Presentation
 
 **28. What did the SI do and what did you do?**
-We chose the problem and the approach, directed the work, decided what to keep, ran
-everything and reviewed it. An SI coding assistant (Claude, by Anthropic) wrote most of the
-code, the tests and the first drafts of the documents under that direction. Every number
+We chose the challenge, the goal and the direction, directed the work, decided what to keep,
+ran everything and reviewed it. The specific method was worked out with an SI assistant
+(Claude, by Anthropic), which also surveyed existing tools, wrote the code and the tests and
+drafted the documents under that direction. Every number
 comes from our own code running on real SPHEREx data. No SI-generated images, video, voices
 or faces are used, and the tool contains no machine-learning model.
 
@@ -212,7 +221,7 @@ more fields, so the benchmark is a survey property and not five examples.
 * Epsilon Indi B: 4.64 +- 0.09 measured, 4.70 catalogued; shift of 1.02 pixels.
 * False detections per frame, Barnard: 4.64 naive, 2.44 gated, 0.99 chromatic.
 * Depth advantage over gating: 3 to 15% in every field.
-* Fainter at matched false alarms: 1.2 to 1.8 times on blank sky.
+* Fainter at matched false alarms: 1.2 to 1.9 times on blank sky.
 * Index: 1,628,230 images, 45.6 MB. Live: 55 images in 10 to 12 s on a fast connection.
 * Asteroid (52) Europa and Pluto: within 0.05 and 0.03 pixel of the Horizons prediction.
 * Tests: 120 Python, 55 TypeScript.

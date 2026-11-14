@@ -27,7 +27,7 @@ SI disclosure: written with the help of an SI coding assistant (Claude), checked
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from math import erf, exp, factorial, pi, sqrt
+from math import erf, exp, factorial, log, pi, sqrt
 
 import numpy as np
 from scipy import ndimage as ndi
@@ -37,7 +37,10 @@ from .frames import BAD_HARD, BAD_SOFT, FLAG_BITS, Field
 
 THRESH = 5.0
 MIN_AREA = 2  # pixels above thresh / 2; a lone pixel is a spike
-MAX_AREA = 30  # a "point-like" residual is not larger than this
+MAX_AREA = 30  # a faint "point-like" residual is not larger than this (pixels)
+WING_MARGIN = 3.0  # allowance for the non-Gaussian PSF wings of a bright source (see max_area)
+STATIC_RATIO = 3.0  # a residual above this many times the static flux is not a star residual
+MAX_RATE = 170.0  # arcsec/hour: fastest motion the same-visit veto lets through (see link_movers)
 EDGE = 2  # pixels
 COUNTERPART_SNR = 5.0  # static source underneath: subtracted image above this many sigma
 PERSIST_FRACTION = 0.7  # "keeps its sign": same sign in this fraction of the pass frames
@@ -88,6 +91,22 @@ def effective_sigma_pix(fwhm_arcsec: float, scale: float) -> float:
 def box_fraction(sigma_pix: float) -> float:
     """Fraction of a centred Gaussian's flux inside a 3x3 pixel box."""
     return erf(1.5 / (sqrt(2.0) * sigma_pix)) ** 2
+
+
+def max_area(snr: float, sigma_pix: float, thresh: float = THRESH) -> float:
+    """Largest footprint (pixels above ``thresh / 2``) a point source of peak ``snr`` may have.
+
+    A Gaussian of peak S/N ``S`` and width ``sigma_pix`` stays above ``thresh / 2`` inside
+    r^2 < 2 sigma^2 ln(2 S / thresh), an area of 2 pi sigma^2 ln(2 S / thresh) pixels: the
+    footprint of a point source grows with its brightness. The real SPHEREx PSF has wings
+    beyond a Gaussian, so ``WING_MARGIN`` times that area is allowed on top of the fixed
+    ``MAX_AREA`` (measured on asteroid (52) Europa: 30 to 75 pixels at S/N 110 to 235,
+    where the Gaussian areas are 14 to 20 pixels).
+    """
+    s = abs(float(snr))
+    if not s > thresh / 2.0:
+        return float(MAX_AREA)
+    return MAX_AREA + WING_MARGIN * 2.0 * pi * sigma_pix**2 * log(2.0 * s / thresh)
 
 
 def find_peaks(snr: np.ndarray, thresh: float = THRESH, min_area: int = 1,
@@ -221,23 +240,33 @@ def classify(f: Field, d: Diff, frame: int, y: int, x: int, snr: float, npix: in
         return "artifact", f"single-pixel spike ({npix} px above half threshold)"
     persistent, frac, med, nfr = _persistence(f, d, frame, y, x, sign)
     ptxt = f"same sign in {100 * frac:.0f}% of {nfr} frames of the pass, median SNR {med:.1f}"
+    counterpart = "no static counterpart"
     if has_static:
         rel = abs(flux) / max(float(np.nansum(np.clip(static_box, 0, None))), 1e-12)
         if persistent:
             return "variable", f"{ptxt}; {100 * rel:.0f}% of the static flux"
-        mism = float(np.nan_to_num(abs(d.mismatch[frame, y, x])))
-        if mism > 0.5:
-            return "chromatic", (
-                f"on a static source, subtracted data {mism:.1f} bandwidths away in wavelength")
-        return "star-residual", (
-            f"{100 * rel:.0f}% of the static flux, wavelength matched to {mism:.2f} bandwidths")
-    if persistent:
+        # Imperfect cancellation of a star leaves a fraction of its flux. A positive
+        # residual several times brighter than everything static in the same 3x3 box is
+        # not that: it is a new source that happens to lie on a faint one.
+        if not (sign > 0 and rel > STATIC_RATIO):
+            mism = float(np.nan_to_num(abs(d.mismatch[frame, y, x])))
+            if mism > 0.5:
+                return "chromatic", (
+                    f"on a static source, subtracted data {mism:.1f} bandwidths away in "
+                    "wavelength")
+            return "star-residual", (
+                f"{100 * rel:.0f}% of the static flux, wavelength matched to {mism:.2f} "
+                "bandwidths")
+        counterpart = f"{rel:.0f} times the faint static source underneath"
+    elif persistent:
         what = "new or strongly brightened" if sign > 0 else "faded"
         return "variable", f"{ptxt}; no static counterpart: {what} source"
     if sign < 0:
         return "artifact", "negative residual with no static source underneath"
-    if npix > MAX_AREA:
-        return "artifact", f"extended ({npix} px), not point-like"
+    limit = max_area(snr, effective_sigma_pix(float(f.psf_fwhm[frame]), f.scale))
+    if npix > limit:
+        return "artifact", (f"extended ({npix} px, more than the {limit:.0f} px a point source "
+                            f"of this brightness covers), not point-like")
     visit = _same_visit(f, d, frame, y, x)
     same = [s for _, dd, s in visit if dd == f.det[frame]]
     if same and max(same) < 0.5 * abs(snr):
@@ -249,7 +278,7 @@ def classify(f: Field, d: Diff, frame: int, y: int, x: int, snr: float, npix: in
     vtxt = ("confirmed in the same visit: " + ", ".join(seen)) if seen else (
         "no other exposure of the same visit to confirm it" if not visit
         else "not seen in the same-visit exposures of " + ", ".join(missed))
-    return "mover", f"point-like ({npix} px), no static counterpart; {vtxt}"
+    return "mover", f"point-like ({npix} px), {counterpart}; {vtxt}"
 
 
 def detect(f: Field, d: Diff, thresh: float = THRESH, min_area: int = MIN_AREA,
@@ -303,8 +332,15 @@ def _fit_track(east, north, hours):
 
 
 def link_movers(f: Field, dets: list[Detection], tol_pix: float = 1.5,
-                min_rate: float = 1.0, max_rate: float = 240.0, min_det: int = 3) -> list[dict]:
+                min_rate: float = 1.0, max_rate: float = MAX_RATE, min_det: int = 3) -> list[dict]:
     """Join ``mover`` detections of one survey pass into linear-motion candidates.
+
+    ``max_rate`` defaults to ``MAX_RATE`` (170 arcsec/hour), the speed limit of the
+    classifier itself: the same-visit veto of ``classify`` looks for the source in the
+    3x3 pixels around its peak in the next exposure about 2.15 minutes later, so anything
+    moving more than about one pixel (6.15 arcsec) in that time, i.e. faster than about
+    170 arcsec/hour, is already called a cosmic ray and never reaches the linker. The
+    linker therefore does not claim a range the classifier cannot deliver.
 
     Rates are in arcsec/hour, position angles in degrees east of north. A candidate
     needs detections in ``min_det`` different visits within ``tol_pix`` of a

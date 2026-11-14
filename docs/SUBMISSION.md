@@ -23,16 +23,16 @@ If the form allows a subtitle or a longer name: `ParallaX: chromatic difference 
 
 ## 2. High-Level Project Summary
 
-About 120 words.
+About 150 words.
 
 ```
-ParallaX is a public web tool that plays NASA's SPHEREx infrared images of any patch of sky as a little video, so anyone can spot things that move or change. Type coordinates and the browser fetches the images itself from the public archive; no server is needed. SPHEREx never photographs the same spot in the same colour twice, so blinking or subtracting two dates makes ordinary stars look like false alarms. ParallaX predicts what an unchanging sky would look like at each frame's own colours and subtracts it. On five real fields this goes 3 to 15% deeper than the usual fix and cuts false detections in four of them. We publish the measurements, the limits, and the code to reproduce them. Planet X is the motivation, not a claim.
+ParallaX is a public web tool that plays NASA's SPHEREx infrared images of any patch of sky as a little video, so anyone can spot things that move or change. Type coordinates and the browser fetches the images itself from the public archive; no server is needed. SPHEREx never photographs the same spot in the same colour twice, so blinking or subtracting two dates makes ordinary stars look like false alarms. For seven prepared fields ParallaX also predicts what an unchanging sky would look like at each frame's own colours and subtracts it; fields fetched live show the frames, stacks, spectra and simple pair differences. On five real fields the prediction sees 3 to 15% fainter than the usual fix and cuts false detections in four of them. We publish the measurements, the limits, and the code to reproduce them. Planet X is the motivation, not a claim.
 ```
 
 Shorter version (about 60 words):
 
 ```
-ParallaX plays NASA's SPHEREx infrared images of any patch of sky as a little video, in the browser, so anyone can spot things that move or change. Because SPHEREx sees every revisit in a different colour, it predicts the unchanging sky at each frame's own colours and subtracts it, and it publishes measured, reproducible false-alarm numbers on five real fields.
+ParallaX plays NASA's SPHEREx infrared images of any patch of sky as a little video, in the browser, so anyone can spot things that move or change. Because SPHEREx sees every revisit in a different colour, for its prepared fields it predicts the unchanging sky at each frame's own colours and subtracts it, and it publishes measured, reproducible false-alarm numbers on five real fields.
 ```
 
 ## 3. Link to Project Demo
@@ -74,7 +74,7 @@ before pasting it.
 
 ## 5. Detailed Project Description
 
-About 500 words.
+About 580 words.
 
 ```
 WHAT IT DOES
@@ -85,14 +85,14 @@ SPHEREx never photographs the same spot in the same colour twice. Each exposure 
 
 HOW IT WORKS
 1. Any coordinates, no server. The site ships a 45.6 MB index of all 1,628,230 public SPHEREx Level-2 images. The browser looks up which images cover your position and reads only the pixels it needs from the public archive bucket: 55 images of M51 in 10 to 12 seconds on a fast connection.
-2. A chromatic template. For every frame, a Python pipeline predicts what a static sky would look like at that frame's own per-pixel wavelength, from the spectrum each pixel showed in the other survey passes, and subtracts it. What is left is change.
+2. A chromatic template, for the prepared fields. For every frame, a Python pipeline predicts what a static sky would look like at that frame's own per-pixel wavelength, from the spectrum each pixel showed in the other survey passes, and subtracts it. Far fewer false alarms are left. Fields fetched live in the browser show frames, stacks, spectra and simple pair differences instead.
 3. A published three-way ledger. The same real frames are differenced three ways (naive pair, wavelength-matched pair, chromatic template), with artificial moving sources injected and searched for again.
 
 RESULTS, WITH THEIR LIMITS
 In Barnard's Star field, false detections per frame are 4.64 (naive), 2.44 (matched pair) and 0.99 (ours); at an equal false-alarm rate we find moving sources down to 563 microJy against 1025. Across five fields the template is 3 to 15% deeper and has fewer false detections in four. We measured Barnard's Star at 10.21 +- 0.26 arcsec/yr (Gaia: 10.36) and Epsilon Indi B at 4.64 +- 0.09 (catalogue: 4.70), recovered the cold brown dwarf WISE 0855 only in stacks (S/N 6.6, moderately optimistic), and saw RW Aurigae and R Draconis vary. We also publish what did not work: for stars that shift one or two pixels a simple blink of per-pass stacks shows the motion better than our template; parallax is not measured reliably; bright targets saturate; R Draconis is not a clean test. Planet X is the motivation, not a claim: a real Planet Nine would be too faint for single SPHEREx frames.
 
 BENEFITS AND GOALS
-Anyone with a browser can explore SPHEREx in time, including classrooms and citizen scientists. Researchers get a quick look at any position and a reproducible false-alarm benchmark. The site is static, so it costs nothing to run, and updating to a new data release is three commands.
+Anyone with a browser can explore SPHEREx in time, including classrooms and citizen scientists. Researchers get a quick look at any position and a reproducible false-alarm benchmark. The site is static, so it costs nothing to run, and updating to a new data release takes a few commands.
 
 TOOLS
 Python 3 (NumPy, SciPy, Astropy, HTTPX, FastAPI, Typer), TypeScript, React, Vite, Vitest, pytest, GitHub Actions and GitHub Pages. Hardware: one laptop. 120 Python and 55 TypeScript tests. Open source, Apache-2.0. Development began on 12-13 November 2026, before the on-site event, after the local organizers allowed early preparation. Not affiliated with or endorsed by NASA.
@@ -107,9 +107,9 @@ ParallaX plays SPHEREx images of any patch of sky as a little video. Enter RA an
 ## 6. Use of Super Intelligence (SI)
 
 ```
-Yes. We used one SI tool: Claude, a large language model by Anthropic, as a coding and writing assistant.
+Yes. We used one SI tool: Claude, a large language model by Anthropic, as a research, coding and writing assistant.
 
-How we used it: under our direction it wrote most of the Python pipeline, the web app and their tests, gathered and checked background research (the challenge text, the rules, the archive interfaces, the literature), and drafted the documentation, which we reviewed. We defined the problem and the approach (correct for SPHEREx's per-visit wavelength change with a per-pixel template, and test it with a three-way comparison), directed the work, decided what to keep, and ran and reviewed everything.
+How we used it: the team chose the challenge, the goal and the direction: a comparison of SPHEREx dates that accounts for the changing wavelength. The specific method (a per-pixel chromatic template checked against two baselines) was worked out with the SI assistant, which also surveyed existing tools, gathered and checked background research (the challenge text, the rules, the archive interfaces, the literature), wrote the code and its tests, and drafted the documents under the team's direction. The team reviewed the work, ran it and is responsible for it.
 
 What SI was not used for: no SI-generated images, video, audio, voices or faces appear anywhere in the project. Every figure is a plot made by our code from real SPHEREx data, or a screenshot of the running app. All results are computed by the project's own code from real SPHEREx data; the tool itself contains no machine-learning or language model.
 
@@ -144,9 +144,9 @@ OTHER DATA AND SERVICES
 - SkyBoT, IMCCE, Observatoire de Paris (Berthier et al. 2006, ASP Conf. Ser. 351, 367): known solar-system objects in each field.
 
 SOFTWARE (all open source; none copied into our code, all installed as dependencies)
-- Python: NumPy (BSD-3-Clause), SciPy (BSD-3-Clause), Astropy (BSD-3-Clause), HTTPX (BSD-3-Clause), Pillow (MIT-CMU), FastAPI (MIT), Uvicorn (BSD-3-Clause), Typer (MIT), sep (LGPL-3.0-or-later; declared, not imported), Matplotlib (Matplotlib licence, for figures), pytest (MIT), Ruff (MIT), Hatchling (MIT), uv (Apache-2.0 OR MIT).
+- Python: NumPy (BSD-3-Clause), SciPy (BSD-3-Clause), Astropy (BSD-3-Clause), HTTPX (BSD-3-Clause), Pillow (MIT-CMU), FastAPI (MIT), Uvicorn (BSD-3-Clause), Typer (MIT), Matplotlib (Matplotlib licence, for figures), pytest (MIT), Ruff (MIT), Hatchling (MIT), uv (Apache-2.0 OR MIT).
 - Web: React and React DOM (MIT), Vite (MIT), TypeScript (Apache-2.0), Vitest (MIT), ESLint and typescript-eslint (MIT), Playwright core (Apache-2.0, drives Chrome for screenshots).
-- Fonts: IBM Plex Sans and IBM Plex Mono (SIL Open Font License 1.1), bundled through the @fontsource packages.
+- Fonts: IBM Plex Sans and IBM Plex Mono (SIL Open Font License 1.1), bundled with the web app through the @fontsource packages. The PDF and PowerPoint deliverables (slides, report, paper) use system fonts that ship with Windows and Office (Segoe UI, Consolas, Times New Roman, Cambria Math); these are not redistributed in the repository beyond being embedded in those files.
 - Hosting and automation: GitHub Pages and GitHub Actions.
 - SI tool: Claude, by Anthropic (see the Use of SI field).
 - Full list with versions and licences: THIRD_PARTY_LICENSES.md in the repository.

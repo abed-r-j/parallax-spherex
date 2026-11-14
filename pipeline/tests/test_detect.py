@@ -53,6 +53,61 @@ def test_mover_is_found_measured_and_classified():
     assert sum(q.cls == "mover" for q in dets) == 1
 
 
+def test_bright_mover_is_still_a_mover():
+    # A point source of S/N > 100 covers more pixels above half the threshold than the
+    # fixed 30-pixel limit once the PSF has wings; it must not be called "extended".
+    f = make_field()
+    frame, x, y = 12, 16.3, 14.8
+    star = inject_image(f, frame, x, y, 30000.0)  # 30 mJy
+    gy, gx = np.mgrid[0: f.n, 0: f.n]
+    wings = 0.02 * star.max() * np.exp(-0.5 * ((gx - x) ** 2 + (gy - y) ** 2) / 2.5**2)
+    f.img[frame] += star + wings.astype(np.float32)
+    dets = detect.detect(f, diffim.corrected_diff(f))
+    q = max(near([q for q in dets if q.frame == frame], x, y), key=lambda q: q.snr)
+    assert q.snr > 100
+    assert q.npix > detect.MAX_AREA  # the old fixed limit would have rejected it
+    assert q.npix <= detect.max_area(q.snr, detect.effective_sigma_pix(7.5, f.scale))
+    assert q.cls == "mover", q.evidence
+    # a faint residual of the same footprint is still not point-like
+    assert detect.max_area(6.0, 0.72) < 40 < detect.max_area(200.0, 0.72)
+    assert detect.max_area(2.0, 0.72) == detect.MAX_AREA
+
+
+def test_mover_on_a_faint_static_source_is_a_mover():
+    f = make_field()
+    frame, x, y = 12, 16.3, 14.8
+    for i in range(len(f)):  # a faint static star (about 8 sigma at its peak) in every frame
+        f.img[i] += inject_image(f, i, x, y, 230.0)
+    quiet = detect.detect(f, diffim.corrected_diff(f))
+    assert not near(quiet, x, y)  # the static star alone cancels
+    f.img[frame] += inject_image(f, frame, x, y, 2000.0)  # the mover, about 9 times brighter
+    d = diffim.corrected_diff(f)
+    assert np.nanmax(d.static[frame, 13:17, 15:18]) > 5 * 0.01  # there is a static counterpart
+    q = near([q for q in detect.detect(f, d) if q.frame == frame], x, y)[0]
+    assert q.cls == "mover", q.evidence
+    assert "faint static source underneath" in q.evidence
+    # a residual comparable to the star stays a star residual
+    g = make_field()
+    sx, sy = STARS[3][0], STARS[3][1]
+    g.img[frame] += inject_image(g, frame, sx, sy, 1200.0)  # about half of that star's flux
+    q = near([q for q in detect.detect(g, diffim.corrected_diff(g)) if q.frame == frame], sx, sy)
+    assert q and q[0].cls in {"star-residual", "chromatic"}
+
+
+def test_linker_speed_limit_matches_the_same_visit_veto():
+    # one pixel in the 2.15 minutes between consecutive exposures
+    import inspect
+
+    assert detect.MAX_RATE <= 6.15 / (2.15 / 60.0) + 1e-9
+    assert inspect.signature(detect.link_movers).parameters["max_rate"].default == detect.MAX_RATE
+    # a track faster than the limit is not linked: 6 px in 0.2 h = 184 arcsec/hour
+    f = make_field()
+    f.mjd[3], f.mjd[4] = f.mjd[2] + 0.2 / 24, f.mjd[2] + 0.4 / 24
+    fast = _mover_dets(f, [2, 3, 4], [5.0, 11.0, 17.0], [6.0, 6.0, 6.0])
+    assert detect.link_movers(f, fast) == []
+    assert len(detect.link_movers(f, fast, max_rate=240.0)) == 1
+
+
 def test_transient_not_repeated_minutes_later_is_an_artifact():
     f = make_field()
     f.mjd[13] = f.mjd[12] + 2.0 / 1440.0  # frame 13 is the next exposure of the same visit

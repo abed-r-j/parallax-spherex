@@ -7,6 +7,8 @@ three things that most often fool you: a cosmic ray, a colour residual, and a pi
 All pictures here are screenshots of the app showing real SPHEREx data, or plots made by the
 project's code from real SPHEREx data.
 
+SI disclosure: drafted with the help of an SI coding assistant (Claude, by Anthropic), checked by the team.
+
 ## 1. What you are looking at
 
 SPHEREx is a NASA space telescope launched in March 2025. Every six months it photographs the
@@ -19,8 +21,8 @@ Three facts about its pictures matter for everything below:
    whose colour changes smoothly from one edge to the other. Where a star lands on the
    detector decides the colour it is seen in. When the telescope comes back, the star lands
    somewhere else. So two pictures of the same star are never taken in the same colour.
-2. **A patch of sky is visited in bursts.** In one survey pass a typical position is seen
-   about 75 times within roughly two weeks. Then nothing for about six months, then another
+2. **A patch of sky is visited in bursts.** In one survey pass a position is typically seen
+   60 to 150 times, spread over two to eight weeks. Then nothing for about six months, then another
    pass.
 3. **The pixels are big.** One pixel is 6.15 arcseconds wide. Barnard's Star, the
    fastest-moving star in the sky, moves less than two pixels between the first and the
@@ -79,7 +81,7 @@ The row of tabs above the picture chooses the view. Each has a keyboard shortcut
 | View (key) | What it shows | Use it to |
 |---|---|---|
 | **Image** (I) | The sky as SPHEREx saw it | Blink and watch |
-| **Chromatic difference** (C) | The picture minus what an unchanging sky would look like at exactly this picture's colours, predicted from the other survey passes | See what really changed; this is the method ParallaX adds |
+| **Chromatic difference** (C) | The picture minus what an unchanging sky would look like at exactly this picture's colours, predicted from the other survey passes | See what changed with far fewer false alarms; this is the method ParallaX adds |
 | **Naive pair** (N) | The picture minus the nearest picture from another pass in the same detector, ignoring colour | See the problem: stars leave false signal |
 | **Gated pair** (G) | The picture minus a picture from another pass whose colour agrees within half a bandwidth | See the usual fix |
 | **Three-way** (T) | The same picture differenced all three ways on one scale | Compare the methods directly |
@@ -133,7 +135,7 @@ A warning that the app also gives: comparing brightness at two different wavelen
 you about the star's colour, not about change. Always compare inside a narrow window. For
 RW Aurigae the pipeline finds that between September 2025 and September 2026 the star became
 0.37 magnitude brighter at the shortest wavelengths and 0.76 magnitude fainter at the
-longest, while a nearby control star stayed constant to 0.005 magnitude.
+longest, while a nearby control star showed no change (0.00 +- 0.02 magnitude).
 
 ## 7. Real or not? A field guide to residuals
 
@@ -152,7 +154,8 @@ how to sort them.
 
 Two fields let you practise on real movers. "Asteroid (52) Europa crossing" holds an
 asteroid that crosses the field in ten hours: it is in 24 of the 111 pictures and absent
-from the rest. "Pluto drifting" holds Pluto creeping 12 pixels in 6.4 days. Open either,
+from the rest. "Pluto drifting" holds Pluto creeping 12 pixels in 6.4 days. Both fields
+use only some detectors (3 and 6 for the asteroid, 2 for Pluto). Open either,
 set the sequence to "Every frame, in time order" and step with the arrow keys. The green
 label is where JPL Horizons predicts the object as seen from SPHEREx itself; the measured
 positions agree with it to a few hundredths of a pixel.

@@ -54,7 +54,6 @@ references:
     authors:
       - family-names: Bock
         given-names: J. J.
-      - name: "SPHEREx Science Team"
     journal: "The Astrophysical Journal"
     volume: 999
     start: 139

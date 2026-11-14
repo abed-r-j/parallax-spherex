@@ -36,6 +36,9 @@ from .template import Template, build_template, pixel_spectrum
 FIXED_RATE = 0.5  # common false-detection rate, detections per usable frame
 TARGET_RADIUS = 14.0  # pixels around the known target left out of the false-detection count
 LOBE_RADIUS = 6.0  # pixels around the target searched for its signal
+SCAN_RATES = (0.2, 1.0)  # further matched false-detection rates, next to FIXED_RATE
+FAINT_S = 3.0  # static sky below this many sigma of the frame noise: "faint sky"
+BRIGHT_S = 10.0  # static sky above this: "bright pixel" (on a star)
 COLOURS = {"naive": "#D55E00", "gated": "#0072B2", "corrected": "#009E73"}  # Okabe-Ito
 LABELS = {"naive": "naive pair", "gated": "wavelength-gated pair",
           "corrected": "chromatic template"}
@@ -74,7 +77,7 @@ def pack_encoding(f: Field) -> tuple[float, float, float]:
     finite = f.img[np.isfinite(f.img)]
     sigma = np.sqrt(np.nanmedian(f.var.reshape(len(f), -1), axis=1))
     soft = float(max(np.nanmedian(sigma), 1e-4))
-    return soft, float(np.arcsinh(np.percentile(finite, 0.01) / soft)), float(
+    return soft, float(np.arcsinh(finite.min() / soft)), float(
         np.arcsinh(finite.max() / soft))
 
 
@@ -95,16 +98,60 @@ def _depth(d: diffim.Diff) -> dict:
     }
 
 
-def _rates(f: Field, d: diffim.Diff, exclude: np.ndarray) -> dict:
-    per_frame = inject.detection_rate(d, detect.THRESH, exclude)
+def _rates(f: Field, d: diffim.Diff, exclude: np.ndarray, snr: np.ndarray | None = None) -> dict:
+    """False-detection rates of one cube (``snr`` replaces ``d.snr`` when given)."""
+    per_frame = inject.detection_rate(d, detect.THRESH, exclude, snr=snr)
+    positive = inject.detection_rate(d, detect.THRESH, exclude, signs=(1.0,), snr=snr)
     free = 1.0 - float(exclude.mean())
-    z = d.snr[d.usable]
+    z = (d.snr if snr is None else snr)[d.usable]
     ok = np.isfinite(z) & ~exclude[d.usable]
     return {
         "perFrame": per_frame,
+        "positivePerFrame": positive,
         "perDeg2": per_frame / (area_deg2(f) * free) if np.isfinite(per_frame) else None,
         "pixelFraction": float(np.mean(np.abs(z[ok]) > detect.THRESH)) if ok.any() else None,
     }
+
+
+def static_snr(f: Field, tpl: Template) -> np.ndarray:
+    """Brightness of the static sky (chromatic template) in units of the frame noise.
+
+    One common cube for all modes, so that "faint sky" and "bright pixel" mean the same
+    pixels whichever mode is being examined.
+    """
+    with np.errstate(all="ignore"):
+        return tpl.pred / np.sqrt(f.var)
+
+
+def snr_widths(d: diffim.Diff, s: np.ndarray, exclude: np.ndarray) -> dict:
+    """Robust width (1.4826 MAD) of the S/N on faint, intermediate and bright pixels.
+
+    Classes are defined on the static sky ``s`` (see ``static_snr``): faint |s| < 3,
+    mid 3 <= s < 10, bright s >= 10; pixels inside ``exclude`` and unusable frames are
+    left out. A perfectly calibrated sigma gives 1.0 in every class.
+    """
+    out = {}
+    use = np.isfinite(d.snr) & ~exclude & d.usable[:, None, None]
+    for name, sel in _snr_classes(s).items():
+        z = d.snr[sel & use]
+        out[name] = diffim._mad_std(z) if z.size >= diffim.MIN_PIXELS else None
+    return out
+
+
+def _snr_classes(s: np.ndarray) -> dict[str, np.ndarray]:
+    with np.errstate(all="ignore"):
+        return {"faint": np.abs(s) < FAINT_S, "mid": (s >= FAINT_S) & (s < BRIGHT_S),
+                "bright": s >= BRIGHT_S}
+
+
+def unit_mad_snr(d: diffim.Diff, s: np.ndarray, widths: dict) -> np.ndarray:
+    """Copy of ``d.snr`` with every class of ``snr_widths`` rescaled to unit robust width."""
+    z = d.snr.copy()
+    for name, sel in _snr_classes(s).items():
+        w = widths.get(name)
+        if w and np.isfinite(w) and w > 0:
+            z[sel] /= w
+    return z
 
 
 def known_signal(f: Field, d: diffim.Diff, target: Target | None,
@@ -141,11 +188,12 @@ def known_signal(f: Field, d: diffim.Diff, target: Target | None,
     return out
 
 
-def _mode_entry(f, d, plain, exclude, target, dets) -> dict:
+def _mode_entry(f, d, plain, exclude, target, dets, s) -> dict:
     far = [q for q in dets if not exclude[q.frame, round(q.y), round(q.x)]]
     nu = max(int(d.usable.sum()), 1)
     by_cls = Counter(q.cls for q in far)
     gains = d.info.get("star_gain", {})
+    widths = snr_widths(d, s, exclude)
     return {
         "usableFraction": float(d.usable.mean()),
         "usableFrames": int(d.usable.sum()),
@@ -153,10 +201,38 @@ def _mode_entry(f, d, plain, exclude, target, dets) -> dict:
         "depthPlainUJy": _depth(plain),
         "false": _rates(f, d, exclude),
         "falsePlain": _rates(f, plain, exclude),
+        "snrWidth": widths,
+        "falseUnitMad": _rates(f, d, exclude, snr=unit_mad_snr(d, s, widths)),
         "detectionsByClassPerFrame": {k: round(v / nu, 4) for k, v in sorted(by_cls.items())},
         "starNoiseGain": {str(k): round(float(v), 4) for k, v in gains.items()},
         "knownSignal": known_signal(f, d, target, dets),
     }
+
+
+def _f50(curves: dict, site: str) -> float | None:
+    return curves.get("mover", {}).get(site, {}).get("f50")
+
+
+def rate_scan(f: Field, diffs: dict[str, diffim.Diff], static: np.ndarray, exclude: np.ndarray,
+              fixed: dict, fixed_rate: float, rates=SCAN_RATES, seed: int = 20261113) -> dict:
+    """f50 of injected movers (blank sky, next to a star) at several matched false rates.
+
+    ``fixed`` is the already computed ``atFixedRate`` block (rate ``fixed_rate``); the
+    other rates are run for movers only, at the same sites.
+    """
+    out: dict = {"rates": sorted({*rates, fixed_rate}), "byMode": {m: {} for m in diffs}}
+    blocks = {fixed_rate: fixed}
+    for rate in rates:
+        thr = {m: inject.threshold_for_rate(d, rate, exclude) for m, d in diffs.items()}
+        blocks[rate] = inject.injection_recovery(f, diffs, static, thresholds=thr,
+                                                 exclude=exclude, seed=seed, kinds=("mover",))
+    for rate, blk in blocks.items():
+        for m in diffs:
+            e = blk["modes"][m]
+            out["byMode"][m][f"{rate:g}"] = {"threshold": e.get("threshold"),
+                                            "f50Blank": _f50(e, "blank"),
+                                            "f50Star": _f50(e, "star")}
+    return out
 
 
 def compute_ledger(f: Field, tpl: Template | None = None,
@@ -169,7 +245,9 @@ def compute_ledger(f: Field, tpl: Template | None = None,
     target = target or find_target(f)
     exclude = target_mask(f, target)
     diffs = diffs or diffim.all_modes(f, tpl, exclude=exclude)
-    plain = diffim.all_modes(f, tpl, star_noise=False)
+    # one purely statistical sigma for all three modes (no star noise, no model-error map)
+    plain = diffim.plain_modes(f, tpl)
+    s = static_snr(f, tpl)
     detections = detections or {m: detect.detect(f, d) for m, d in diffs.items()}
     out: dict = {
         "nFrames": len(f), "nPasses": len(np.unique(f.campaign)),
@@ -178,16 +256,33 @@ def compute_ledger(f: Field, tpl: Template | None = None,
         "target": target.name if target else None,
         "excludedRadiusPix": TARGET_RADIUS if exclude.any() else 0.0,
         "gate": diffim.GATE,
-        "modes": {m: _mode_entry(f, diffs[m], plain[m], exclude, target, detections[m])
+        "modes": {m: _mode_entry(f, diffs[m], plain[m], exclude, target, detections[m], s)
                   for m in diffs},
         "notes": [
             "false = detections per usable frame outside the excluded radius around the "
-            "target; falsePlain uses the plain statistical sigma (no star-noise term).",
+            "target; positivePerFrame counts positive detections only.",
+            "falsePlain uses one purely statistical sigma for all three modes (no star-noise "
+            "term and no model-error map for the template); falsePlainModelError (template "
+            "only) is the earlier asymmetric number, statistical sigma plus the template's "
+            "model-error map.",
+            "falsePairCalibration (template only) gives the template exactly the pairs' "
+            "calibration: the fitted star-noise term without its model-error map.",
+            "snrWidth = robust width (1.4826 MAD) of the S/N outside the target mask on faint "
+            "sky (static sky < 3 sigma), mid (3-10) and bright (> 10 sigma) pixels, classes "
+            "defined on the chromatic template; 1.0 means a calibrated sigma. falseUnitMad = "
+            "false detections after dividing each class of each mode's S/N by that width.",
             "depth = median 1-sigma of the difference image in microJy per 6.15 arcsec pixel.",
             "completeness: fraction of injected point sources recovered; 'all' counts frames "
             "without a result as misses, 'searchable' leaves them out.",
         ],
     }
+    if "corrected" in diffs:
+        c = out["modes"]["corrected"]
+        c["falsePlainModelError"] = _rates(
+            f, diffim.corrected_diff(f, tpl, star_noise=False), exclude)
+        same = diffim.corrected_diff(f, tpl, model_error=False, exclude=exclude)
+        c["falsePairCalibration"] = _rates(f, same, exclude)
+        c["depthPairCalibrationUJy"] = _depth(same)
     if tpl.mode != "cross-pass":
         out["notes"].append(
             "single survey pass: the template is leave-one-visit-out within the pass, so "
@@ -200,6 +295,10 @@ def compute_ledger(f: Field, tpl: Template | None = None,
             "atFixedRate": inject.injection_recovery(f, diffs, tpl.pred, thresholds=thr,
                                                      exclude=exclude, seed=seed),
         }
+        # kept beside (not inside) "injection": the web app lists every entry of that block
+        # that has a "modes" table as a completeness-curve comparison
+        out["rateScan"] = rate_scan(
+            f, diffs, tpl.pred, exclude, out["injection"]["atFixedRate"], fixed_rate, seed=seed)
         for m in diffs:
             out["modes"][m]["thresholdAtFixedRate"] = (
                 round(thr[m], 2) if np.isfinite(thr[m]) else None)

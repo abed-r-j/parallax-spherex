@@ -6,7 +6,7 @@ All clips are silent, 1920x1080, 30 frames per second, H.264 (`.mp4`), and open 
 
 | Clip | Length | What it shows | Script line it covers |
 |---|---|---|---|
-| `shot_01_type_coordinates.mp4` | 9.8 s | Home page; the challenge coordinates of WISE 0855-0714 (`08 55 10.83 -07 14 42.5`) are typed; the field opens; six per-pass stacks are stepped | 30 s: "This is ParallaX: see what really moved or changed in the infrared." 2 min: "Our data is open: SPHEREx images from the NASA/IPAC archive..." |
+| `shot_01_type_coordinates.mp4` | 9.8 s | Home page; the challenge coordinates of WISE 0855-0714 (`08 55 10.83 -07 14 42.5`) are typed; the field opens; six per-pass stacks are stepped | 30 s: "This is ParallaX: fewer false alarms in the infrared sky." 2 min: "Our data is open: SPHEREx images from the NASA/IPAC archive..." |
 | `shot_02_blink_barnard.mp4` | 8.8 s | Barnard's Star, detector 3, the three survey passes blinked in the smooth 4x display (the dark square is the saturated core; watch the wings and the cross-hair shift) | 2 min: "Here is Barnard's Star, blinked pass by pass: you can see it move." |
 | `shot_03_time_wavelength.mp4` | 10.0 s | 84 frames of the Barnard field stepped in time order: the picture changes colour band and the marker walks across the "When and at what colour" map | 30 s: "SPHEREx never repeats a colour..." 2 min: "But SPHEREx never photographs a spot in the same colour twice..." |
 | `shot_04_naive_false_alarms.mp4` | 8.3 s | Naive pair difference, frames 93 to 109: the star lights up or goes dark from frame to frame | 30 s: "...so stars become false alarms." 2 min: "Blink two dates, and stars light up as false alarms." |

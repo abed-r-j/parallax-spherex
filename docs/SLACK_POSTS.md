@@ -35,7 +35,7 @@ The problem: SPHEREx never photographs the same spot in the same colour twice. E
 
 Our solution:
 1. Type any coordinates and get the "little video" in the browser, with no server, straight from NASA's public archive.
-2. For each picture we predict what an unchanging sky would look like in that picture's own colours and subtract it. What is left is real change.
+2. For our prepared fields we predict, for each picture, what an unchanging sky would look like in that picture's own colours, and subtract it. Far fewer false alarms are left.
 3. We measure how well this works against the simpler methods, on real data, and publish the numbers and the limits.
 
 Planet X is the motivation, not a claim.
@@ -50,10 +50,10 @@ Official resources we used:
 - SPHEREx at NASA/IPAC IRSA (the data): https://irsa.ipac.caltech.edu/Missions/spherex.html
 - IRSA SPHEREx tutorial notebooks: https://caltech-ipac.github.io/irsa-tutorials/spherex/
 - WiseView, our model for a browser blink tool: http://byw.tools/wiseview
-- Gaia Data Release 3 (ESA): https://archive.stsci.edu/missions-and-data/gaia
+- Gaia Data Release 3 (ESA), listed by the challenge at https://archive.stsci.edu/missions-and-data/gaia (we query the ESA archive)
 
 What we found:
-- Every SPHEREx revisit is at a different wavelength; a position is seen about 75 times per pass, and passes repeat about every six months.
+- Every SPHEREx revisit is at a different wavelength; a position is seen 60 to 150 times per pass, and passes repeat about every six months.
 - Browsers cannot query IRSA directly, but can read the public data bucket. So we ship our own index of all 1,628,230 public images.
 - A real Planet Nine would be too faint for single SPHEREx frames.
 
@@ -160,9 +160,9 @@ ParallaX: final summary.
 
 What it is: a public web tool that plays NASA's SPHEREx infrared images of any patch of sky as a little video, in the browser and without a server, so anyone can look for things that move or vary.
 
-What is new: SPHEREx sees every revisit in a different colour. We predict the unchanging sky in each picture's own colours and subtract it, and we publish a measured comparison with the simpler methods (Barnard's field: 0.99 false detections per picture against 2.44 and 4.64).
+What is new: SPHEREx sees every revisit in a different colour. For prepared fields we predict the unchanging sky in each picture's own colours and subtract it, and we publish a measured comparison with the simpler methods (Barnard's field: 0.99 false detections per picture against 2.44 and 4.64).
 
-Impact: classrooms and citizen scientists need only a browser, in Lebanon and anywhere else. Researchers get a quick look at any position and a reproducible false-alarm benchmark. It costs nothing to run and updates with new data in three commands.
+Impact: classrooms and citizen scientists need only a browser, in Lebanon and anywhere else. Researchers get a quick look at any position and a reproducible false-alarm benchmark. It costs nothing to run and updates with new data in a few commands.
 
 Limits: no Planet X claim, no reliable parallax, bright stars saturate.
 

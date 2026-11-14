@@ -3,9 +3,12 @@
 ParallaX itself is licensed under Apache-2.0 (see `LICENSE`). This file lists everything it
 depends on, with the licence each item declares. Versions are those installed on the
 development machine on 14 November 2026; licences were read from each package's own metadata
-(`pipeline/.venv`, Python package metadata; `web/node_modules/*/package.json`). Every item is
-either under a licence approved by the Open Source Initiative or is public data that is free
-to use with attribution. No "non-commercial only" asset is used.
+(`pipeline/.venv`, Python package metadata; `web/node_modules/*/package.json`). Almost every software
+item is under a licence approved by the Open Source Initiative; the exceptions are permissive
+too and are named where they occur (the Matplotlib licence, CC0-1.0 parts bundled in NumPy,
+and CC-BY-4.0 browser-support data in one build-only package). The data are public and free
+to use with attribution. No "non-commercial only" asset is used. The fonts of the PDF and
+PowerPoint deliverables are system fonts, described in section 3.
 
 No third-party source code is copied into this repository; dependencies are installed by `uv`
 and `npm`. The only third-party files that are redistributed with the built website are the
@@ -20,17 +23,15 @@ React runtime (bundled into the JavaScript) and the IBM Plex font files.
 | numpy | 2.5.4 | BSD-3-Clause (bundled parts: 0BSD, MIT, Zlib, CC0-1.0) | arrays |
 | scipy | 1.18.1 | BSD-3-Clause | filters, fitting, labelling |
 | astropy | 8.0.2 | BSD-3-Clause | FITS files, sky coordinates, WCS |
-| sep | 1.4.1 | LGPL-3.0-or-later (parts BSD-3-Clause and MIT) | declared as a dependency; not imported by the current code |
 | httpx | 0.28.1 | BSD-3-Clause | HTTP range requests and service queries |
 | pillow | 13.0.0 | MIT-CMU | thumbnails |
 | fastapi | 0.162.7 | MIT | local engine (`parallax serve`) |
 | uvicorn | 0.54.0 | BSD-3-Clause | local engine web server |
 | typer | 0.29.1 | MIT | command line |
 
-Note on `sep`: it is the only copyleft item. It is installed as an unmodified, separately
-distributed library and is not redistributed in this repository or in the website, which is
-compatible with releasing ParallaX under Apache-2.0. Since no module imports it, it can be
-dropped from `pyproject.toml` without changing any result.
+Note on `sep` (LGPL-3.0-or-later): an early version declared it; it has been removed from
+`pyproject.toml` and no module imports it, so ParallaX has no copyleft dependency. A copy may
+remain in an old local environment; a fresh `uv sync` does not install it.
 
 ### Installed with them (transitive runtime dependencies)
 
@@ -135,6 +136,12 @@ GitHub Actions `actions/checkout`, `actions/setup-node`, `actions/upload-pages-a
 | IBM Plex Mono (weight 400; Latin subset) | SIL Open Font License 1.1 | Copyright IBM Corp.; files from `@fontsource/ibm-plex-mono` |
 
 "IBM Plex" is a reserved font name under the OFL; the files are redistributed unmodified.
+These are the fonts of the web app.
+
+The PDF and PowerPoint deliverables use system fonts that ship with Windows and Microsoft
+Office and are not open source: Segoe UI and Consolas (slides and project report), Times New
+Roman and Cambria Math (paper). They are not redistributed in this repository beyond being
+embedded, as subsets, in those PDF files; the `.pptx` only names them.
 
 ## 4. Data and services
 
