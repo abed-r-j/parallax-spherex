@@ -164,6 +164,9 @@ def _label_known(blocks: dict, radius_pix: float = 2.5, max_vmag: float = 17.5) 
         for o in by_frame.get(int(d["frame"]), []):
             if abs(d["x"] - o["x"]) <= radius_pix and abs(d["y"] - o["y"]) <= radius_pix:
                 d["known"] = o["name"]
+                if d.get("cls") != "mover":  # keep what the classifier said without the label
+                    d["evidence"] = (f"{d.get('evidence', '')}; named from the ephemeris "
+                                     f"(classifier alone: {d.get('cls')})").lstrip("; ")
                 d["cls"] = "mover"
                 break
 

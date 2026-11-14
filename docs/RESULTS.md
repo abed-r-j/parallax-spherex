@@ -44,43 +44,112 @@ Barnard's field). "f50" is the flux at which half of the injected
 moving point sources are recovered, at a detection threshold tuned so that every method
 yields the same false-detection rate (0.5 per frame).
 
-| Field | Method | Usable frames | Depth (microJy) | False detections per frame | Same, plain noise model | f50, blank sky (microJy) | f50, next to a star (microJy) |
+| Field | Method | Usable frames | Depth (microJy) | False detections per frame | Same, with one purely statistical sigma for all three | f50, blank sky (microJy) | f50, next to a star (microJy) |
 |---|---|---|---|---|---|---|---|
-| Barnard's Star | naive | 93.6% | 38.9 | 4.64 | 28.70 | 1457 | 2334 |
-| | gated | 96.4% | 33.8 | 2.44 | 31.99 | 1025 | 1668 |
-| | **chromatic** | **100%** | **30.5** | **0.99** | **1.91** | **563** | **1047** |
+| Barnard's Star | naive | 93.6% | 38.9 | 4.44 | 27.55 | 1427 | 2297 |
+| | gated | 96.4% | 33.8 | 2.40 | 31.38 | 1003 | 1641 |
+| | **chromatic** | **100%** | **30.5** | **0.99** | 32.98 | **563** | **1047** |
 | Epsilon Indi B | naive | 100% | 28.4 | 2.51 | 7.56 | 955 | 1524 |
 | | gated | 99.3% | 25.3 | 2.34 | 7.88 | 808 | 1176 |
-| | **chromatic** | **100%** | **24.5** | **2.09** | **2.23** | **571** | **1094** |
+| | **chromatic** | **100%** | **24.5** | **2.09** | 8.39 | **571** | **1094** |
 | RW Aurigae | naive | 100% | 30.4 | 3.28 | 24.84 | 1014 | 1349 |
-| | gated | 99.4% | 30.2 | 2.54 | 23.67 | 1150 | 1568 |
-| | **chromatic** | **100%** | **25.8** | **1.28** | **1.81** | **593** | **982** |
+| | gated | 99.4% | 30.2 | 2.54 | 23.66 | 1150 | 1568 |
+| | **chromatic** | **100%** | **25.8** | **1.28** | 24.23 | **593** | **982** |
 | WISE 0855-0714 | naive | 100% | 27.5 | 3.54 | 18.98 | 2193 | not reached |
-| | gated | 98.8% | 19.1 | 2.22 | 19.77 | 859 | 1326 |
-| | **chromatic** | **99.6%** | **18.0** | **1.64** | **2.07** | **707** | **1157** |
+| | gated | 98.8% | 19.1 | 2.21 | 19.74 | 859 | 1326 |
+| | **chromatic** | **99.6%** | **18.0** | **1.64** | 21.12 | **707** | **1157** |
 | R Draconis | naive | 100% | 147.4 | 0.49 | 3.27 | 1793 | not reached |
 | | gated | 79.0% | 106.8 | 0.58 | 3.30 | 1743 | not reached |
-| | chromatic | 97.1% | 103.1 | 0.61 | 1.26 | 1136 | not reached |
+| | chromatic | 97.1% | 103.1 | 0.61 | 3.24 | 1136 | not reached |
 
-The "plain noise model" column uses only the pipeline's statistical variance for the pair
-methods; the main column gives every method the same fitted "star noise" term (see 2.2).
+The plain column gives all three methods one purely statistical sigma: no "star noise" term
+for anyone and no model-error map for the template. Under it the template floods as much as
+the pairs (33 false detections per frame in Barnard's field): its subtraction of an
+under-sampled star is no cleaner than a pair's. In the main column the pairs get a fitted
+"star noise" term (see 2.2) and the template gets the larger of that term and its own
+measured per-pixel model-error map, which the pairs do not have. With the statistical
+sigma plus that map alone the template gives 1.91 / 2.23 / 1.81 / 2.07 / 1.26 false
+detections per frame in the five fields; an earlier version of this table showed those
+numbers in the plain column, which was not the same noise model. The two false-detection
+columns are therefore not like for like between methods. The f50 columns, taken at a
+matched false-detection rate, are; see the robustness tables in 2.1.
+
+Frames without a result are now left out of both the count and the denominator of the
+false-detection rate. This changed the pair rows of Barnard's field (naive 4.64 to 4.44,
+gated 2.44 to 2.40, their f50 by 2%) and the gated row of WISE 0855 (2.22 to 2.21); no
+chromatic number in the main columns changed.
 
 ### 2.1 What the comparison shows
 
-* The chromatic template is 3 to 15% deeper than the gated pair in every field.
-* At a matched false-detection rate it recovers moving sources 1.2 to 1.9 times fainter than
-  the gated pair on blank sky (Barnard's field: 563 against 1025 microJy), and 1.1 to 1.6
-  times fainter next to a star.
-* It gives fewer false detections than the gated pair in four of five fields (Barnard's
-  field: 0.99 against 2.44 per frame, i.e. 109 against 269 per square degree per frame).
+* The chromatic template is 3 to 15% deeper than the gated pair in every field in quoted
+  sigma, and 17 to 25% deeper in the measured scatter of blank-sky residuals (robust
+  scatter 19.5 against 26.0 microJy in Barnard's field). Bilinear resampling correlates
+  the noise of neighbouring pixels in every method (the scatter of 2x2 pixel sums is 1.1 to
+  1.4 times the independent-pixel value), so a per-pixel depth understates the noise per
+  beam for all three.
+* At a matched false-detection rate of 0.5 per frame it recovers moving sources 1.2 to 1.9
+  times fainter than the gated pair on blank sky (Barnard's field: 563 against 1003
+  microJy), and 1.1 to 1.6 times fainter next to a star. The factor depends on the chosen
+  rate: on blank sky it is 1.1 to 2.0 for rates of 0.2 to 1 per frame and the ranking never
+  flips; next to a star the advantage is gone at 0.2 per frame (in Eps Indi the gated pair
+  is then better, elsewhere no method reaches 50%).
+* A raw count of false detections at |S/N| > 5 is not a like-for-like comparison, because
+  the methods' sigmas are not equally well calibrated: the robust width of the S/N outside
+  the target mask is 0.65 to 0.88 on faint sky and 0.79 to 0.94 on stars for the template
+  (sigma too large), against 0.71 to 0.97 and 1.22 to 1.85 for the gated pair (sigma too
+  small on stars). The template gives fewer false detections than the gated pair in
+  Barnard's and RW Aurigae's fields under every calibration we tried (Barnard: 0.99 against
+  2.40 per frame as tabulated, i.e. 109 against 265 per square degree per frame; 1.89
+  against 2.40 with the pairs' calibration; 1.57 against 1.87 after rescaling every S/N to
+  unit width). In Eps Indi and WISE 0855 the sign depends on the noise model, and in
+  R Draconis the template has slightly more. The like-for-like comparison is the
+  matched-rate f50.
+* A stronger trivial baseline does not beat the template: the inverse-variance mean of all
+  other-pass frames inside the half-bandwidth gate, calibrated like the pairs, reaches f50
+  of 733 / 821 / 894 microJy (Barnard, RW Aurigae, WISE 0855; blank sky, 0.5 per frame)
+  against 563 / 593 / 707 for the template. Only 1 to 3 frames fall inside the gate per
+  pixel, while the template reaches about 6 effective references by fitting across
+  neighbouring wavelengths.
+* The injection shortcut (adding the source to the S/N cube instead of to the image) was
+  checked against a full re-run in Barnard's field: 320 sources injected into the images of
+  80 frames, template, calibration and differences rebuilt. The peak S/N is 0.98 of the
+  shortcut's in all three methods and the completeness agrees within 0 to 4 percentage
+  points; the shortcut is slightly optimistic for all three equally.
 * It needs no partner frame, so it uses 97 to 100% of frames; the gated pair loses 1 to 4% of frames
   in ordinary fields and 21% in the R Draconis deep field.
+
+Robustness of the false-detection count (per frame at |S/N| > 5, gated pair against
+chromatic template):
+
+| Field | As in the main table | Template with exactly the pairs' calibration (no model-error map) | Every method's S/N rescaled to unit robust width | Positive detections only (main table) |
+|---|---|---|---|---|
+| Barnard's Star | 2.40 / 0.99 | 2.40 / 1.89 | 1.87 / 1.57 | 1.63 / 0.69 |
+| Epsilon Indi B | 2.34 / 2.09 | 2.34 / 2.95 | 2.08 / 2.80 | 1.63 / 1.86 |
+| RW Aurigae | 2.54 / 1.28 | 2.54 / 2.27 | 1.96 / 1.77 | 1.84 / 1.02 |
+| WISE 0855-0714 | 2.21 / 1.64 | 2.21 / 3.11 | 1.76 / 2.17 | 1.58 / 1.27 |
+| R Draconis | 0.58 / 0.61 | 0.58 / 0.71 | 0.74 / 1.05 | 0.45 / 0.46 |
+
+The rescaling divides each method's S/N by its robust width (1.4826 MAD) measured outside
+the target mask, separately on faint sky (static sky below 3 sigma), intermediate (3 to 10)
+and bright (above 10 sigma) pixels; the classes are defined on the chromatic template for
+all methods.
+
+Robustness of the matched-rate sensitivity (f50 of the gated pair divided by f50 of the
+chromatic template; above 1 the template reaches fainter):
+
+| Field | Blank sky, 0.2 per frame | 0.5 per frame | 1.0 per frame | Next to a star, 0.2 per frame | 0.5 per frame | 1.0 per frame |
+|---|---|---|---|---|---|---|
+| Barnard's Star | 1.41 | 1.78 | 1.97 | not reached by either | 1.57 | 1.71 |
+| Epsilon Indi B | 1.09 | 1.41 | 1.35 | 0.82 | 1.08 | 1.06 |
+| RW Aurigae | 1.21 | 1.94 | 1.84 | not reached by either | 1.60 | 1.55 |
+| WISE 0855-0714 | 1.07 | 1.21 | 1.49 | not reached by either | 1.15 | 1.36 |
+| R Draconis | not reached by either | 1.53 | 1.62 | not reached by either | not reached by either | template only (2325 microJy) |
 
 ### 2.2 What it does not show (limits we measured)
 
 * **Gating costs few frames.** 96 to 99% of frames find a partner within half a bandwidth,
   because the survey revisits at nearly repeating wavelengths. The advantage of the template
-  is depth and false-alarm rate, not rescued frames.
+  is depth and sensitivity at a matched false-alarm rate, not rescued frames.
 * **Pixel sampling, not colour, is the largest noise term.** SPHEREx pixels (6.15 arcsec)
   under-sample the image: the peak pixel of a bright star scatters by 23 to 27% from frame
   to frame at fixed wavelength. This is why pair differences flood with false detections
@@ -101,8 +170,16 @@ methods; the main column gives every method the same fitted "star noise" term (s
   recovered" row it scores "no" for Barnard's Star: its detection sits next to the saturated
   core and is classed an artifact in 85% of frames. RW Aurigae's change exceeds 5 sigma in
   39% of template frames against 86% for the gated pair, and no method classes it "variable".
+* **The false-detection tail is not Gaussian noise.** It is dominated by artefacts of
+  saturated stars that reach beyond the 14-pixel mask and by transients the archive did not
+  flag (single residuals reach S/N of several hundred to more than a thousand; 5 to 16% of
+  the strongest carry the TRANSIENT flag). This is why the thresholds that give 0.5 false
+  detections per frame are about 8 to 12 sigma in the four ordinary fields (14 to 54 sigma
+  at 0.2 per frame), and why f50 is several times the 5-sigma point-source depth.
 * Injected sources are achromatic Gaussian point sources; the 14-pixel exclusion radius and
-  the 0.5-per-frame matched rate are our choices and are recorded in the ledger files.
+  the 0.5-per-frame matched rate are our choices and are recorded in the ledger files,
+  which now also hold the rates 0.2 and 1.0. With exclusion radii of 8 and 20 pixels the
+  ranking at |S/N| > 5 is unchanged in the four ordinary fields and flips in R Draconis.
 
 ## 3. The five challenge targets
 
@@ -157,7 +234,7 @@ object tool for (52) Europa.
 | Field | Frames | Object present in | Chromatic-difference detections labelled with the object | Median S/N in the chromatic difference | Measured minus predicted position |
 |---|---|---|---|---|---|
 | (52) Europa crossing, 20-21 Aug 2025 (V 12.2, detectors 3 and 6) | 111 | 24 | 24 of 24 (S/N 111 to 236), matched to the ephemeris within 0.5 pixel; without the ephemeris the classifier calls 21 of the 24 "mover" | 186 | -0.05 +- 0.04, 0.00 +- 0.07 pixel |
-| Pluto, 4-10 Oct 2025 (V 14.5, detector 2) | 46 | 18 | 18 of 18 (S/N 14 to 57), matched to the ephemeris; without the ephemeris the classifier calls 8 "mover", 8 "variable", 1 "star-residual" and 1 "artifact" | 47 | +0.03 +- 0.10, +0.01 +- 0.04 pixel |
+| Pluto, 4-10 Oct 2025 (V 14.5, detector 2) | 46 | 18 | 18 of 18 (S/N 14 to 57), matched to the ephemeris; without the ephemeris the classifier calls 8 "mover", 8 "variable", 1 "star-residual" and 1 "artifact" | 50 | +0.03 +- 0.10, +0.01 +- 0.04 pixel |
 
 * What the pipeline does blind, with no ephemeris (re-run on the cached fields): for
   (52) Europa the classifier calls 21 of the 24 detections "mover" and the linker joins
@@ -196,4 +273,4 @@ object tool for (52) Europa.
   archive at six test positions.
 * In-browser live mode: 55 images of M51 in 10 to 12 seconds, no server (fast connection;
   an estimated one to two minutes on a slow one).
-* 120 Python tests and 55 TypeScript tests, all offline (2 more Python tests call live services and are skipped unless `PARALLAX_NETWORK=1` is set).
+* 130 Python tests and 55 TypeScript tests, all offline (2 more Python tests call live services and are skipped unless `PARALLAX_NETWORK=1` is set).
