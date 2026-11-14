@@ -144,7 +144,20 @@ try {
       if (tab) await page.getByRole('tab', { name: tab, exact: false }).first().click()
       await page.waitForTimeout(500)
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
-      if (overflow > 1) problems.push(`${tag}/${name}: horizontal overflow of ${overflow}px`)
+      if (overflow > 1) {
+      // name the widest offender so the layout bug can be found without guessing
+      const who = await page.evaluate(() => {
+        const w = window.innerWidth
+        let worst = null
+        for (const el of document.querySelectorAll('body *')) {
+          const r = el.getBoundingClientRect()
+          if (r.right > w + 1 && (!worst || r.right > worst.right) && !el.closest('.table-wrap > table'))
+            worst = { right: Math.round(r.right), tag: el.tagName.toLowerCase(), cls: String(el.className).slice(0, 60), text: (el.textContent || '').slice(0, 50) }
+        }
+        return worst
+      })
+      problems.push(`${tag}/${name}: horizontal overflow of ${overflow}px (${who ? `${who.tag}.${who.cls} "${who.text}"` : 'unknown element'})`)
+    }
       await page.screenshot({ path: join(out, `${tag}-${name}.png`), fullPage: tag === 'phone' || ['how', 'about', 'ledger', 'science', 'home'].includes(name) })
       await page.close()
     }
