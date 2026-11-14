@@ -155,7 +155,16 @@ flowchart TB
   <field>` rebuilds the pack.
 * `pipeline/scripts/build_sky_index.py` fetches only the days that are missing and rebuilds
   the shards.
-* Pushing to the main branch runs the tests and deploys the site (GitHub Actions).
+* Deployment: the live site <https://abed-r-j.github.io/parallax-spherex/> is served by
+  GitHub Pages from the `gh-pages` branch, which holds the contents of `web/dist`. To
+  redeploy, run `npm run build` in `web/`, then from the repository root
+  `powershell -File web/scripts/publish_site.ps1 -Push`.
+* The published data packs under `web/public/data` (about 100 MB) are tracked in git, so a
+  clean clone builds and tests the web app; only the top-level `data/` scratch folder is
+  ignored.
+* Tests are run locally (`uv run pytest -q` in `pipeline/`, `npm test` in `web/`). A GitHub
+  Actions workflow that runs the same tests is provided and is started by hand; it does not
+  run on push and does not deploy.
 
 ## 8. Known limits of the design
 

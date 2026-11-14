@@ -37,7 +37,9 @@ npm run build
 ```
 
 Two Python tests call live services and are skipped by default; run them with
-`PARALLAX_NETWORK=1` set. The same checks run in GitHub Actions (`.github/workflows/ci.yml`).
+`PARALLAX_NETWORK=1` set. Run these checks locally before you
+push. A GitHub Actions workflow with the same checks (`.github/workflows/ci.yml`) is provided
+and is started by hand from the Actions tab; it does not run on push.
 
 ## Style
 
@@ -77,8 +79,9 @@ Two Python tests call live services and are skipped by default; run them with
 4. If the field should carry ledger numbers with injection tests, run
    `uv run python scripts/run_ledger.py myfield` first (a few minutes), then publish again.
 
-Keep fields small (6 arcmin is the default). `data/` is git-ignored; only the packs under
-`web/public/data/` are committed.
+Keep fields small (6 arcmin is the default). The top-level `data/` folder is
+git-ignored; the packs under `web/public/data/` are committed (about 100 MB in total), so
+commit a new pack only if it should ship with the site.
 
 ## Report a false alarm
 

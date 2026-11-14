@@ -4,6 +4,9 @@ For anyone curious. You do not need to be an astronomer. This guide explains wha
 pictures are, what each view means, and how to tell something that really moved from the
 three things that most often fool you: a cosmic ray, a colour residual, and a pixel effect.
 
+The tool is at <https://abed-r-j.github.io/parallax-spherex/>; it needs only a browser. The
+source code is at <https://github.com/abed-r-j/parallax-spherex>.
+
 All pictures here are screenshots of the app showing real SPHEREx data, or plots made by the
 project's code from real SPHEREx data.
 

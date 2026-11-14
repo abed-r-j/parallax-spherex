@@ -21,13 +21,16 @@ event Beirut. **Not affiliated with or endorsed by NASA.**
 
 ## Try it
 
-The public site and repository are **to be published** at:
+The site and the repository are public:
 
 * Site: <https://abed-r-j.github.io/parallax-spherex/>
 * Code: <https://github.com/abed-r-j/parallax-spherex>
+* Slides (PDF): <https://github.com/abed-r-j/parallax-spherex/blob/main/presentation/ParallaX_ZENITH_LABS.pdf>
+* Paper (PDF): <https://github.com/abed-r-j/parallax-spherex/blob/main/paper/ParallaX_IEEE.pdf>
+* Project report (PDF): <https://github.com/abed-r-j/parallax-spherex/blob/main/docs/ParallaX_Project_Report.pdf>
 
-Until then, run it on your own computer (see [Quick start](#quick-start)); every link below
-also works against `http://127.0.0.1:8000/`.
+You can also run it on your own computer (see [Quick start](#quick-start)); every link below
+then works against `http://127.0.0.1:8000/` too.
 
 The five challenge targets:
 
@@ -40,8 +43,10 @@ The five challenge targets:
 | R Draconis | <https://abed-r-j.github.io/parallax-spherex/?field=rdra> |
 
 Two more fields show real solar-system objects in motion: the main-belt asteroid (52) Europa
-crossing a fixed field in ten hours (`?field=europa52&seq=frames`) and Pluto, the original
-"Planet X", drifting 12 pixels in 6.4 days (`?field=pluto&seq=frames`).
+crossing a fixed field in ten hours
+(<https://abed-r-j.github.io/parallax-spherex/?field=europa52&seq=frames>) and Pluto, the
+original "Planet X", drifting 12 pixels in 6.4 days
+(<https://abed-r-j.github.io/parallax-spherex/?field=pluto&seq=frames>).
 
 Coordinates in the URL (decimal degrees, ICRS):
 
@@ -104,7 +109,7 @@ Objectives of the challenge:
 
 | Objective | In ParallaX |
 |---|---|
-| Public-facing web tool | Static site (GitHub Pages, to be published); no account, no server of ours |
+| Public-facing web tool | Static site on GitHub Pages, <https://abed-r-j.github.io/parallax-spherex/>; no account, no server of ours |
 | Display SPHEREx images of the sky | Real Level-2 spectral images (DR1 and QR3) from NASA/IPAC IRSA |
 | Enter Right Ascension and declination | Search box takes decimal degrees or sexagesimal, for example `08h55m10.831s -7d14m42.53s` |
 | A series of images "like a little video" | Blink player: play, step, speed, loop; by survey pass or every frame |
@@ -220,7 +225,7 @@ same with `\` in paths.
 ### (a) Just look at it
 
 ```bash
-git clone https://github.com/abed-r-j/parallax-spherex   # to be published
+git clone https://github.com/abed-r-j/parallax-spherex   # about 100 MB: the data packs are in the repository
 cd parallax-spherex/web
 npm install
 npm run build                 # writes web/dist
@@ -265,8 +270,16 @@ cd pipeline
 uv run parallax fetch barnard            # incremental: only images not already on disk
 uv run parallax publish barnard          # rebuild that pack (no argument: every field with data)
 uv run python scripts/build_sky_index.py # fetch only the new days, rebuild web/public/skyindex
-cd ../web && npm run build               # then push: CI tests and deploys the site
+cd ../web && npm run build               # writes web/dist with the new packs and index
+cd .. && powershell -File web/scripts/publish_site.ps1 -Push   # publishes web/dist as the gh-pages branch
 ```
+
+The site is served from the `gh-pages` branch, which holds the contents of `web/dist`;
+`web/scripts/publish_site.ps1` writes that branch and, with `-Push`, pushes it. Commit the
+changed packs under `web/public/data` to the main branch as well: they are tracked in git,
+so a clean clone builds and tests the web app without running the pipeline. Tests are run
+locally with the commands under [Testing](#testing); a GitHub Actions workflow that runs the
+same tests is provided and is started by hand (it does not run on push and does not deploy).
 
 `build_sky_index.py` is resumable (`--skip-dump` builds from what is cached, `--verify`
 compares with the live archive). The first full download took about 73 minutes; an update
@@ -304,12 +317,12 @@ pipeline/                 Python package "parallax" (installs with uv)
 web/                      Vite + React + TypeScript static site
   src/lib/                decoding, WCS, FITS, sky index, live fetch, photometry, URL state
   src/components/         viewer, charts, panels, live fetch
-  public/data/            published data packs
+  public/data/            published data packs (tracked in git, about 100 MB)
   public/skyindex/        sky index shards
-  scripts/                screenshot and live checks (headless Chrome)
+  scripts/                screenshot and live checks (headless Chrome), publish_site.ps1
 docs/                     results, architecture, guides, submission material
-.github/workflows/ci.yml  tests for both halves, deploy to GitHub Pages
-data/                     local working data (git-ignored)
+.github/workflows/ci.yml  tests for both halves, started by hand (the site is published from the gh-pages branch)
+data/                     local working data (the only git-ignored data folder)
 ```
 
 ## Testing

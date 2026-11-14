@@ -3,19 +3,19 @@
 An audit of ParallaX against the official challenge text (details and resources tabs as
 published on 13 November 2026). Items A1 to A12 are what the Objectives require; B1 to B11
 are the optional "Potential Considerations"; C1 to C6 come from the Resources tab. Status is
-one of **Met**, **Partial** or **Pending**, and anything short of fully met says why.
+one of **Met**, **Partial** or **Not used**, and anything short of fully met says why.
 
 SI disclosure: drafted with the help of an SI coding assistant (Claude, by Anthropic), checked by the team.
 
-State of the audit: 14 November 2026, on the local build (`parallax serve`). The public site
-and repository are to be published at <https://abed-r-j.github.io/parallax-spherex/> and
+State of the audit: 14 November 2026. The site and the repository are public at
+<https://abed-r-j.github.io/parallax-spherex/> and
 <https://github.com/abed-r-j/parallax-spherex>.
 
 ## Summary
 
-| Group | Met | Partial | Pending |
+| Group | Met | Partial | Open |
 |---|---|---|---|
-| A. Mandatory (12) | 11 | 0 | 1 (A2, publication) |
+| A. Mandatory (12) | 12 | 0 | 0 |
 | B. Optional (11) | 10 | 1 (B11) | 0 |
 | C. Resources (6) | 4 | 1 (C6) | 0; C5 not used |
 
@@ -24,7 +24,7 @@ and repository are to be published at <https://abed-r-j.github.io/parallax-spher
 | # | Requirement | Status | Where it is satisfied | Evidence |
 |---|---|---|---|---|
 | A1 | It is a web tool | Met | `web/`: static Vite + React + TypeScript site, built to `web/dist` | `npm run build` passes; 55 unit tests; screenshots in `docs/img/` |
-| A2 | It is public-facing | **Pending** | GitHub Pages deployment is configured in `.github/workflows/ci.yml`; the site needs no account and no server | Not yet published at the time of this audit. Tested locally from a plain static server with relative paths. Must be re-checked in a private browser window after publishing |
+| A2 | It is public-facing | Met | Live site <https://abed-r-j.github.io/parallax-spherex/>, served by GitHub Pages from the `gh-pages` branch (the contents of `web/dist`, published with `web/scripts/publish_site.ps1`); source at <https://github.com/abed-r-j/parallax-spherex>. The site needs no account and no server of ours | Published on 14 November 2026. Worth re-checking in a private browser window, signed out, before submitting |
 | A3 | Displays images of the sky from SPHEREx | Met | Real Level-2 spectral images, DR1 (doi:10.26131/IRSA678) and QR3 (doi:10.26131/IRSA662), from NASA/IPAC IRSA | 1,991 frames in five packs under `web/public/data/`; live path reads the public archive bucket directly; no synthetic imagery in the app |
 | A4 | Easy for anyone to quickly see how the sky changes over time | Met | Home page with one-click fields; blink player; plain-language text under every view; "How it works" page; [USER_GUIDE.md](USER_GUIDE.md) | Precomputed fields open from 10 to 18 MB of local files; a live field of 55 images arrives in 10 to 12 s on a fast connection (one to two minutes on a slow one) |
 | A5 | Users enter coordinates as Right Ascension and declination | Met | Search box on every page (`web/src/lib/coords.ts`); also `?ra=&dec=` in the URL | Decimal degrees and sexagesimal both parse; headless-browser check of four typed strings |
@@ -40,14 +40,14 @@ and repository are to be published at <https://abed-r-j.github.io/parallax-spher
 
 | # | Consideration | Status | Where it is satisfied | Evidence |
 |---|---|---|---|---|
-| B1 | Easy to update with the latest data releases | Met | `parallax fetch` (incremental), `parallax publish`, `pipeline/scripts/build_sky_index.py` (fetches only missing days), CI deploy | Index covers both DR1 and QR3 collections, 1,628,230 images; the update path is documented in the README. Not yet exercised on a release newer than 13 Nov 2026 |
+| B1 | Easy to update with the latest data releases | Met | `parallax fetch` (incremental), `parallax publish`, `pipeline/scripts/build_sky_index.py` (fetches only missing days), `web/scripts/publish_site.ps1 -Push` to redeploy | Index covers both DR1 and QR3 collections, 1,628,230 images; the update path is documented in the README. Not yet exercised on a release newer than 13 Nov 2026 |
 | B2 | Creative display of the 102 bands | Met | Time-against-wavelength map of every frame; per-pixel wavelength read-out; wavelength window; chromatic template; wavelength-mismatch tint | `docs/img/three-way.png`, `docs/img/naive-mismatch.png` |
 | B3 | Add the data of each of the six detector arrays separately | Met | `stack` section of every pack: per survey pass, per detector, inverse-variance mean; detector picker; Add mode | Default view of motion fields is the per-pass, per-detector stack blink |
 | B4 | Generate spectra on the fly ("extra kudos") | Met | Spectrum panel: click a pixel, aperture 1, 3 x 3 or 5 x 5 pixels, light curve in a wavelength window, CSV download (`web/src/lib/photometry.ts`) | `docs/img/spectrum.png`; CSV check `parallax_barnard_x15_y45_spectrum.csv`, 341 lines. Works on live fields too. No aperture correction; saturated cores have no data |
 | B5 | Option to add images taken at different times | Met | Add mode: any frame, or all frames of a pass and/or detector | In the app (key A) |
 | B6 | Option to subtract images taken at different times | Met | Subtract mode (A minus B, each a frame or a group); plus three differencing methods per frame | `docs/img/subtract.png` |
 | B7 | User-chosen field of view | Met | Field-of-view picker in the viewer and `fov=` in the URL; live fields in 3, 6 or 9 arcmin with the download size and time shown before fetching; engine fields up to 12 arcmin | `docs/img/live-offer.png`. Limit: precomputed packs are 6.25 or 8.3 arcmin across; the picker zooms inside them |
-| B8 | Overlay data from other telescopes (Gaia, WISE) | Met | Gaia DR3 stars moved to the frame date; CatWISE2020 sources; known solar-system objects (SkyBoT, JPL Horizons) | `docs/img/overlays.png`. Limits: overlays exist only in pipeline packs, not in live fields; CatWISE2020 has no sources around R Draconis (a hole in the catalogue) |
+| B8 | Overlay data from other telescopes (Gaia, WISE) | Met | Gaia DR3 stars moved to the frame date; CatWISE2020 sources; known solar-system objects (SkyBoT, JPL Horizons) | `docs/img/overlays.png`. Limits: overlays exist only in pipeline packs, not in live fields. The WISE overlay is present in all seven packs; around R Draconis, where CatWISE2020 has a hole, it comes from AllWISE |
 | B9 | Coordinates in the URL; embeddable | Met | `web/src/lib/urlstate.ts`: `?ra=&dec=&fov=&det=&mode=&frame=`, `embed=1`; Share button with link and iframe code | URL round-trip tests; a reopened URL restores the same view |
 | B10 | Display metadata such as contamination flags | Met | Pixel-flags overlay (no data, suspect, catalogued source, pipeline outlier); Frame panel (date, detector, wavelength, bandwidth, noise, sky removed, archive file) | `docs/img/overlays.png`. Live fields carry only the no-data flag |
 | B11 | Consider Astropy and Aladin | **Partial** | Astropy is used throughout the pipeline (FITS, WCS, coordinates). Aladin Lite is not used | We chose our own viewer so that the site makes no outside request for precomputed fields and runs offline; CDS services were also unreachable from our network during development |
@@ -65,7 +65,8 @@ and repository are to be published at <https://abed-r-j.github.io/parallax-spher
 
 ## What is honestly not met or only partly met
 
-* **A2**: the site is not public until it is published. This is the one mandatory item open.
+* **The two videos** (30-second demo, 2-minute judging video) are not recorded yet; the
+  demo link currently points to the slides.
 * **B11**: Aladin is not used.
 * **Depth of the "moving object" demonstration**: the three test stars move 1 to 2 pixels.
   The tool shows it best with per-pass stacks and Subtract, not with the chromatic template.

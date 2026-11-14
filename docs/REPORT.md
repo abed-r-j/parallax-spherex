@@ -13,7 +13,7 @@ event Beirut. Team ZENITH LABS. 14 November 2026.**
 | Members | **Abed El Rahmane Jaafir**, team lead: AI engineer; MEng Software Engineering and currently Master in AI, Saint Joseph University of Beirut. **Mohamad Alayli**: BSc Computer Science, Lebanese American University; autonomous systems, back-end engineering. |
 | Challenge | Planet X and SPHEREx (Advanced; astrophysics, planets and moons, software) |
 | Project | ParallaX, a web tool and an open pipeline |
-| Site and code | To be published at https://abed-r-j.github.io/parallax-spherex/ and https://github.com/abed-r-j/parallax-spherex |
+| Site and code | Live site: https://abed-r-j.github.io/parallax-spherex/ . Source code: https://github.com/abed-r-j/parallax-spherex |
 | Licence | Apache-2.0 |
 | Timeline | Development began on 12-13 November 2026, before the on-site event of 14-15 November, after the local organizers allowed early preparation. |
 
@@ -128,7 +128,8 @@ site needs no server and works offline for the ready fields.
 
 **Software and tools.** Python 3 with NumPy, SciPy, Astropy, HTTPX, FastAPI and Typer;
 TypeScript, React and Vite for the site; pytest and Vitest (130 Python and 55 TypeScript
-tests, all offline); GitHub Actions and GitHub Pages. The FITS reader, the coordinate code
+tests, all offline, run locally; a GitHub workflow that runs them can be started by hand);
+GitHub Pages for the site. The FITS reader, the coordinate code
 and the charts in the browser are our own, and fonts are bundled, so the site makes no
 outside request for the ready fields. Hardware: one laptop. An SI coding assistant was used
 under our direction (section 12).

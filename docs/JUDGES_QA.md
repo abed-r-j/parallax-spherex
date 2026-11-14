@@ -35,7 +35,9 @@ no account. The whole index of 1,628,230 images is 45.6 MB.
 A few commands. `parallax fetch` downloads only images that are not on disk yet,
 `parallax publish` rebuilds the data packs, and `build_sky_index.py` fetches only the days
 that are missing. The first full index download took about 73 minutes; an update
-downloads only the new days. Pushing to the repository tests and redeploys the site.
+downloads only the new days. Then build the site and run one
+script (`web/scripts/publish_site.ps1 -Push`) to redeploy it. Tests are run locally with the
+documented commands; a GitHub workflow that runs them is provided and is started by hand.
 
 **6. Could volunteers really discover something with it?**
 Possibly variable stars and unusual movers, but we are careful here. Almost everything
@@ -198,8 +200,9 @@ request.
 **23. Does it meet the stated objectives?**
 Yes, all of them: a web tool; SPHEREx images; coordinates in right ascension and
 declination, including the exact notation in the challenge text; a little video; and all
-five named targets tested and measured. The one item pending at the time of writing is
-publication of the public site. Of the eleven optional considerations we address ten fully;
+five named targets tested and measured. The site is public at
+<https://abed-r-j.github.io/parallax-spherex/> and the code at
+<https://github.com/abed-r-j/parallax-spherex>. Of the eleven optional considerations we address ten fully;
 for the eleventh we use Astropy but not Aladin. See
 [CHALLENGE_CHECKLIST.md](CHALLENGE_CHECKLIST.md).
 

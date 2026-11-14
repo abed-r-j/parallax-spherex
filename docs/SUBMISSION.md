@@ -8,8 +8,9 @@ resubmit.
 The Project Submission Guide states no character limits. Check the live form for limits when
 it opens; each long field below has a shorter version in case one is enforced.
 
-Everything must be in English. Do not paste anything marked **paste after publishing** until
-the link has been opened successfully in a private browser window, logged out.
+Everything must be in English. The site and the repository are public. Open every link in a
+private browser window, logged out, before submitting. The two videos (30-second demo and
+2-minute judging video) are not recorded yet; their links are the only placeholders left.
 
 ---
 
@@ -37,12 +38,25 @@ ParallaX plays NASA's SPHEREx infrared images of any patch of sky as a little vi
 
 ## 3. Link to Project Demo
 
-**Paste after publishing.** This must point to the demo itself: either a video of 30 seconds
-or less, or a slide deck of at most 7 slides including the title and introduction slides.
-Exceeding either limit makes the project ineligible for Global Judging.
+This must point to the demo itself: either a video of 30 seconds or less, or a slide deck of
+at most 7 slides including the title and introduction slides. Exceeding either limit makes
+the project ineligible for Global Judging. Use the 7-slide deck, which is public now:
 
 ```
-[PASTE AFTER PUBLISHING: public link to the 30-second demo video or the 7-slide deck]
+https://github.com/abed-r-j/parallax-spherex/blob/main/presentation/ParallaX_ZENITH_LABS.pdf
+```
+
+If the team records the 30-second video before the form closes, this field may be changed to:
+
+```
+[VIDEO NOT RECORDED YET: public link to the 30-second demo video]
+```
+
+The 2-minute judging video goes to the local organizers (see
+[SLACK_POSTS.md](SLACK_POSTS.md), post 7):
+
+```
+[VIDEO NOT RECORDED YET: public link to the 2-minute judging video]
 ```
 
 * It must open without a password, permission request or sign-in. Test it in a private
@@ -55,22 +69,16 @@ Exceeding either limit makes the project ineligible for Global Judging.
 
 ## 4. Link to Final Project
 
-**Paste after publishing.** This should point to the working tool. Recommended: the live
-site, with the repository linked from it and from the description below.
+This points to the working tool: the live site, which links to the repository from its
+footer and its About page.
 
 ```
-[PASTE AFTER PUBLISHING: https://abed-r-j.github.io/parallax-spherex/]
+https://abed-r-j.github.io/parallax-spherex/
 ```
 
-Only one link fits in this field. If the site is not live in time, use the repository
-instead:
-
-```
-[PASTE AFTER PUBLISHING: https://github.com/abed-r-j/parallax-spherex]
-```
-
-Neither address is published at the time of writing. Open the link in a private window
-before pasting it.
+Only one link fits in this field. The source code is at
+`https://github.com/abed-r-j/parallax-spherex`; it is also named in the description below.
+Open the link in a private window before pasting it.
 
 ## 5. Detailed Project Description
 

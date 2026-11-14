@@ -216,7 +216,9 @@ export function About({ index, dois }: { index: PackIndex | null; dois: string[]
       </p>
 
       <h2>Licence</h2>
-      <p>Code: Apache-2.0. Fonts: IBM Plex (SIL Open Font License 1.1), bundled with the site.</p>
+      <p>
+        Source code: <a href="https://github.com/abed-r-j/parallax-spherex" target="_blank" rel="noopener noreferrer">github.com/abed-r-j/parallax-spherex</a>, under Apache-2.0.
+        Fonts: IBM Plex (SIL Open Font License 1.1), bundled with the site.</p>
       <p>Not affiliated with or endorsed by NASA.</p>
     </article>
   )

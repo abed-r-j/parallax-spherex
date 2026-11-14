@@ -186,7 +186,7 @@ export default function App() {
       <footer>
         <span><strong>Not affiliated with or endorsed by NASA.</strong></span>
         <span>SPHEREx data from the NASA/IPAC Infrared Science Archive. Team ZENITH LABS, NASA Space Apps Challenge 2026, Beirut.</span>
-        <span>Code under Apache-2.0.</span>
+        <span><a href="https://github.com/abed-r-j/parallax-spherex" target="_blank" rel="noopener noreferrer">Source code</a> under Apache-2.0.</span>
       </footer>
     </div>
   )

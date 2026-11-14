@@ -5,7 +5,9 @@ network cable out and Wi-Fi off. Only one optional step (the live fetch) needs t
 and it has a fallback.
 
 Paths assume the repository is at `C:\...\parallax-spherex`. The demo address is
-`http://127.0.0.1:8000`. Replace it with the public site address once the site is published.
+`http://127.0.0.1:8000` (local, so the demo does not depend on the venue's network). The same
+pages are public at <https://abed-r-j.github.io/parallax-spherex/>; the source code is at
+<https://github.com/abed-r-j/parallax-spherex>.
 
 ## 1. The night before
 
@@ -153,7 +155,8 @@ Every URL of the 2-minute demo works the same. Only "Build this field with the e
 unavailable, and the demo does not use it.
 
 **D. The laptop or the browser fails.** Play the screen recording made the night before, or
-open the published site from any other computer or a phone (once published).
+open the live site, <https://abed-r-j.github.io/parallax-spherex/>, from any other computer
+or a phone.
 
 **E. A field does not open.** Reload once (Ctrl+R). If `?field=...` still fails, go back to
 the home page and click the field card; if a pack is missing, the page says "This field

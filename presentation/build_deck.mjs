@@ -293,11 +293,11 @@ const body = (extra = {}) => ({ fontFace: SANS, fontSize: 18, color: C.ink, marg
   s.addShape('rect', { x: M, y: 4.6, w: W - 2 * M, h: 1.02, fill: { color: C.panel }, line: { color: C.line, width: 1 } })
   s.addText([
     { text: 'Code  ', options: { fontFace: MONO, fontSize: 14, color: C.muted } },
-    { text: 'github.com/abed-r-j/parallax-spherex', options: { fontFace: MONO, fontSize: 16, color: C.ink } },
-    { text: '   (to be published)', options: { fontFace: SANS, fontSize: 14, color: C.accent, breakLine: true } },
+    { text: 'https://github.com/abed-r-j/parallax-spherex', options: { fontFace: MONO, fontSize: 16, color: C.ink, hyperlink: { url: 'https://github.com/abed-r-j/parallax-spherex' } } },
+    { text: '   public, Apache-2.0', options: { fontFace: SANS, fontSize: 14, color: C.accent, breakLine: true } },
     { text: 'Site  ', options: { fontFace: MONO, fontSize: 14, color: C.muted } },
-    { text: 'abed-r-j.github.io/parallax-spherex', options: { fontFace: MONO, fontSize: 16, color: C.ink } },
-    { text: '   (to be published)', options: { fontFace: SANS, fontSize: 14, color: C.accent } },
+    { text: 'https://abed-r-j.github.io/parallax-spherex/', options: { fontFace: MONO, fontSize: 16, color: C.ink, hyperlink: { url: 'https://abed-r-j.github.io/parallax-spherex/' } } },
+    { text: '   live', options: { fontFace: SANS, fontSize: 14, color: C.accent } },
   ], { x: M + 0.22, y: 4.6, w: W - 2 * M - 0.44, h: 1.02, margin: 0, valign: 'middle', paraSpaceAfter: 4 })
   s.addText([
     { text: 'Not affiliated with or endorsed by NASA. ', options: { bold: true, color: C.ink } },

@@ -141,18 +141,19 @@ Numbers have not changed since the validation post unless stated here: [NONE / W
 ```
 ParallaX: demo and videos.
 
-- Live tool: [PASTE AFTER PUBLISHING: https://abed-r-j.github.io/parallax-spherex/]
-- Source code: [PASTE AFTER PUBLISHING: https://github.com/abed-r-j/parallax-spherex]
-- Project demo (30 seconds or less): [PASTE LINK]
-- Two-minute judging video: [PASTE LINK]
-- Project report (PDF): [PASTE LINK]
+- Live tool: https://abed-r-j.github.io/parallax-spherex/
+- Source code: https://github.com/abed-r-j/parallax-spherex
+- Slides (7): https://github.com/abed-r-j/parallax-spherex/blob/main/presentation/ParallaX_ZENITH_LABS.pdf
+- 30-second demo video: [VIDEO NOT RECORDED YET: link]
+- Two-minute judging video: [VIDEO NOT RECORDED YET: link]
+- Report: https://github.com/abed-r-j/parallax-spherex/blob/main/docs/ParallaX_Project_Report.pdf
 
-All links open without sign-in. Try these in the tool:
-- Barnard's Star: add ?field=barnard to the tool address
-- Three methods side by side: ?field=barnard&mode=compare&frame=40
-- Any coordinates, fetched live in your browser (the galaxy M51): ?ra=202.4696&dec=47.1953&live=1&size=3&dets=3
+All links open without sign-in. Try these:
+- Barnard's Star: https://abed-r-j.github.io/parallax-spherex/?field=barnard
+- Three methods side by side: add ?field=barnard&mode=compare&frame=40
+- Any coordinates, fetched live (the galaxy M51): add ?ra=202.4696&dec=47.1953&live=1&size=3&dets=3
 
-The two-minute video covers the data, software, methods and tools, a demonstration, what is distinctive, our process with its challenges and limits, and why we chose this approach.
+The two videos are still to be recorded; we will post their links here. The two-minute video will cover the data, software, methods and tools, a demonstration, what is distinctive, our process with its limits, and why we chose this approach.
 ```
 
 ## 8. Final summary
