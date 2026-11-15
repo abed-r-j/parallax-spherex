@@ -85,11 +85,18 @@ https://github.com/abed-r-j/parallax-spherex/blob/main/presentation/ParallaX_ZEN
   (slide 4, "What a user does"); and how NASA and partner-agency data make it possible
   (slide 6, credits on slide 7).
 
-Decision: field 3 carries the 7-slide deck. A 27.6-second demo video and a 112.9-second
+Decision (15 November, evening): the team member chose to submit the **27.6-second demo
+video** in field 3 instead of the deck. It is hosted on the project site:
+
+```
+https://abed-r-j.github.io/parallax-spherex/ParallaX_demo_30s.mp4
+```
+
+The 7-slide deck above stays public as supporting material. The video and a 112.9-second
 judging video (required by the Beirut organizers) were recorded on 15 November 2026; one
 adult team member appears and speaks, and there is no music. Both were posted in the team's
-Slack channel on 15 November ([SLACK_POSTS.md](SLACK_POSTS.md), post 7). They are not hosted
-on the project site or in the repository, and they do not go in this field.
+Slack channel on 15 November ([SLACK_POSTS.md](SLACK_POSTS.md), post 7). The judging video
+is not hosted on the project site or in the repository.
 
 ## 4. Link to Final Project
 
