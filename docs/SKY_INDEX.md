@@ -45,6 +45,7 @@ most `part_max_records` = 16384 records (458,752 bytes). Part 000 is the oldest.
 |---|---|
 | `format`, `version` | `"parallax-skyindex"`, `1`. Refuse anything else. |
 | `built_utc` | build time, ISO 8601. Use it as a cache-busting query string for shard URLs. |
+| `provenance` | optional; readers ignore it. Generator, data source, DOIs and the SI-use sentence. It is added by `submission/stamp_packs.py`: run that script again after rebuilding the index. |
 | `s3_root` | `"https://nasa-irsa-spherex.s3.amazonaws.com/"` |
 | `key_template` | how an S3 key is assembled, see section 5 |
 | `shard_template` | `"b{band:02d}/c{cell:03d}_{part:03d}.bin"` |

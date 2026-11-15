@@ -1,9 +1,22 @@
 # Likely questions from judges, with honest answers
 
-Thirty-two questions (12b and 15b were added after the independent review) grouped by the five judging criteria (Impact, Creativity, Validity,
-Relevance, Presentation). Each answer is short, says what is true, and is backed by a number
-from [RESULTS.md](RESULTS.md) or the build reports. Where the honest answer is "no" or "not
-yet", it says so.
+Thirty-five questions (12b and 15b were added after the independent review; 22b, 25b and 31
+after reading the two official guides on 15 November) grouped by the five judging criteria
+(Impact, Creativity, Validity, Relevance, Presentation). Each answer is short, says what is
+true, and is backed by a number from [RESULTS.md](RESULTS.md) or the build reports. Where
+the honest answer is "no" or "not yet", it says so.
+
+What the Judging & Awards Guide says each criterion is, in its own words, so the answers
+aim at the right thing. Each is scored 1 to 5.
+
+* **Impact**: the problem addressed and how many people it helps or inspires.
+* **Creativity**: "a novel concept" or an improvement on existing ideas "in a meaningful way".
+* **Validity**: "grounded in scientific principles", feasible, complete; "the usability and
+  user-friendliness of the project" count.
+* **Relevance**: "fully and directly addresses the challenge" and "meaningfully integrates
+  NASA data, utilizing it as a core component ... rather than a superficial addition".
+* **Presentation**: the challenge, the solution and its significance, clearly told. "Judges
+  evaluate the demo and full project to compute this score."
 
 ## Impact
 
@@ -195,6 +208,14 @@ positions: zero misses.
 and on recorded real service responses. Two more Python tests call live services and run on
 request.
 
+**22b. Is it finished and usable, or a prototype?**
+The tool is live and public now, with no install and no account. A user does four things:
+types coordinates or picks a field, watches the little video, clicks a star for its
+spectrum, and switches to the difference views. Plain-language text sits under every view,
+and there is a "How it works" page and a user guide. What is not finished, and we say so:
+fields fetched live have no overlays, no flags and no chromatic template; those exist for
+the seven prepared fields.
+
 ## Relevance
 
 **23. Does it meet the stated objectives?**
@@ -219,6 +240,13 @@ ESA's Gaia Data Release 3, as the challenge resources recommend: star positions 
 for the overlays, moved to the date of each frame, and the reference proper motion for
 Barnard's Star. The Canadian resources listed for this challenge (NEOSSat, CADC) are not
 used.
+
+**25b. Is NASA data the core of the tool, or an add-on?**
+The core. Without the SPHEREx Level-2 images from NASA/IPAC IRSA there is no tool: every
+picture, spectrum and number comes from them, and the method itself exists because of how
+SPHEREx observes (a different wavelength at every visit). JPL Horizons tells us where known
+solar-system objects are, as seen from the spacecraft. ESA's Gaia DR3 gives the star
+positions and motions. Slide 6 of the deck says this in one column.
 
 **26. Why does your WISE 0855 field not sit on the challenge coordinates?**
 The challenge coordinates are the object's 2010 WISE position. At 8.1 arcsec per year it is
@@ -250,6 +278,14 @@ Model the sub-pixel position of each exposure in the template, which is the larg
 remaining noise term. Add co-moving fields so that a fast object can be followed across the
 sky. Build a volunteer vetting queue on top of the candidates. And run the ledger on many
 more fields, so the benchmark is a survey property and not five examples.
+
+**31. Where is your demo, and why slides and not a video?**
+The official Project Demo is a deck of 7 slides including the title, which the Project
+Submission Guide accepts in place of a 30-second video. It is served by the project site at
+<https://abed-r-j.github.io/parallax-spherex/ParallaX_ZENITH_LABS.pdf>, with a copy in the
+repository under `presentation/`. It names the team, the members and the challenge (slide
+1), shows the tool, says what a user does (slide 4) and which NASA and ESA data make it
+possible (slide 6). The tool itself is live, so anyone can try what the slides show.
 
 ## Short answers to keep ready
 

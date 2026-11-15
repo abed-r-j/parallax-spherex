@@ -2,6 +2,8 @@
 
 SI disclosure: the capture scripts and this list were written with the help of an SI coding assistant (Claude, by Anthropic) and checked by the team. The clips show the real ParallaX web app on real SPHEREx data. They contain no SI-generated imagery.
 
+The clips `shot_*.mp4` are unedited captures of the running app on real data. They are not SI-generated video, so they carry no SI watermark; each file's metadata (title and comment) says it is a scripted capture of the real app.
+
 All clips are silent, 1920x1080, 30 frames per second, H.264 (`.mp4`), and open in Clipchamp. The only thing drawn on top of the app is the white mouse pointer (headless Chrome shows none). Clips may be trimmed, sped up or slowed down freely in the editor.
 
 | Clip | Length | What it shows | Script line it covers |

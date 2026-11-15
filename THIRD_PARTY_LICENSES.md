@@ -112,6 +112,10 @@ project's own code.
 | eslint-plugin-react-hooks | 7.1.1 | MIT | lint |
 | globals | 17.14.0 | MIT | lint |
 | playwright-core | 1.65.0 | Apache-2.0 | drives an installed Chrome for screenshots and checks |
+| pptxgenjs | 4.0.1 | MIT | builds the slide deck (`presentation/build_deck.mjs`) |
+| python-pptx | 1.0.2 | MIT | stamps document properties into the slide deck (`submission/set_metadata.py`) |
+| pypdf | 7.1.0 | BSD-3-Clause | stamps document properties into the PDFs (`submission/set_metadata.py`) |
+| FFmpeg | 9.0 (system tool, not redistributed) | LGPL-2.1-or-later / GPL builds | encodes the screen clips and the two GIFs in `submission/media/` |
 | @types/node | 26.6.6 | MIT | types |
 | @types/react | 19.3.0 | MIT | types |
 | @types/react-dom | 19.3.0 | MIT | types |

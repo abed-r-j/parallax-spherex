@@ -1,118 +1,205 @@
 # Submission text for the NASA Space Apps project form
 
-Ready-to-paste text for the eight fields of the 2026 project form, in the order of the form.
-The form opens on Saturday 14 November 2026 at 09:00 and closes on Sunday 15 November 2026
-at 23:59, Beirut time. Only the last saved submission is judged, so submit early and
-resubmit.
+Ready-to-paste text for the eight fields of the 2026 project form. Field names and prompts
+are copied from the official Project Submission Guide (dated 13 November 2026, read on 15
+November). The form closes on **Sunday 15 November 2026 at 23:59, Beirut time**. Only the
+last saved submission is judged, so submit early and resubmit. The step-by-step order for
+the day is in [SUBMISSION_DAY.md](SUBMISSION_DAY.md).
 
-The Project Submission Guide states no character limits. Check the live form for limits when
-it opens; each long field below has a shorter version in case one is enforced.
+SI disclosure: drafted with the help of an SI coding assistant (Claude, by Anthropic), checked by the team.
 
-Everything must be in English. The site and the repository are public. Open every link in a
-private browser window, logged out, before submitting. The two videos (30-second demo and
-2-minute judging video) are not recorded yet; their links are the only placeholders left.
+Three things the guide says that shape this page:
+
+* "This is the page that the judges will review. The more information you provide on this
+  page, the better the judges can rate your submission." So the long versions below are the
+  ones to paste. Each sub-question of the guide is answered under its own short heading.
+* The page accepts pasted or uploaded **images** (JPG, PNG, GIF, up to 10 MB each). It does
+  not accept videos or documents: those go in as public links that need no login.
+* The guide states no character limits. If the live form enforces one, use the shorter
+  versions at the end of this file.
+
+Everything must be in English. Open every link in a private browser window, logged out,
+before pasting it.
 
 ---
 
 ## 1. Project Name
 
+Prompt: "What is the name of your project?"
+
 ```
 ParallaX
 ```
 
-If the form allows a subtitle or a longer name: `ParallaX: chromatic difference imaging for the SPHEREx sky`
+If the field takes a longer name: `ParallaX: chromatic difference imaging for the SPHEREx sky`
 
 ## 2. High-Level Project Summary
 
-About 150 words.
+Prompt: "Provide a high-level summary of your project. What did you develop? How does it
+address the challenge? Why is it important?"
+
+About 275 words.
 
 ```
-ParallaX is a public web tool that plays NASA's SPHEREx infrared images of any patch of sky as a little video, so anyone can spot things that move or change. Type coordinates and the browser fetches the images itself from the public archive; no server is needed. SPHEREx never photographs the same spot in the same colour twice, so blinking or subtracting two dates makes ordinary stars look like false alarms. For seven prepared fields ParallaX also predicts what an unchanging sky would look like at each frame's own colours and subtracts it; fields fetched live show the frames, stacks, spectra and simple pair differences. On five real fields, at the same false-alarm rate, this finds moving sources 1.2 to 1.9 times fainter than the usual fix on blank sky. We publish the measurements, the limits, and the code to reproduce them. Planet X is the motivation, not a claim.
+WHAT WE DEVELOPED
+ParallaX is a public web tool that plays NASA's SPHEREx infrared images of any patch of sky as a little video, so anyone can spot things that move or change. You type coordinates or pick a field, watch the video, click a star to get its spectrum, and switch to difference views that show what changed. It runs in the browser: the page reads the images itself from the public NASA/IPAC archive, with no server and no account.
+
+HOW IT ADDRESSES THE CHALLENGE
+"Planet X and SPHEREx" asks for exactly this tool, tested on five named targets. ParallaX meets every stated objective and ten of the eleven optional considerations, and we measured all five targets against catalogues (Barnard's Star: 10.2 +- 0.5 arcsec/yr; Gaia: 10.36). We also found the catch in the data: SPHEREx never photographs the same spot in the same colour twice, so blinking or subtracting two dates makes ordinary stars look like false alarms. For seven prepared fields ParallaX predicts what an unchanging sky would look like at each frame's own colours and subtracts it. On five real fields, at the same false-alarm rate, this finds moving sources 1.2 to 1.9 times fainter than the usual fix on blank sky.
+
+WHY IT IS IMPORTANT
+SPHEREx images the whole sky again and again, and 1,628,230 of its images are already public. With ParallaX anyone with a browser (a classroom, a citizen scientist, a researcher) can look at how any position changes, and can check what they see against a measured, reproducible false-alarm comparison. We publish the numbers, the limits and the code. Planet X is the motivation, not a claim.
 ```
 
-Shorter version (about 65 words):
-
-```
-ParallaX plays NASA's SPHEREx infrared images of any patch of sky as a little video, in the browser, so anyone can spot things that move or change. Because SPHEREx sees every revisit in a different colour, for its prepared fields it predicts the unchanging sky at each frame's own colours and subtracts it, and it publishes a measured, reproducible comparison with simpler methods on five real fields.
-```
+**Images to paste under this field** (from `submission/media/`): `01_hero.png` first, then
+`02_little_video_barnard.gif`.
 
 ## 3. Link to Project Demo
 
-This must point to the demo itself: either a video of 30 seconds or less, or a slide deck of
-at most 7 slides including the title and introduction slides. Exceeding either limit makes
-the project ineligible for Global Judging. Use the 7-slide deck, which is public now:
+Prompt: "Provide a short demonstration ("demo") of your project, either in the form of a
+7-slide presentation (including title and introductory slides) or a 30-second or less video
+presentation. ... The link you provide should not require a password, permission, or
+registration in order to access your project demo."
+
+Our demo is the slide deck: **7 slides, including the title slide**. Paste this link (the
+copy served by the project site, which opens directly in the browser):
+
+```
+https://abed-r-j.github.io/parallax-spherex/ParallaX_ZENITH_LABS.pdf
+```
+
+Backup, the same file in the public repository (use it if the first link does not open in a
+private window at the moment you submit):
 
 ```
 https://github.com/abed-r-j/parallax-spherex/blob/main/presentation/ParallaX_ZENITH_LABS.pdf
 ```
 
-If the team records the 30-second video before the form closes, this field may be changed to:
+* On 15 November at 12:30 Beirut time the first link still answered 404 (the file is ready
+  in `web/public/` and goes live when the site is published again); the backup answered 200.
+  **Open the first link in a private window before pasting it.** Paste whichever opens; you
+  can change it later by resubmitting. A link that answers 404 cannot be judged.
+* The limit is strict: more than 7 slides, or a video over 30 seconds, makes the project
+  ineligible for Global Judging. The PDF has exactly 7 pages (counted on 15 November).
+* The deck shows what the guide asks of a slide demo: the team name, the members' names and
+  the challenge (slide 1); pictures of the project (slides 1 to 4); the user experience
+  (slide 4, "What a user does"); and how NASA and partner-agency data make it possible
+  (slide 6, credits on slide 7).
+
+Optional, only if the team records one before the form closes. A video does not replace the
+deck unless you decide so; if you do put a video in this field it must be 30.0 seconds or
+less as shown by the host, with English narration or English subtitles, and nobody under 18
+may appear or be heard:
 
 ```
-[VIDEO NOT RECORDED YET: public link to the 30-second demo video]
+[OPTIONAL: public link to a 30-second demo video, if one is recorded]
 ```
-
-The 2-minute judging video goes to the local organizers (see
-[SLACK_POSTS.md](SLACK_POSTS.md), post 7):
-
-```
-[VIDEO NOT RECORDED YET: public link to the 2-minute judging video]
-```
-
-* It must open without a password, permission request or sign-in. Test it in a private
-  window.
-* If it is a video: 30.0 seconds or less as shown by the host (render at about 29 seconds),
-  English narration or English subtitles.
-* If it is a deck: team name, member names, the challenge name, a picture of the project,
-  the user experience, and how NASA data makes it possible.
-* A file in the public GitHub repository or a public video link both qualify.
 
 ## 4. Link to Final Project
 
-This points to the working tool: the live site, which links to the repository from its
-footer and its About page.
+Prompt: "Share a publicly accessible link to your final project. ... The link you provide
+should not require a password, permission, or registration in order to access your final
+project."
+
+The working tool, live:
 
 ```
 https://abed-r-j.github.io/parallax-spherex/
 ```
 
-Only one link fits in this field. The source code is at
-`https://github.com/abed-r-j/parallax-spherex`; it is also named in the description below.
-Open the link in a private window before pasting it.
+The source code, public (Apache-2.0):
+
+```
+https://github.com/abed-r-j/parallax-spherex
+```
+
+If the field accepts only one link, paste the first; the repository link is also the first
+line of field 5 and is in the site's footer and About page. If it accepts free text, paste
+both lines as `Live tool: ...` and `Source code: ...`.
 
 ## 5. Detailed Project Description
 
-About 670 words.
+Prompt: "Provide additional details about your project. Some questions to consider are:
+What exactly does it do? How does it work? What benefits does it have? What do you hope to
+achieve? What tools, coding languages, hardware, or software did you use to develop your
+project?"
+
+About 1,120 words. Paste all of it; add the images where marked below the block.
 
 ```
-WHAT IT DOES
-ParallaX shows how the SPHEREx infrared sky changes over time. You enter Right Ascension and declination, or pick one of the five challenge targets, and it plays the SPHEREx images of that patch as a little video. You can blink survey passes six months apart, step through every exposure, add or subtract any images, click any pixel to get its spectrum on the fly, and overlay Gaia DR3 stars, WISE sources, contamination flags and known asteroids. Every view is a link that can be shared or embedded.
+Live tool: https://abed-r-j.github.io/parallax-spherex/
+Source code: https://github.com/abed-r-j/parallax-spherex
+Team ZENITH LABS (Abed El Rahmane Jaafir, Mohamad Alayli). Challenge: Planet X and SPHEREx.
 
-THE PROBLEM WE FOUND
-SPHEREx never photographs the same spot in the same colour twice. Each exposure passes through a filter whose wavelength changes across the detector, so every pixel has its own wavelength and every revisit lands on another one. Blink or subtract two dates naively and ordinary stars light up as false alarms. The pixels are also coarse (6.15 arcsec), and the challenge's own test stars move by only one to two pixels.
+WHAT EXACTLY DOES IT DO?
+ParallaX shows how the SPHEREx infrared sky changes over time. A user does four things:
+1. Types a position as Right Ascension and declination, in decimal degrees or in the hours-minutes-seconds notation of the challenge text, or picks one of the prepared fields.
+2. Watches the SPHEREx images of that patch as a little video: survey passes six months apart, or every exposure in time order, with play, pause, step and speed.
+3. Clicks any star or pixel and gets its spectrum on the fly, with a light curve and a CSV download.
+4. Switches to the difference views: add or subtract any images, or see one frame differenced three ways side by side.
+Overlays show Gaia DR3 stars moved to the date of the frame, WISE sources, contamination flags and known asteroids. Every view is a link that can be shared or embedded in another page. Plain-language text sits under every view, and there is a "How it works" page and a user guide.
 
-HOW IT WORKS
-1. Any coordinates, no server. The site ships a 45.6 MB index of all 1,628,230 public SPHEREx Level-2 images. The browser looks up which images cover your position and reads only the pixels it needs from the public archive bucket: 55 images of M51 in 10 to 12 seconds on a fast connection.
-2. A chromatic template, for the prepared fields. For every frame, a Python pipeline predicts what a static sky would look like at that frame's own per-pixel wavelength, from the spectrum each pixel showed in the other survey passes, and subtracts it. At the same false-alarm rate, fainter changes then stand out. Fields fetched live in the browser show frames, stacks, spectra and simple pair differences instead.
-3. A published three-way ledger. The same real frames are differenced three ways (naive pair, wavelength-matched pair, chromatic template), with artificial moving sources injected and searched for again.
+HOW DOES IT WORK?
+The problem we found. SPHEREx never photographs the same spot in the same colour twice. Each exposure passes through a filter whose wavelength changes across the detector, so every pixel has its own wavelength and every revisit lands on another one. Blink or subtract two dates naively and ordinary stars light up as false alarms. The pixels are also coarse (6.15 arcsec), and the challenge's test stars move by only one to two pixels.
 
-RESULTS, WITH THEIR LIMITS
-At an equal false-alarm rate (0.5 per frame) the template finds moving sources 1.2 to 1.9 times fainter than the matched pair on blank sky in five fields (Barnard's Star field: 563 microJy against 1003) and 1.1 to 1.6 times fainter next to a star; it is 3 to 15% deeper in quoted noise. We measured Barnard's Star at 10.2 +- 0.5 arcsec/yr (Gaia: 10.36) and Epsilon Indi B at 4.64 +- 0.09 (catalogue: 4.70), recovered the cold brown dwarf WISE 0855 only in stacks (a statistic of 6.6, calibrated on random tracks), and saw RW Aurigae and R Draconis vary. An asteroid, (52) Europa, is found in 24 of 24 frames and its track is recovered without any ephemeris. The work went through an independent adversarial review that re-ran the code; these are the corrected numbers. We also publish what did not work: a raw count of false alarms is not a fair comparison, because our low count rests on a measured error map that the pairs do not have, and with a purely statistical noise model our method floods like the others; for stars that shift one or two pixels a simple blink of per-pass stacks shows the motion better than our template; parallax is not measured reliably; bright targets saturate; R Draconis is not a clean test. Planet X is the motivation, not a claim: a real Planet Nine would be too faint for single SPHEREx frames.
+Three parts answer it.
+1. Any coordinates, no server. The site carries a 45.6 MB index of all 1,628,230 public SPHEREx Level-2 images. The browser looks up which images cover the position and reads only the pixels it needs from the public archive: 55 images of the galaxy M51 in 10 to 12 seconds on a fast connection.
+2. A chromatic template, for the prepared fields. For every frame, an open Python pipeline predicts what a static sky would look like at that frame's own per-pixel wavelength, from the spectrum each pixel showed in the other survey passes, and subtracts it. Fields fetched live in the browser show frames, stacks, spectra and simple pair differences instead.
+3. A published three-way comparison. The same real frames are differenced three ways (naive pair, wavelength-matched pair, chromatic template), with artificial moving sources added and searched for again.
 
-BENEFITS AND GOALS
-Anyone with a browser can explore SPHEREx in time, including classrooms and citizen scientists. Researchers get a quick look at any position and a reproducible false-alarm benchmark. The site is static, so it costs nothing to run, and updating to a new data release takes a few commands.
+What is new. Template subtraction is standard in astronomy; careful SPHEREx blink tools avoid the colour problem by comparing only frames of matching wavelength. ParallaX corrects instead of rejecting, by building the template along the wavelength axis, and it measures all three approaches on the same frames and publishes the result, including where ours loses.
 
-TOOLS
-Python 3 (NumPy, SciPy, Astropy, HTTPX, FastAPI, Typer), TypeScript, React, Vite, Vitest, pytest, GitHub Actions and GitHub Pages. Hardware: one laptop. 130 Python and 55 TypeScript tests. Open source, Apache-2.0. Development began on 12-13 November 2026, before the on-site event, after the local organizers allowed early preparation. Not affiliated with or endorsed by NASA.
+HOW WE TESTED IT, AND WHAT WE FOUND
+We treated the idea as a hypothesis and tested it against two baselines on real data, with known answers as controls.
+- Sensitivity. At an equal false-alarm rate (0.5 per frame) the template finds moving sources 1.2 to 1.9 times fainter than the wavelength-matched pair on blank sky in five fields (Barnard's Star field: 563 microJy against 1003), and 1.1 to 1.6 times fainter next to a star. It is 3 to 15% deeper in quoted noise.
+- The five challenge targets, against catalogues. Barnard's Star: 10.2 +- 0.5 arcsec/yr (Gaia DR3: 10.36). Epsilon Indi B: 4.64 +- 0.09 (catalogue: 4.70). WISE 0855-0714: recovered only in stacks, with a statistic of 6.6 calibrated on random tracks. RW Aurigae and R Draconis: brightness changes measured.
+- Moving objects with a known answer. Asteroid (52) Europa is found in 24 of 24 frames, and its track is recovered with no ephemeris at 28.3 arcsec per hour (JPL Horizons: 28.5). Pluto, the original Planet X, is found in 18 of 18 frames where Horizons predicts it.
+- Review. The work went through an independent adversarial review that re-ran the code; these are the corrected numbers. Anyone can regenerate them with two scripts.
+What did not work, which we also publish: a raw count of false alarms is not a fair comparison, because our low count rests on a measured error map that the pairs do not have, and with a purely statistical noise model our method floods like the others; for a star that shifts one or two pixels a simple blink of per-pass stacks shows the motion better than our template; parallax is not measured reliably; bright targets saturate; R Draconis is not a clean test. Planet X is the motivation, not a claim: a real Planet Nine would be too faint for single SPHEREx frames.
+
+HOW NASA DATA IS USED
+NASA data is the core, not an addition. Every picture, spectrum and measurement comes from SPHEREx Level-2 spectral images served by the NASA/IPAC Infrared Science Archive (1,991 frames in the five challenge fields). We use the per-pixel wavelength, variance and flag information, not only the pictures. NASA/JPL Horizons gives the positions of known solar-system objects as seen from the SPHEREx spacecraft. From a Space Agency Partner, ESA's Gaia Data Release 3 gives the star positions and motions used in the overlays and as the reference for Barnard's Star.
+
+WHAT BENEFITS DOES IT HAVE?
+- Open to everyone: a browser is enough, with no install, no account and no cost, so classrooms and citizen scientists anywhere can explore SPHEREx in time.
+- Useful to researchers: a quick look at any position, and a reproducible false-alarm benchmark for anyone building a search for moving or variable sources on SPHEREx.
+- Honest by design: a residual comes with its evidence (three-way view, repeat exposure, known-object labels), and the limits are stated in the app.
+- Cheap to keep alive: the site is static files, and updating to a new data release takes a few commands.
+
+WHAT DO YOU HOPE TO ACHIEVE?
+That people who are not astronomers can see the infrared sky change for themselves, and that the comparison we publish helps others avoid false alarms in SPHEREx data. Next steps: more moving-object fields (asteroids and comets), the chromatic template in live fields, and following each new SPHEREx data release.
+
+WHAT TOOLS, CODING LANGUAGES, HARDWARE, OR SOFTWARE DID YOU USE?
+Languages: Python 3 and TypeScript. Pipeline: NumPy, SciPy, Astropy, HTTPX, FastAPI, Typer, Matplotlib. Web app: React, Vite. Tests: pytest (130 tests) and Vitest (55 tests). Hosting and automation: GitHub Pages and GitHub Actions. Hardware: one laptop. An SI coding assistant (Claude, by Anthropic) was used under the team's direction; see the SI field. Open source, Apache-2.0. Development began on 12-13 November 2026, before the on-site event, after the local organizers allowed early preparation. Not affiliated with or endorsed by NASA.
 ```
 
-Shorter version (about 150 words), if a limit applies:
+**Images to paste in this field** (from `submission/media/`), each right after the paragraph
+it illustrates:
 
-```
-ParallaX plays SPHEREx images of any patch of sky as a little video. Enter RA and Dec; the browser finds the images in a 45.6 MB index of all 1,628,230 public Level-2 images and reads only the pixels it needs from the public archive, with no server. You can blink survey passes, add or subtract images, get spectra on the fly, overlay Gaia DR3, WISE and known asteroids, and share or embed any view by URL. Because SPHEREx sees every revisit at a different wavelength, a Python pipeline predicts the static sky at each frame's own per-pixel wavelength and subtracts it. On five real fields, at the same false-alarm rate, this finds moving sources 1.2 to 1.9 times fainter than wavelength-matched pairs on blank sky (Barnard's field: 563 against 1003 microJy). All five challenge targets are measured against catalogues, and the limits are published. Python, TypeScript, React. Apache-2.0. Planet X is the motivation, not a claim.
-```
+| Image | Paste after |
+|---|---|
+| `05_spectrum_on_click.png` | "WHAT EXACTLY DOES IT DO?" (the four user steps) |
+| `06_time_wavelength.png` | "The problem we found" |
+| `08_live_fetch.png` | part 1, "Any coordinates, no server" |
+| `04_three_way.png` | part 3, "A published three-way comparison" |
+| `07_results_chart.png` | "Sensitivity" |
+| `03_asteroid_europa.gif` | "Moving objects with a known answer" |
+
+`submission/media/README.md` describes each image and gives a caption for it; its "Form
+field" column agrees with the table above. All eight files are PNG or GIF and under 10 MB
+(checked on 15 November; the largest, the asteroid GIF, is 3.24 MB).
+Every image is a screenshot of our app or a plot made by our code from SPHEREx data: nothing
+is SI-generated, so nothing needs a watermark, and no person appears in any of them.
 
 ## 6. Use of Super Intelligence (SI)
+
+Prompt: "Did you utilize any Super Intelligence (SI) tools and software in preparing your
+solution? If yes, how did you use them?"
+
+The guide says this answer is collected for data purposes and is not shown to the judges,
+but the judges do see the SI markings inside the project. The wording below is the agreed
+one from [SI_DISCLOSURE.md](SI_DISCLOSURE.md); correct it only if it says more, or less,
+than what happened.
 
 ```
 Yes. We used one SI tool: Claude, a large language model by Anthropic, as a research, coding and writing assistant.
@@ -121,10 +208,13 @@ How we used it: the team chose the challenge, the goal and the direction: a comp
 
 What SI was not used for: no SI-generated images, video, audio, voices or faces appear anywhere in the project. Every figure is a plot made by our code from real SPHEREx data, or a screenshot of the running app. All results are computed by the project's own code from real SPHEREx data; the tool itself contains no machine-learning or language model.
 
-How it is marked: every source file written with the assistant carries an "SI disclosure" line in its header; the README, the app's About page and docs/SI_DISCLOSURE.md in the repository state the same. Outputs of ParallaX are its own and are not NASA products.
+How it is marked: every source file written with the assistant carries an "SI disclosure" line in its header; the README, the app's About page, the slides (text and file properties) and docs/SI_DISCLOSURE.md in the repository state the same. Outputs of ParallaX are its own and are not NASA products.
 ```
 
 ## 7. NASA Data
+
+Prompt: "Provide specific details about what NASA data and resources you used. To be
+eligible for a Global Award, you must use at least one NASA data or resource."
 
 ```
 1. SPHEREx Level-2 Spectral Images, from the NASA/IPAC Infrared Science Archive (IRSA): Data Release 1 (doi:10.26131/IRSA678) and Quick Release 3 (doi:10.26131/IRSA662), retrieved 13 November 2026. This is the core of the project. We use the calibrated images with their per-pixel wavelength, variance and flag information: 1,991 frames in the five challenge fields (Barnard's Star, Epsilon Indi B, WISE 0855-0714, RW Aurigae, R Draconis), read as small cutouts by HTTP range request. Every picture, spectrum and measurement in the tool comes from these images. https://irsa.ipac.caltech.edu/Missions/spherex.html
@@ -144,6 +234,14 @@ Acknowledgements: This publication makes use of data products from the Spectro-P
 
 ## 8. Space Agency Partner Data and Other References
 
+Prompt: "List all of the data, resources, and tools used in your project. Resources should
+include any code, text, and images (even if they are open source or freely available) that
+you used when creating your project. If you are using any copyrighted materials, make sure
+you have permission to use them."
+
+The second checkbox of the form refers to this field: everything external must be listed
+here. Compare it once more with `THIRD_PARTY_LICENSES.md` before ticking the box.
+
 ```
 SPACE AGENCY PARTNER DATA
 - European Space Agency (ESA), Gaia Data Release 3 (Gaia mission, processed by the Gaia Data Processing and Analysis Consortium): positions, proper motions and parallaxes of stars. Used for the star overlay (each star moved to the date of the frame) and as the reference position and proper motion of Barnard's Star. Queried at the ESA Gaia archive, with IRSA's copy as fallback.
@@ -154,13 +252,14 @@ OTHER DATA AND SERVICES
 SOFTWARE (all open source; none copied into our code, all installed as dependencies)
 - Python: NumPy (BSD-3-Clause), SciPy (BSD-3-Clause), Astropy (BSD-3-Clause), HTTPX (BSD-3-Clause), Pillow (MIT-CMU), FastAPI (MIT), Uvicorn (BSD-3-Clause), Typer (MIT), Matplotlib (Matplotlib licence, for figures), pytest (MIT), Ruff (MIT), Hatchling (MIT), uv (Apache-2.0 OR MIT).
 - Web: React and React DOM (MIT), Vite (MIT), TypeScript (Apache-2.0), Vitest (MIT), ESLint and typescript-eslint (MIT), Playwright core (Apache-2.0, drives Chrome for screenshots).
+- Slides and page images: PptxGenJS (MIT) to build the deck; Microsoft PowerPoint to export it to PDF; pypdf (BSD-3-Clause) and python-pptx (MIT) to write the document properties; FFmpeg (LGPL/GPL, used as a command-line tool, not redistributed) to encode the two animated GIFs from our own screen captures.
 - Fonts: IBM Plex Sans and IBM Plex Mono (SIL Open Font License 1.1), bundled with the web app through the @fontsource packages. The PDF and PowerPoint deliverables (slides, report, paper) use system fonts that ship with Windows and Office (Segoe UI, Consolas, Times New Roman, Cambria Math); these are not redistributed in the repository beyond being embedded in those files.
 - Hosting and automation: GitHub Pages and GitHub Actions.
 - SI tool: Claude, by Anthropic (see the Use of SI field).
-- Full list with versions and licences: THIRD_PARTY_LICENSES.md in the repository.
+- Full list with versions and licences: THIRD_PARTY_LICENSES.md in the repository, https://github.com/abed-r-j/parallax-spherex/blob/main/THIRD_PARTY_LICENSES.md
 
 IMAGES
-- All images in the project are screenshots of our app or plots made by our code from SPHEREx data. No third-party images, logos, music or video are used.
+- All images in the project, on this page and in the slides are screenshots of our app or plots made by our code from SPHEREx data. No third-party images, logos, music or video are used.
 
 PAPERS
 - Bock, J. J., et al. 2026, "The SPHEREx Satellite Mission", ApJ 999, 139, doi:10.3847/1538-4357/ae2be2.
@@ -202,84 +301,88 @@ To affirm this, the team must be able to say:
   disclosed in field 6;
 * field 8 lists every dataset, library, font, service, paper and tool (compare it once more
   with `THIRD_PARTY_LICENSES.md`);
-* the demo video, the two-minute video and the slides contain no music, footage, images or
-  logos that the team does not have the right to use;
+* the slides, the pasted images and any video contain no music, footage, images or logos
+  that the team does not have the right to use;
 * the work that was done on 12-13 November, before the on-site event, was allowed by the
-  local organizers. The Participant FAQ says teams may not begin before the hackathon; keep
-  the organizers' permission in writing (a screenshot of the message).
+  local organizers. Keep the organizers' permission in writing (a screenshot of the message).
+
+## How the text serves the five judging criteria
+
+For the team's own check, not for pasting. Wording of the criteria is from the Judging &
+Awards Guide.
+
+| Criterion (guide wording, shortened) | Where the form text answers it |
+|---|---|
+| **Impact**: the problem addressed; how many it helps or inspires | Field 2 "Why it is important"; field 5 "What benefits does it have?" |
+| **Creativity**: a novel concept or a meaningful improvement on existing ideas | Field 5 "What is new" (correct along the wavelength axis instead of rejecting frames; a published three-way comparison) |
+| **Validity**: scientifically sound, feasible, complete, usable and user-friendly | Field 5 "How we tested it" (baselines, known answers, injected sources, independent review, published failures); the four user steps; the live link in field 4 works now |
+| **Relevance**: addresses the challenge directly; NASA data is a core component, not a superficial addition | Field 2 "How it addresses the challenge"; field 5 "How NASA data is used"; field 7 |
+| **Presentation**: the challenge, the solution and its significance told clearly; "judges evaluate the demo and full project" | The 7-slide deck (field 3), the sub-headed text, the pasted images |
+
+## Shorter versions, only if the live form enforces a limit
+
+High-Level Project Summary, about 65 words:
+
+```
+ParallaX plays NASA's SPHEREx infrared images of any patch of sky as a little video, in the browser, so anyone can spot things that move or change. Because SPHEREx sees every revisit in a different colour, for its prepared fields it predicts the unchanging sky at each frame's own colours and subtracts it, and it publishes a measured, reproducible comparison with simpler methods on five real fields.
+```
+
+Detailed Project Description, about 150 words:
+
+```
+ParallaX plays SPHEREx images of any patch of sky as a little video. Enter RA and Dec; the browser finds the images in a 45.6 MB index of all 1,628,230 public Level-2 images and reads only the pixels it needs from the public archive, with no server. You can blink survey passes, add or subtract images, get spectra on the fly, overlay Gaia DR3, WISE and known asteroids, and share or embed any view by URL. Because SPHEREx sees every revisit at a different wavelength, a Python pipeline predicts the static sky at each frame's own per-pixel wavelength and subtracts it. On five real fields, at the same false-alarm rate, this finds moving sources 1.2 to 1.9 times fainter than wavelength-matched pairs on blank sky (Barnard's field: 563 against 1003 microJy). All five challenge targets are measured against catalogues, and the limits are published. Python, TypeScript, React. Apache-2.0. Planet X is the motivation, not a claim.
+```
 
 ## Pre-submission checklist
 
 **Eligibility and timing**
 
 - [ ] Both members are registered for the 2026 challenge and for the Beirut local event, are
-      not on the waiting list, and appear on the team's Members tab.
+      not on the waiting list, and appear on the team's Members tab. No member can be added
+      after submission closes.
 - [ ] The team works on one challenge only: "Planet X and SPHEREx".
 - [ ] "Submit for Judging" is clicked before Sunday 15 November, 23:59 Beirut time. Submit
       early and resubmit; only the last saved version is judged.
-- [ ] Local judging deadlines are confirmed with the Local Lead; they may be earlier.
-- [ ] The live form has been checked for character limits.
+- [ ] Local judging times are confirmed with the Local Lead (semi-finals 15:00,
+      presentations 19:00).
 
 **Form**
 
-- [ ] All eight fields are filled, in English.
+- [ ] All eight fields are filled, in English, with the long versions above.
+- [ ] The images are pasted where the tables above say.
 - [ ] Both checkboxes are ticked, and the team can affirm them (see above).
+- [ ] The confirmation banner appeared after "Submit for Judging".
 
 **Demo link**
 
-- [ ] The video is 30.0 seconds or less as shown by the host, or the deck has 7 slides or
-      fewer including title and introduction. Over the limit means not eligible for Global
+- [ ] The deck has 7 slides, title included. Over the limit means not eligible for Global
       Judging.
-- [ ] English narration or English subtitles; slides in English.
-- [ ] A deck shows the team name, the members' names, the challenge name, a picture of the
-      project, the user experience, and how NASA data makes it possible.
 - [ ] The link opens in a private window with no password, permission or sign-in.
-- [ ] Nobody under 18 appears or is heard. Both members agree to appear.
-- [ ] No copyrighted music or footage.
+- [ ] Nobody under 18 appears or is heard in anything linked or pasted.
+- [ ] No copyrighted music, footage or images.
 
 **Final project link**
 
-- [ ] The site and the repository are public and open without sign-in.
+- [ ] The site and the repository open in a private window without sign-in.
 - [ ] The repository has `LICENSE` (Apache-2.0), `THIRD_PARTY_LICENSES.md`, `NOTICE`.
-- [ ] No personal data anywhere in the repository, site, slides or videos (no e-mail
-      addresses, phone numbers, addresses, birth dates, identity documents, CVs).
-- [ ] Nothing promotes a commercial product or service.
-- [ ] Optional: request a FortiGuard web-filter classification for the new site address
-      (company name "N/A"), to reduce the chance that a judge's network blocks it.
+- [ ] No personal data anywhere in the repository, site or slides (no e-mail addresses,
+      phone numbers, addresses, birth dates, identity documents, CVs).
+- [ ] Optional: a FortiGuard web-filter classification was requested for the site address
+      (company name "N/A"); see [SUBMISSION_DAY.md](SUBMISSION_DAY.md).
 
-**SI disclosure**
+**SI disclosure and branding**
 
-- [ ] Field 6 is filled as above.
-- [ ] The idea is presented as the team's own.
-- [ ] There is no SI-generated image, video or audio. If one is ever added, it carries a
-      visible "SI-generated" mark.
-- [ ] No NASA logos, flags or mission identifiers in any generated content.
-- [ ] Nothing the tool outputs is described as "according to NASA".
-
-**NASA branding and credits**
-
+- [ ] Field 6 is filled as above and matches what happened.
+- [ ] No SI-generated image, video or audio. If one is ever added, it carries a visible
+      "SI-generated" mark.
 - [ ] No NASA insignia, logotype or seal, no JPL, Caltech or IPAC logo, no mission patch, no
-      NASA-style lettering, anywhere (app, slides, videos, documents, repository).
-- [ ] The Space Apps logo is used only if the Local Lead confirms it is allowed.
+      NASA-style lettering, anywhere.
 - [ ] "Not affiliated with or endorsed by NASA" appears in the app footer and the README.
-- [ ] The SPHEREx and IRSA acknowledgement sentences appear verbatim in the app's About page,
-      the README, the report and the slide or video credits, with the DOIs 10.26131/IRSA678
-      and 10.26131/IRSA662.
-- [ ] JPL Horizons is credited as "NASA/JPL Solar System Dynamics. Data retrieved on 13
-      November 2026. Horizons System. https://ssd.jpl.nasa.gov".
-
-**Timeline honesty**
-
-- [ ] Written confirmation from the Local Lead that early preparation was allowed is saved.
-- [ ] The README states when development began. No commit is back-dated.
+- [ ] Nothing the tool outputs is described as "according to NASA".
 
 **Beirut local requirements**
 
-- [ ] The two-minute judging video covers: data, software, methods and tools; a
-      demonstration; what is distinctive; the process with challenges and limitations; why
-      this approach.
-- [ ] The demo, the two-minute video, the research and sources, team details, problem,
-      solution, impact and references are posted in the team's Slack channel
-      (see `SLACK_POSTS.md`).
+- [ ] The final links and the summary are posted in the team's Slack channel
+      (posts 7 and 8 in [SLACK_POSTS.md](SLACK_POSTS.md)).
 - [ ] Identification and emergency-contact details are sent privately to the organizers,
       never posted in the channel.

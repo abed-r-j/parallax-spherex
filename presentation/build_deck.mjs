@@ -37,9 +37,9 @@ const TALK = [
   { who: ABED, text: 'Hello, we are ZENITH LABS. I am Abed El Rahmane Jaafir, and this is Mohamad Alayli. Our project is ParallaX, for the challenge Planet X and SPHEREx.' },
   { who: MOHAMAD, text: 'Pluto, the original Planet X, was found by blinking two photographs of the same sky. Today the SPHEREx telescope images the whole sky in the infrared, again and again. The challenge asks for a public tool that shows how that sky changes, so anyone can spot what moves or varies.' },
   { who: ABED, text: 'Here is the catch. SPHEREx never photographs the same spot in the same colour twice. On the left, each dot is one exposure, each at another wavelength. So when you subtract two dates, stars light up as false alarms, as on the right.' },
-  { who: ABED, text: 'Our answer is a chromatic template. For every frame, we predict what an unchanging sky would look like at that frame’s own wavelengths, from the spectrum each pixel showed in the other survey passes. Then we subtract. And anyone can type coordinates and watch that sky in the browser, with no server.' },
-  { who: MOHAMAD, text: 'We measured it on real frames, against two baselines. On blank sky, at the same false-alarm rate, the template finds moving sources 1.2 to 1.9 times fainter than a wavelength-matched pair. For Barnard’s Star we get 10.2 plus or minus 0.5 arcseconds per year; Gaia says 10.4. An independent review re-ran our code: these are the corrected numbers.' },
-  { who: MOHAMAD, text: 'Everything runs on open data: SPHEREx images from the NASA/IPAC archive, plus Gaia, CatWISE, JPL Horizons and SkyBoT. We state our limits: this is not a Planet Nine detector, and bright stars saturate. We used an SI coding assistant, and we directed and checked its work.' },
+  { who: ABED, text: 'Our answer is a chromatic template: for every frame, we predict the unchanging sky at that frame’s own wavelengths, from the other survey passes, and subtract it. A user types coordinates, watches the little video, clicks a star for its spectrum, and switches to the difference views. All in the browser, with no server.' },
+  { who: MOHAMAD, text: 'We measured it on real frames, against two baselines. On blank sky, at the same false-alarm rate, the template finds moving sources 1.2 to 1.9 times fainter than a wavelength-matched pair. For Barnard’s Star we get 10.2 plus or minus 0.5 arcseconds per year; Gaia says 10.4.' },
+  { who: MOHAMAD, text: 'NASA open data is the core: SPHEREx images from the NASA/IPAC archive and JPL Horizons, plus Gaia from ESA. We state our limits: this is not a Planet Nine detector, and bright stars saturate. We used an SI coding assistant, and we directed and checked its work.' },
   { who: ABED, text: 'ParallaX lets anyone, from students to researchers, blink the infrared sky and check what they see. The code is open source and every number can be reproduced. Thank you.' },
 ]
 const ELEVATOR = 'Pluto was found by blinking two photographs. SPHEREx photographs the whole infrared sky, but never the same spot in the same colour twice, so a simple blink fills with false alarms. ParallaX predicts each frame at its own colours and subtracts it, so fainter real changes stand out. Type any coordinates and watch, in your browser. It is built on NASA open data, and it is open source.'
@@ -180,13 +180,20 @@ const body = (extra = {}) => ({ fontFace: SANS, fontSize: 18, color: C.ink, marg
   })
   // "any coordinates" block under the diagram
   const dw = 3 * bw + 2 * gap
-  s.addShape('rect', { x: M, y: 3.75, w: dw, h: 2.75, fill: { color: C.panel }, line: { color: C.line, width: 1 } })
-  s.addText([
-    { text: 'Any coordinates · in your browser · no server', options: { fontFace: HEAD, fontSize: 21, color: C.accent, breakLine: true } },
-    { text: 'A 45.6 MB index of all 1,628,230 public SPHEREx images; pixels are read straight from the public archive.', options: { fontSize: 17, color: C.ink, breakLine: true } },
-    { text: 'Spectra on click, per-pass blink, add and subtract, Gaia and WISE overlays, known-asteroid labels, shareable links.', options: { fontSize: 17, color: C.ink, breakLine: true } },
-    { text: 'Live fields give frames, stacks, spectra and pair differences; the template is computed by the open Python pipeline.', options: { fontSize: 14, color: C.muted } },
-  ], { x: M + 0.22, y: 3.92, w: dw - 0.44, h: 2.5, fontFace: SANS, margin: 0, valign: 'top', paraSpaceAfter: 7 })
+  s.addShape('rect', { x: M, y: 3.75, w: dw, h: 3.15, fill: { color: C.panel }, line: { color: C.line, width: 1 } })
+  s.addText('WHAT A USER DOES   in the browser, no install, no account', { x: M + 0.22, y: 3.86, w: dw - 0.44, h: 0.32, fontFace: MONO, fontSize: 14, color: C.accent, margin: 0, fit: 'shrink' })
+  const steps = [
+    ['1', 'Type coordinates (RA, Dec) or pick a field'],
+    ['2', 'Watch the little video of that patch of sky'],
+    ['3', 'Click a star to get its spectrum'],
+    ['4', 'Switch to the difference views to see what changed'],
+  ]
+  steps.forEach(([k, t], i) => {
+    const sy = 4.26 + i * 0.4
+    s.addText(k, { x: M + 0.22, y: sy, w: 0.36, h: 0.36, fontFace: MONO, fontSize: 18, color: C.accent, margin: 0, valign: 'middle' })
+    s.addText(t, { x: M + 0.62, y: sy, w: dw - 0.84, h: 0.36, fontFace: SANS, fontSize: 18, color: C.ink, margin: 0, valign: 'middle' })
+  })
+  s.addText('Any position works: the site carries a 45.6 MB index of all 1,628,230 public SPHEREx images and reads the pixels straight from the public NASA/IPAC archive, with no server. The template is computed for the prepared fields; live fields show frames, stacks, spectra and pair differences.', { x: M + 0.22, y: 5.9, w: dw - 0.44, h: 0.95, fontFace: SANS, fontSize: 13, color: C.muted, margin: 0, valign: 'top' })
   // before / after
   const px = M + dw + 0.45
   const pw = (W - M - px - 0.25) / 2
@@ -239,10 +246,11 @@ const body = (extra = {}) => ({ fontFace: SANS, fontSize: 18, color: C.ink, marg
 {
   const s = base(6, 'DATA, TOOLS AND HOW IT WAS BUILT', 'Open data in, open source out')
   const cols = [
-    ['NASA AND PARTNER DATA', C.blue, [
-      'SPHEREx Level-2 spectral images, DR1 and QR3, from the NASA/IPAC Infrared Science Archive (IRSA)',
-      'ESA Gaia DR3 and CatWISE2020 star positions',
-      'JPL Horizons and IMCCE SkyBoT for known solar-system objects',
+    ['THE DATA THAT MAKE IT POSSIBLE', C.blue, [
+      'NASA, the core: SPHEREx Level-2 spectral images from NASA/IPAC IRSA. Every picture, spectrum and number comes from them',
+      'NASA: JPL Horizons, for known solar-system objects',
+      'Partner agency, ESA: Gaia DR3 star positions and motions',
+      'Also: CatWISE2020, IMCCE SkyBoT',
     ]],
     ['THE STACK', C.chroma, [
       'Pipeline: Python with NumPy, SciPy and Astropy; 130 tests',
@@ -250,7 +258,7 @@ const body = (extra = {}) => ({ fontFace: SANS, fontSize: 18, color: C.ink, marg
       'Licence: Apache-2.0',
     ]],
     ['HOW IT WAS BUILT', C.accent, [
-      'Research first, then pipeline, three-way comparison, web app and live mode',
+      'Research, pipeline, three-way comparison, then web app and live mode',
       'An independent adversarial review re-ran the code; the numbers shown are the corrected ones',
       'Development began on 12–13 November 2026, before the on-site event; the local organizers allowed early preparation',
     ]],
@@ -258,19 +266,19 @@ const body = (extra = {}) => ({ fontFace: SANS, fontSize: 18, color: C.ink, marg
   const cw = (W - 2 * M - 2 * 0.3) / 3
   cols.forEach(([k, col, items], i) => {
     const x = M + i * (cw + 0.3)
-    s.addShape('rect', { x, y: 1.85, w: cw, h: 3.5, fill: { color: C.panel }, line: { color: C.line, width: 1 } })
+    s.addShape('rect', { x, y: 1.85, w: cw, h: 3.68, fill: { color: C.panel }, line: { color: C.line, width: 1 } })
     s.addShape('rect', { x, y: 1.85, w: cw, h: 0.06, fill: { color: col }, line: { color: col, width: 0 } })
     s.addText(k, { x: x + 0.2, y: 2.02, w: cw - 0.4, h: 0.32, fontFace: MONO, fontSize: 14, color: col, margin: 0 })
-    s.addText(items.map((t) => ({ text: t, options: { bullet: { indent: 14 }, breakLine: true } })), { x: x + 0.2, y: 2.44, w: cw - 0.4, h: 2.85, fontFace: SANS, fontSize: 15, color: C.ink, margin: 0, valign: 'top', paraSpaceAfter: 7 })
+    s.addText(items.map((t) => ({ text: t, options: { bullet: { indent: 14 }, breakLine: true } })), { x: x + 0.2, y: 2.44, w: cw - 0.4, h: 3.0, fontFace: SANS, fontSize: 15, color: C.ink, margin: 0, valign: 'top', paraSpaceAfter: 7 })
   })
   s.addText([
     { text: 'Limits  ', options: { fontFace: HEAD, color: C.naive } },
     { text: 'Planet X is the motivation, not a claim: a real Planet Nine would be far too faint for single SPHEREx frames. Parallax is not reliably measured; bright targets saturate.', options: { color: C.ink } },
-  ], { x: M, y: 5.55, w: W - 2 * M, h: 0.66, fontFace: SANS, fontSize: 15, margin: 0, valign: 'top' })
+  ], { x: M, y: 5.68, w: W - 2 * M, h: 0.62, fontFace: SANS, fontSize: 15, margin: 0, valign: 'top' })
   s.addText([
     { text: 'SI use  ', options: { fontFace: HEAD, color: C.accent } },
     { text: 'The team chose the goal and the direction. The specific method was worked out with an SI assistant (Claude, by Anthropic), which also wrote the code and drafted the documents under the team’s direction; the team reviewed and ran everything. All results come from our own code on real SPHEREx data. No SI-generated images, video, voices or faces.', options: { color: C.ink } },
-  ], { x: M, y: 6.25, w: W - 2 * M, h: 1.0, fontFace: SANS, fontSize: 14, margin: 0, valign: 'top' })
+  ], { x: M, y: 6.34, w: W - 2 * M, h: 0.95, fontFace: SANS, fontSize: 14, margin: 0, valign: 'top' })
 }
 
 // ---- 7. Impact, next, links, credits -----------------------------------------------------------
@@ -318,7 +326,7 @@ SI disclosure: drafted with the help of an SI coding assistant (Claude, by Anthr
 Generated by \`build_deck.mjs\` from the same text as the speaker notes in \`ParallaX_ZENITH_LABS.pptx\`. Edit the text there and rebuild.
 
 Speakers: **Abed** = Abed El Rahmane Jaafir, **Mohamad** = Mohamad Alayli.
-Total: **${total} words** (Abed ${per(ABED)}, Mohamad ${per(MOHAMAD)}). At a calm 145 to 150 words per minute this is ${(total / 150 * 60).toFixed(0)} to ${(total / 145 * 60).toFixed(0)} seconds. Rehearse with a timer; if you run over, drop the last sentence of slide 6.
+Total: **${total} words** (Abed ${per(ABED)}, Mohamad ${per(MOHAMAD)}). At a calm 145 to 150 words per minute this is ${(total / 150 * 60).toFixed(0)} to ${(total / 145 * 60).toFixed(0)} seconds. Rehearse with a timer; if you run over, drop the last sentence of slide 6. Slide 4 is where the user experience is said aloud (type coordinates, watch the little video, click a star, switch to the difference views); slide 6 is where the NASA and ESA data are named.
 
 | Slide | Speaker | Words | About |
 |---|---|---|---|

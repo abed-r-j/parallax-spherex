@@ -25,7 +25,7 @@ The site and the repository are public:
 
 * Site: <https://abed-r-j.github.io/parallax-spherex/>
 * Code: <https://github.com/abed-r-j/parallax-spherex>
-* Slides (PDF): <https://github.com/abed-r-j/parallax-spherex/blob/main/presentation/ParallaX_ZENITH_LABS.pdf>
+* Slides, the project demo (PDF, 7 slides): <https://github.com/abed-r-j/parallax-spherex/blob/main/presentation/ParallaX_ZENITH_LABS.pdf>
 * Paper (PDF): <https://github.com/abed-r-j/parallax-spherex/blob/main/paper/ParallaX_IEEE.pdf>
 * Project report (PDF): <https://github.com/abed-r-j/parallax-spherex/blob/main/docs/ParallaX_Project_Report.pdf>
 

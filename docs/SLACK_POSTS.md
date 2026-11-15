@@ -6,7 +6,8 @@ placeholder: replace it before posting. Do not post phone numbers, e-mail addres
 identity documents in the channel; send those privately to the organizers.
 
 Times are Beirut time. Post 2 is due Saturday 14 November at 14:30 and post 5 on Saturday at
-20:30.
+20:30. Posts 7 and 8 go out on Sunday 15 November, right after the project form is submitted
+(see [SUBMISSION_DAY.md](SUBMISSION_DAY.md)).
 
 ---
 
@@ -129,31 +130,32 @@ Next, before [TIME]:
 State of the deliverables:
 - Web tool: [local only / published at LINK]
 - Repository: [private / public at LINK]
-- 30-second demo: [not started / draft / final at LINK]
-- Two-minute video: [not started / draft / final at LINK]
+- Project demo (7 slides): [draft / final at LINK]
 - Project form: [not started / saved / submitted]
 
 Numbers have not changed since the validation post unless stated here: [NONE / WHAT CHANGED AND WHY].
 ```
 
-## 7. Demo and video links
+## 7. Demo and final links
+
+If the first slides link does not open in a private window, post the backup instead:
+`https://github.com/abed-r-j/parallax-spherex/blob/main/presentation/ParallaX_ZENITH_LABS.pdf`.
+If the team records a video, add one line with its public link.
 
 ```
-ParallaX: demo and videos.
+ParallaX: demo and final links. Project form submitted.
 
+- Project demo, 7 slides including the title: https://abed-r-j.github.io/parallax-spherex/ParallaX_ZENITH_LABS.pdf
 - Live tool: https://abed-r-j.github.io/parallax-spherex/
 - Source code: https://github.com/abed-r-j/parallax-spherex
-- Slides (7): https://github.com/abed-r-j/parallax-spherex/blob/main/presentation/ParallaX_ZENITH_LABS.pdf
-- 30-second demo video: [VIDEO NOT RECORDED YET: link]
-- Two-minute judging video: [VIDEO NOT RECORDED YET: link]
 - Report: https://github.com/abed-r-j/parallax-spherex/blob/main/docs/ParallaX_Project_Report.pdf
 
-All links open without sign-in. Try these:
+All links open without sign-in. What a user does: type coordinates or pick a field, watch the little video, click a star for its spectrum, switch to the difference views. Try these:
 - Barnard's Star: https://abed-r-j.github.io/parallax-spherex/?field=barnard
 - Three methods side by side: add ?field=barnard&mode=compare&frame=40
 - Any coordinates, fetched live (the galaxy M51): add ?ra=202.4696&dec=47.1953&live=1&size=3&dets=3
 
-The two videos are still to be recorded; we will post their links here. The two-minute video will cover the data, software, methods and tools, a demonstration, what is distinctive, our process with its limits, and why we chose this approach.
+The slides cover the data, software, methods and tools, pictures of the tool, what is distinctive, our process with its limits, and why we chose this approach. Data: NASA SPHEREx images from NASA/IPAC IRSA and NASA/JPL Horizons, plus ESA Gaia DR3.
 ```
 
 ## 8. Final summary

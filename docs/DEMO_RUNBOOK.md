@@ -9,6 +9,25 @@ Paths assume the repository is at `C:\...\parallax-spherex`. The demo address is
 pages are public at <https://abed-r-j.github.io/parallax-spherex/>; the source code is at
 <https://github.com/abed-r-j/parallax-spherex>.
 
+**Sunday 15 November.** The order of the day (semi-finals at 15:00, the form, presentations
+at 19:00) is in [SUBMISSION_DAY.md](SUBMISSION_DAY.md). The official Project Demo is the
+7-slide deck, `presentation/ParallaX_ZENITH_LABS.pptx`, spoken with
+`presentation/SPEAKER_SCRIPT.md` (297 words, about 2 minutes); the live demo below comes
+after it, or replaces it if the judges prefer to see the tool.
+
+Slide 4 of the deck tells the user experience in four steps. They map to the tabs of
+section 3 like this, so the talk and the clicks say the same thing:
+
+| Step on slide 4 | Tab |
+|---|---|
+| 1. Type coordinates (RA, Dec) or pick a field | 1 (home page) |
+| 2. Watch the little video of that patch of sky | 2 (Barnard's Star, Space to play) |
+| 3. Click a star to get its spectrum | 6 (RW Aurigae) |
+| 4. Switch to the difference views to see what changed | 3 (Subtract) and 4 (Three-way) |
+
+The 2-minute path of section 4 skips step 3 to save time; if a judge asks for the spectrum,
+go to tab 6.
+
 ## 1. The night before
 
 Do all of this on the laptop that will be on stage, with the same Windows account.
@@ -169,9 +188,10 @@ dot map and the Ledger, or use `&embed=1` on the picture tabs for a picture-only
 
 See [JUDGES_QA.md](JUDGES_QA.md). The three to have ready: "Did you find Planet X?" (no,
 and we explain why it could not be seen); "How do you know detections are real?" (the
-ledger, the two-minute repeat exposure, the known-object labels); "What did the SI do?" (it
-wrote most of the code under our direction; the idea, the decisions and the checks are ours;
-all numbers come from our code on real data).
+ledger, the two-minute repeat exposure, the known-object labels); "What did the SI do?" (we
+chose the goal and the direction; the specific method was worked out with the SI assistant,
+which also wrote the code under our direction; we reviewed and ran everything; all numbers
+come from our code on real data).
 
 ## 7. After the demo
 

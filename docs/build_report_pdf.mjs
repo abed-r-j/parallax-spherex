@@ -7,6 +7,7 @@
 import { createRequire } from 'node:module'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import { stampMetadata } from '../submission/stamp_pdf.mjs'
 import { readFile, writeFile, rm } from 'node:fs/promises'
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -103,6 +104,7 @@ try {
     footerTemplate: '<div style="width:100%;font-size:7.5pt;font-family:Segoe UI,Arial;color:#566;padding:0 16mm;display:flex;justify-content:space-between"><span>ParallaX project report, team ZENITH LABS. Not affiliated with or endorsed by NASA.</span><span>page <span class="pageNumber"></span> of <span class="totalPages"></span></span></div>',
     margin: { top: '17mm', bottom: '18mm', left: '16mm', right: '16mm' },
   })
+  stampMetadata(pdf) // Title, Author, Subject, Keywords, Comments (SI statement); see submission/set_metadata.py
   const bytes = await readFile(pdf)
   const pages = (bytes.toString('latin1').match(/\/Type\s*\/Page(?![s\w])/g) || []).length
   console.log(`wrote ${pdf}: ${bytes.length} bytes, ${pages} pages, ${md.split(/\s+/).length} words in REPORT.md`)

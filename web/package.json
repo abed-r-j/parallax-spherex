@@ -2,6 +2,7 @@
   "name": "parallax-web",
   "private": true,
   "version": "1.0.0",
+  "description": "ParallaX web app: blink, add, subtract and difference SPHEREx infrared images in the browser. Written with the help of an SI coding assistant (Claude, Anthropic), directed and checked by the team.",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {

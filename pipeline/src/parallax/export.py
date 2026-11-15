@@ -28,6 +28,26 @@ DOI = {
     "spherex_qr2": "10.26131/IRSA652",
 }
 
+SI_DISCLOSURE = (
+    "Produced with the help of an SI coding assistant (Claude, Anthropic), directed and "
+    "checked by the team; computed by the project's own code from real SPHEREx data."
+)
+DATA_SOURCE = "SPHEREx Level-2 spectral images, NASA/IPAC IRSA"
+
+
+def provenance(dois: list[str]) -> dict:
+    """Metadata block written into every ``meta.json`` and into ``index.json``.
+
+    It states how the file was made (the SI acknowledgement the Space Apps rules ask for in
+    data metadata) and where the pixels come from. The web app ignores keys it does not know.
+    """
+    return {
+        "generator": f"parallax-spherex {__version__}",
+        "siDisclosure": SI_DISCLOSURE,
+        "source": DATA_SOURCE,
+        "dois": sorted(dois),
+    }
+
 
 def _clean(o):
     """Make numpy values JSON-safe; NaN and infinities become null."""
@@ -213,6 +233,7 @@ def write_pack(
         "science": {}, "ledger": {},
     }
     meta.update(blocks or {})
+    meta["provenance"] = provenance(meta["release"]["doi"])
     (out / "meta.json").write_text(json.dumps(_clean(meta), separators=(",", ":")))
     thumbnail(f, out / "thumb.png")
     return {
@@ -222,10 +243,21 @@ def write_pack(
     }
 
 
+def _pack_dois(out_root: Path, entries: list[dict]) -> list[str]:
+    """Union of the data DOIs recorded in the packs listed in the index."""
+    dois: set[str] = set()
+    for e in entries:
+        p = out_root / str(e.get("key", "")) / "meta.json"
+        if p.is_file():
+            dois.update(json.loads(p.read_text(encoding="utf-8")).get("release", {}).get("doi", []))
+    return sorted(dois)
+
+
 def write_index(out_root: Path, entries: list[dict]) -> None:
     doc = {
         "generated": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "pipeline": __version__,
+        "provenance": provenance(_pack_dois(Path(out_root), entries)),
         "fields": entries,
     }
     (Path(out_root) / "index.json").write_text(json.dumps(_clean(doc), indent=1))

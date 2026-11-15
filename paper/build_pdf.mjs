@@ -1,4 +1,4 @@
-﻿// Build paper/ParallaX_IEEE.pdf from paper/paper.html with installed Chrome (headless),
+// Build paper/ParallaX_IEEE.pdf from paper/paper.html with installed Chrome (headless),
 // through playwright-core from web/node_modules. No network access is needed or allowed.
 // Usage (from the repository root):  node paper/build_pdf.mjs
 // Then run  node paper/render_pages.mjs  to get paper/pages/page-N.png for a visual check.
@@ -6,6 +6,7 @@
 import { createRequire } from 'node:module'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import { stampMetadata } from '../submission/stamp_pdf.mjs'
 import { readFile } from 'node:fs/promises'
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -29,6 +30,7 @@ try {
   if (broken.length) throw new Error('missing images: ' + broken.join(', '))
   await page.pdf({ path: pdf, preferCSSPageSize: true, printBackground: true,
     displayHeaderFooter: false, tagged: true })
+  stampMetadata(pdf) // Title, Author, Subject, Keywords, Comments (SI statement); see submission/set_metadata.py
   const bytes = await readFile(pdf)
   const pages = (bytes.toString('latin1').match(/\/Type\s*\/Page(?![s\w])/g) || []).length
   console.log(`wrote ${pdf}: ${bytes.length} bytes, ${pages} pages`)
