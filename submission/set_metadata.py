@@ -35,7 +35,7 @@ from xml.sax.saxutils import escape
 
 logging.getLogger("pypdf").setLevel(logging.ERROR)  # Chrome PDFs trigger a harmless size warning
 ROOT = Path(__file__).resolve().parent.parent
-AUTHOR = "ZENITH LABS: Abed El Rahmane Jaafir, Mohamad Alayli"
+AUTHOR = "ZENITH LABS: Abed El Rahmane Jaafir; former member: Mohamad Alayli"
 SI = (
     "Produced with the help of an SI coding assistant (Claude, Anthropic), directed and "
     "checked by the team; computed by the project's own code from real SPHEREx data."

@@ -10,7 +10,8 @@ event Beirut. Team ZENITH LABS. 14 November 2026.**
 | | |
 |---|---|
 | Team | ZENITH LABS (Beirut, Lebanon) |
-| Members | **Abed El Rahmane Jaafir**, team lead: AI engineer; MEng Software Engineering and currently Master in AI, Saint Joseph University of Beirut. **Mohamad Alayli**: BSc Computer Science, Lebanese American University; autonomous systems, back-end engineering. |
+| Member | **Abed El Rahmane Jaafir**, team lead: AI engineer; MEng Software Engineering and currently Master in AI, Saint Joseph University of Beirut. |
+| Former member | Mohamad Alayli (until 14 November 2026) |
 | Challenge | Planet X and SPHEREx (Advanced; astrophysics, planets and moons, software) |
 | Project | ParallaX, a web tool and an open pipeline |
 | Site and code | Live site: https://abed-r-j.github.io/parallax-spherex/ . Source code: https://github.com/abed-r-j/parallax-spherex |

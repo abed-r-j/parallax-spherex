@@ -162,7 +162,8 @@ Beirut, Lebanon}
 \and
 \IEEEauthorblockN{Mohamad Alayli}
 \IEEEauthorblockA{\textit{Lebanese American University}\\
-Beirut, Lebanon}}
+Beirut, Lebanon\\
+former member of team ZENITH LABS}}
 
 \maketitle
 """
@@ -173,6 +174,7 @@ def main() -> None:
     title = inline(re.search(r"<h1>(.*?)</h1>", html, re.S).group(1))
     team = inline(re.search(r'<div class="team">(.*?)</div>', html, re.S).group(1))
     assert "Abed El Rahmane Jaafir" in html and "Mohamad Alayli" in html
+    assert "former member of team ZENITH LABS" in html  # same note as in PREAMBLE
     body = html[html.index('<div class="cols">'):html.index("<h2>References</h2>")]
     n_refs = len(re.findall(r"<li><span>\[\d+\]</span>", html))
     assert n_refs == len(KEYS), (n_refs, len(KEYS))

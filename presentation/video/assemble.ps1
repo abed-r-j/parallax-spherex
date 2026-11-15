@@ -2,7 +2,7 @@
 #   powershell -ExecutionPolicy Bypass -File assemble.ps1 -Video 30s  -Take takes\take_30s.mp4
 #   powershell -ExecutionPolicy Bypass -File assemble.ps1 -Video 2min -Take takes\take_2min.mp4 -Offset 6.2
 # Needs base_<video>.mp4 and timeline_<video>.json (made by: node build_video.mjs) and ffmpeg/ffprobe.
-# It records nothing: the take is a file you filmed yourselves.
+# It records nothing: the take is a file you filmed yourself.
 # SI disclosure: written with the help of an SI coding assistant (Claude, by Anthropic).
 param(
   [Parameter(Mandatory = $true)][ValidateSet('30s', '2min')][string]$Video,

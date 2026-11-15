@@ -129,7 +129,7 @@ About 1,120 words. Paste all of it; add the images where marked below the block.
 ```
 Live tool: https://abed-r-j.github.io/parallax-spherex/
 Source code: https://github.com/abed-r-j/parallax-spherex
-Team ZENITH LABS (Abed El Rahmane Jaafir, Mohamad Alayli). Challenge: Planet X and SPHEREx.
+Team ZENITH LABS (Abed El Rahmane Jaafir). Former member: Mohamad Alayli (until 14 November 2026). Challenge: Planet X and SPHEREx.
 
 WHAT EXACTLY DOES IT DO?
 ParallaX shows how the SPHEREx infrared sky changes over time. A user does four things:
@@ -286,7 +286,7 @@ The form asks you to tick both. Read them; you are affirming them personally.
 > Space Apps Project Submission Guide, and I agree to the Participant Terms and Conditions and
 > Privacy Policy."
 
-To affirm this, both team members should actually have read the Project Submission Guide and
+To affirm this, the team member should actually have read the Project Submission Guide and
 the Participant Terms and Conditions.
 
 > "I confirm that the submitted project represents my team's original work and that all
@@ -337,8 +337,9 @@ ParallaX plays SPHEREx images of any patch of sky as a little video. Enter RA an
 
 **Eligibility and timing**
 
-- [ ] Both members are registered for the 2026 challenge and for the Beirut local event, are
-      not on the waiting list, and appear on the team's Members tab. No member can be added
+- [ ] The team's one member (Abed El Rahmane Jaafir) is registered for the 2026 challenge and
+      for the Beirut local event, is not on the waiting list, and appears on the team's
+      Members tab. No member can be added
       after submission closes.
 - [ ] The team works on one challenge only: "Planet X and SPHEREx".
 - [ ] "Submit for Judging" is clicked before Sunday 15 November, 23:59 Beirut time. Submit

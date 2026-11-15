@@ -388,8 +388,8 @@ ZENITH LABS, Beirut:
 
 * **Abed El Rahmane Jaafir**, team lead. AI engineer; MEng Software Engineering and
   currently Master in AI, Saint Joseph University of Beirut.
-* **Mohamad Alayli**. BSc Computer Science, Lebanese American University; autonomous
-  systems, back-end engineering.
+
+Former member: Mohamad Alayli (until 14 November 2026).
 
 Development began on 12-13 November 2026, before the on-site hackathon of 14-15 November,
 after the local organizers allowed early preparation.

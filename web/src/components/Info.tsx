@@ -156,8 +156,8 @@ export function About({ index, dois }: { index: PackIndex | null; dois: string[]
     <article className="prose">
       <h1>About ParallaX</h1>
       <p>
-        ParallaX is the entry of team ZENITH LABS (Abed El Rahmane Jaafir, Mohamad Alayli) to the NASA Space Apps Challenge 2026, Beirut, for the challenge
-        &ldquo;Planet X and SPHEREx&rdquo;. Planet X is the motivation, not a claim: this tool shows how to look for moving and varying objects in SPHEREx data, and reports
+        ParallaX is the entry of team ZENITH LABS (Abed El Rahmane Jaafir) to the NASA Space Apps Challenge 2026, Beirut, for the challenge
+        &ldquo;Planet X and SPHEREx&rdquo;. Former member: Mohamad Alayli (until 14 November 2026). Planet X is the motivation, not a claim: this tool shows how to look for moving and varying objects in SPHEREx data, and reports
         only what it measures.
       </p>
 

@@ -31,15 +31,14 @@ const SPHEREX_ACK = 'This publication makes use of data products from the Spectr
 const IRSA_ACK = 'This research has made use of the NASA/IPAC Infrared Science Archive, which is funded by the National Aeronautics and Space Administration and operated by the California Institute of Technology.'
 
 // ---- the talk: one entry per slide; this is also what goes into the speaker notes ---------
-const ABED = 'Abed'
-const MOHAMAD = 'Mohamad'
+const ABED = 'Abed' // single speaker
 const TALK = [
-  { who: ABED, text: 'Hello, we are ZENITH LABS. I am Abed El Rahmane Jaafir, and this is Mohamad Alayli. Our project is ParallaX, for the challenge Planet X and SPHEREx.' },
-  { who: MOHAMAD, text: 'Pluto, the original Planet X, was found by blinking two photographs of the same sky. Today the SPHEREx telescope images the whole sky in the infrared, again and again. The challenge asks for a public tool that shows how that sky changes, so anyone can spot what moves or varies.' },
+  { who: ABED, text: 'Hello, I am Abed El Rahmane Jaafir, team ZENITH LABS. Our project is ParallaX, for the challenge Planet X and SPHEREx.' },
+  { who: ABED, text: 'Pluto, the original Planet X, was found by blinking two photographs of the same sky. Today the SPHEREx telescope images the whole sky in the infrared, again and again. The challenge asks for a public tool that shows how that sky changes, so anyone can spot what moves or varies.' },
   { who: ABED, text: 'Here is the catch. SPHEREx never photographs the same spot in the same colour twice. On the left, each dot is one exposure, each at another wavelength. So when you subtract two dates, stars light up as false alarms, as on the right.' },
   { who: ABED, text: 'Our answer is a chromatic template: for every frame, we predict the unchanging sky at that frame’s own wavelengths, from the other survey passes, and subtract it. A user types coordinates, watches the little video, clicks a star for its spectrum, and switches to the difference views. All in the browser, with no server.' },
-  { who: MOHAMAD, text: 'We measured it on real frames, against two baselines. On blank sky, at the same false-alarm rate, the template finds moving sources 1.2 to 1.9 times fainter than a wavelength-matched pair. For Barnard’s Star we get 10.2 plus or minus 0.5 arcseconds per year; Gaia says 10.4.' },
-  { who: MOHAMAD, text: 'NASA open data is the core: SPHEREx images from the NASA/IPAC archive and JPL Horizons, plus Gaia from ESA. We state our limits: this is not a Planet Nine detector, and bright stars saturate. We used an SI coding assistant, and we directed and checked its work.' },
+  { who: ABED, text: 'We measured it on real frames, against two baselines. On blank sky, at the same false-alarm rate, the template finds moving sources 1.2 to 1.9 times fainter than a wavelength-matched pair. For Barnard’s Star we get 10.2 plus or minus 0.5 arcseconds per year; Gaia says 10.4.' },
+  { who: ABED, text: 'NASA open data is the core: SPHEREx images from the NASA/IPAC archive and JPL Horizons, plus Gaia from ESA. We state our limits: this is not a Planet Nine detector, and bright stars saturate. We used an SI coding assistant, and we directed and checked its work.' },
   { who: ABED, text: 'ParallaX lets anyone, from students to researchers, blink the infrared sky and check what they see. The code is open source and every number can be reproduced. Thank you.' },
 ]
 const ELEVATOR = 'Pluto was found by blinking two photographs. SPHEREx photographs the whole infrared sky, but never the same spot in the same colour twice, so a simple blink fills with false alarms. ParallaX predicts each frame at its own colours and subtracts it, so fainter real changes stand out. Type any coordinates and watch, in your browser. It is built on NASA open data, and it is open source.'
@@ -107,11 +106,12 @@ const body = (extra = {}) => ({ fontFace: SANS, fontSize: 18, color: C.ink, marg
   s.addText([
     { text: 'TEAM  ', options: { fontFace: MONO, fontSize: 14, color: C.muted } },
     { text: 'ZENITH LABS', options: { fontFace: HEAD, fontSize: 18, color: C.ink, breakLine: true } },
-    { text: 'Abed El Rahmane Jaafir  ·  Mohamad Alayli', options: { fontFace: SANS, fontSize: 18, color: C.ink, breakLine: true } },
+    { text: 'Abed El Rahmane Jaafir', options: { fontFace: SANS, fontSize: 18, color: C.ink, breakLine: true } },
+    { text: 'Former member: Mohamad Alayli (until 14 November 2026)', options: { fontFace: SANS, fontSize: 12, color: C.muted, breakLine: true } },
     { text: 'CHALLENGE  ', options: { fontFace: MONO, fontSize: 14, color: C.muted } },
     { text: 'Planet X and SPHEREx', options: { fontFace: HEAD, fontSize: 18, color: C.ink, breakLine: true } },
     { text: 'NASA Space Apps Challenge 2026 - Beirut', options: { fontFace: SANS, fontSize: 18, color: C.muted } },
-  ], { x: M, y: 4.8, w: 5.9, h: 1.9, margin: 0, valign: 'top', paraSpaceAfter: 7 })
+  ], { x: M, y: 4.8, w: 5.9, h: 2.25, margin: 0, valign: 'top', paraSpaceAfter: 7 })
   const r = fit(s, A('app_threeway.png'), 6.75, 1.0, W - 6.75 - M, 5.1)
   s.addText('The ParallaX web app on real SPHEREx data (Barnard’s Star field)', { x: r.x, y: r.y + r.h + 0.1, w: r.w, h: 0.32, fontFace: SANS, fontSize: 14, color: C.muted, margin: 0 })
 }
@@ -319,14 +319,13 @@ await pptx.writeFile({ fileName: join(here, 'ParallaX_ZENITH_LABS.pptx') })
 // ---- the speaker script, from the same text --------------------------------------------------
 const TITLES = ['Title', 'The challenge', 'The problem', 'The solution', 'Proof', 'Data, tools and how it was built', 'Impact and what is next']
 const total = TALK.reduce((a, t) => a + words(t.text), 0)
-const per = (who) => TALK.filter((t) => t.who === who).reduce((a, t) => a + words(t.text), 0)
 let md = `# ParallaX: speaker script for the 7 slides (2 minutes)
 
 SI disclosure: drafted with the help of an SI coding assistant (Claude, by Anthropic); to be reviewed and spoken by the team.
 Generated by \`build_deck.mjs\` from the same text as the speaker notes in \`ParallaX_ZENITH_LABS.pptx\`. Edit the text there and rebuild.
 
-Speakers: **Abed** = Abed El Rahmane Jaafir, **Mohamad** = Mohamad Alayli.
-Total: **${total} words** (Abed ${per(ABED)}, Mohamad ${per(MOHAMAD)}). At a calm 145 to 150 words per minute this is ${(total / 150 * 60).toFixed(0)} to ${(total / 145 * 60).toFixed(0)} seconds. Rehearse with a timer; if you run over, drop the last sentence of slide 6. Slide 4 is where the user experience is said aloud (type coordinates, watch the little video, click a star, switch to the difference views); slide 6 is where the NASA and ESA data are named.
+Speaker: **Abed** = Abed El Rahmane Jaafir (single speaker, all slides).
+Total: **${total} words**. At a calm 145 to 150 words per minute this is ${(total / 150 * 60).toFixed(0)} to ${(total / 145 * 60).toFixed(0)} seconds. Rehearse with a timer; if you run over, drop the last sentence of slide 6. Slide 4 is where the user experience is said aloud (type coordinates, watch the little video, click a star, switch to the difference views); slide 6 is where the NASA and ESA data are named.
 
 | Slide | Speaker | Words | About |
 |---|---|---|---|
@@ -335,7 +334,7 @@ ${TALK.map((t, i) => `| ${i + 1}. ${TITLES[i]} | ${t.who} | ${words(t.text)} | $
 
 `
 TALK.forEach((t, i) => { md += `## Slide ${i + 1}: ${TITLES[i]} (${t.who}, ${words(t.text)} words)\n\n${t.text}\n\n` })
-md += `## Notes for the speakers
+md += `## Notes for the speaker
 
 * Every number spoken is from \`docs/RESULTS.md\`: 1.2 to 1.9 times fainter than the gated pair on blank sky at a matched false-detection rate (section 2.1; next to a star it is 1.1 to 1.6); Barnard's Star 10.2 +- 0.5 arcsec/yr against 10.36 from Gaia DR3 (section 3), spoken as "10.2 plus or minus 0.5" and "10.4".
 * Do not quote raw false-detection counts as a win: they are not like for like (the template's count uses a measured error map; with one statistical sigma all three flood). The like-for-like claim is the matched-rate sensitivity.

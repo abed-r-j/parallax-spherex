@@ -13,8 +13,9 @@ judged.
 
 ## Now, before 14:30: get ready for the semi-finals
 
-- [ ] Both members open the Space Apps site, profile icon, "My Team", "Members" tab: both
-      names are there, both are registered for the **Beirut** local event, nobody is
+- [ ] Open the Space Apps site, profile icon, "My Team", "Members" tab: the team is now one
+      member, Abed El Rahmane Jaafir (former member: Mohamad Alayli, until 14 November
+      2026). The name is there, registered for the **Beirut** local event and not
       waitlisted. If not, message the Local Lead now. No member can be added after the form
       closes.
 - [ ] Open in a **private window**, signed out, and confirm each one loads:
@@ -31,8 +32,8 @@ judged.
       in PowerShell, `cd pipeline` then `.\.venv\Scripts\parallax.exe serve`, and open
       `http://127.0.0.1:8000`. If it will not start, use fallback C of the runbook, or the
       live site.
-- [ ] Rehearse the talk once with a timer: `presentation/SPEAKER_SCRIPT.md`, 297 words,
-      about 2 minutes, Abed and Mohamad alternating. There is a 30-second version at the end
+- [ ] Rehearse the talk once with a timer: `presentation/SPEAKER_SCRIPT.md`, 291 words,
+      about 2 minutes, one speaker (Abed). There is a 30-second version at the end
       of that file.
 - [ ] Laptop charged and plugged in, notifications off, browser zoom 100%, video adapter in
       the bag.
@@ -51,13 +52,13 @@ judged.
 
 ## Right after the semi-finals, and by 18:00 at the latest: submit
 
-Decide who edits (one person). The other reads along and does not open the editor.
+The team's one member edits, in one browser window only.
 
 1. [ ] Click your **profile icon** (top right of the Space Apps site), then **My Team**.
 2. [ ] On the team page select the **Project** tab.
 3. [ ] Click the blue **Edit** button.
-4. [ ] Toggle the edit **Lock** to **ON**. (A teammate can still remove the lock and
-       overwrite unsaved changes, so stay in touch.)
+4. [ ] Toggle the edit **Lock** to **ON**. (The guide warns that another member could
+       remove the lock; the team now has one member, so keep a single editor window.)
 5. [ ] Paste the eight fields from [SUBMISSION.md](SUBMISSION.md), in order, using the long
        versions: Project Name; High-Level Project Summary; Link to Project Demo; Link to
        Final Project; Detailed Project Description; Use of Super Intelligence (SI); NASA
@@ -86,7 +87,7 @@ after 23:59.
 ### What the two boxes mean
 
 * Box 1: you have read the Project Submission Guide and you agree to the Participant Terms
-  and Conditions and the Privacy Policy. Both members should have read them.
+  and Conditions and the Privacy Policy. The member should have read them.
 * Box 2: the project is the team's original work; **every external resource (code, text,
   images, even open source or free) is listed in the References field**; and no copyrighted
   material is used without permission.
@@ -128,7 +129,7 @@ block it. It is not required.
 
 ## After submitting
 
-- [ ] **Certificate.** Each member: profile icon, **Profile**, **Participant Information**,
+- [ ] **Certificate.** Profile icon, **Profile**, **Participant Information**,
       "2026 NASA Space Apps Challenge", yellow **Download Participant Certificate** button.
       Use a laptop, paper size Letter; it is a PDF. The name printed is the "Full Name" of
       your profile (Account Information, "Change"), which you can still correct.

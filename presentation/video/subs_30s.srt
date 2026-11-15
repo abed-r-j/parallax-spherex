@@ -1,6 +1,6 @@
 1
 00:00:00,000 --> 00:00:03,000
-We are Abed and Mohamad, team ZENITH LABS.
+I am Abed, team ZENITH LABS.
 
 2
 00:00:03,000 --> 00:00:07,000

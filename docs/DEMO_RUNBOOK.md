@@ -12,7 +12,7 @@ pages are public at <https://abed-r-j.github.io/parallax-spherex/>; the source c
 **Sunday 15 November.** The order of the day (semi-finals at 15:00, the form, presentations
 at 19:00) is in [SUBMISSION_DAY.md](SUBMISSION_DAY.md). The official Project Demo is the
 7-slide deck, `presentation/ParallaX_ZENITH_LABS.pptx`, spoken with
-`presentation/SPEAKER_SCRIPT.md` (297 words, about 2 minutes); the live demo below comes
+`presentation/SPEAKER_SCRIPT.md` (291 words, about 2 minutes); the live demo below comes
 after it, or replaces it if the judges prefer to see the tool.
 
 Slide 4 of the deck tells the user experience in four steps. They map to the tabs of

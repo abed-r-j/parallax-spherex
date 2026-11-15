@@ -81,7 +81,7 @@ printed from the Space Apps site that morning: the **Judging & Awards Guide** (1
 rows J) and the **Project Submission Guide** (16 pages, rows S), both dated 13 November 2026.
 Every "must", limit, required field, checkbox and condition in them is listed below and
 checked against the repository and the public links. Status is **Met** (verified in the
-files or on the web today), **Team action** (only the two members can do or confirm it on
+files or on the web today), **Team action** (only the team member can do or confirm it on
 the Space Apps site) or **Not applicable**.
 
 How the links were checked: each public address was requested on 15 November at about 12:05
@@ -107,14 +107,14 @@ GitHub and on the site show the new slides only after the next push and site pub
 | # | Requirement in the guide | Status | Evidence, or what the team must do |
 |---|---|---|---|
 | J1 | "Respond to one of the official NASA Space Apps Challenges" | Met | One challenge, "Planet X and SPHEREx": named on slide 1, in the README and in the form text; objectives audited in sections A to C above |
-| J2 | All members registered, on the same Local Event, not waitlisted, and shown on the team's Members tab; no new members after submission closes; 1 to 6 members for a Local Event team | Team action | Two members. Both must look at the Members tab today and confirm Beirut, not waitlisted. If one is waitlisted, write to the Local Lead at once |
+| J2 | All members registered, on the same Local Event, not waitlisted, and shown on the team's Members tab; no new members after submission closes; 1 to 6 members for a Local Event team | Team action | One member, Abed El Rahmane Jaafir (former member: Mohamad Alayli, until 14 November 2026). He must look at the Members tab today and confirm Beirut, not waitlisted. If waitlisted, write to the Local Lead at once |
 | J3 | "Complete all of the required fields on the Project Submission page" | Team action | Text for all eight fields is ready in [SUBMISSION.md](SUBMISSION.md); the form refuses to submit while a required field is empty |
 | J4 | A demo: a slide presentation of at most 7 slides including title and intro slides, or a video of at most 30 seconds | Met | `presentation/ParallaX_ZENITH_LABS.pdf` has 7 pages (counted with a PDF reader library) and the `.pptx` has 7 slides (counted by PowerPoint in `export_deck.ps1`) |
 | J5 | English on the project page and in linked materials | Met | Form text, deck, site, README and report are in English |
 | J6 | Submit on the Project tab ("edit", then "submit") before Sunday 15 November, 23:59 local time of the Local Event | Team action | Beirut time. Plan in [SUBMISSION_DAY.md](SUBMISSION_DAY.md): first submission by 18:00 |
-| J7 | Tick the box "I have read and understand the project submission requirements ... and I agree to the Participant Terms and Conditions and Privacy Policy" | Team action | Both members read the guide and the terms before ticking |
+| J7 | Tick the box "I have read and understand the project submission requirements ... and I agree to the Participant Terms and Conditions and Privacy Policy" | Team action | The member reads the guide and the terms before ticking |
 | J8 | Tick the box confirming original work, that all external resources (code, text, images, even open source) are listed in the References field, and that no copyrighted material is used without permission | Team action | Field 8 of [SUBMISSION.md](SUBMISSION.md) and `THIRD_PARTY_LICENSES.md` hold the list; all images are our own screenshots and plots; no music or footage is used. One addition made today: the deck-building library (PptxGenJS, MIT) is now named in field 8; it should also be added to `THIRD_PARTY_LICENSES.md` |
-| J9 | Review for prohibited bilateral activity with China or a Chinese-owned entity, decided by NASA "based on information provided by the applicant" | Team action | Nothing to change in the project. Each member answers any affiliation question on the site truthfully; the data used come from NASA/IPAC, NASA/JPL, ESA and IMCCE (France) |
+| J9 | Review for prohibited bilateral activity with China or a Chinese-owned entity, decided by NASA "based on information provided by the applicant" | Team action | Nothing to change in the project. The member answers any affiliation question on the site truthfully; the data used come from NASA/IPAC, NASA/JPL, ESA and IMCCE (France) |
 | J10 | Everyone who submits a project by the deadline receives a certificate of participation | Team action | After submitting: see S35 |
 
 ### Judging criteria and awards (Judging & Awards Guide, pages 5 to 11)
@@ -128,7 +128,7 @@ addresses the wording; the score is the judges'.
 | J12 | Creativity: "a novel concept" or an improvement on existing ideas "in a meaningful way" | Met | Field 5 "What is new"; slides 3 and 4. We state that template subtraction itself is standard |
 | J13 | Validity: grounded in scientific principles, feasible, complete; "usability and user-friendliness" count | Met | Field 5 "How we tested it" with baselines, controls and published failures ([RESULTS.md](RESULTS.md)); the tool is live and needs no install; four user steps on slide 4 |
 | J14 | Relevance: addresses the challenge directly; "meaningfully integrates NASA data, utilizing it as a core component ... rather than a superficial addition" | Met | Sections A to C above; field 5 "How NASA data is used"; field 7; slide 6 says "NASA, the core" |
-| J15 | Presentation: challenge, solution and significance conveyed clearly; "Judges evaluate the demo and full project" | Met | 7-slide deck with a 2-minute script (297 words); sub-headed form text; pasted images |
+| J15 | Presentation: challenge, solution and significance conveyed clearly; "Judges evaluate the demo and full project" | Met | 7-slide deck with a 2-minute script (291 words); sub-headed form text; pasted images |
 | J16 | Local awards are optional and separate; only officially submitted Global Nominees go to Global Judging | Team action | Ask the Local Lead how the Beirut awards work |
 | J17 | Dates: Global Nominees 3 December 2026; Global Finalists and Honorable Mentions 17 December 2026; Global Winners 26 January 2027 | Not applicable | For the calendar; listed in [SUBMISSION_DAY.md](SUBMISSION_DAY.md) |
 | J18 | Ten Global Awards, among them Best Use of Data ("best makes space data accessible or leverages it to a unique application"), Best Use of Science ("best and most valid use of the scientific method"), Best Use of Technology | Not applicable | Awards are decided by the executive judges among Global Finalists. The form text describes access to the data, the tested hypothesis and the server-less design plainly, without naming any award |
@@ -140,7 +140,7 @@ addresses the wording; the score is the judges'.
 | S1 | Submission is open from Saturday 14 November 09:00 to Sunday 15 November 23:59, time zone of the Local Event; local judging times may differ | Team action | Beirut: semi-finals 15:00, presentations 19:00, form closes 23:59 |
 | S2 | Reach the page through the profile icon, "My Team", then the "Project" tab | Team action | Steps in [SUBMISSION_DAY.md](SUBMISSION_DAY.md) |
 | S3 | Click "Edit"; click "Save Progress" often; changes are visible only to the team until the project is submitted | Team action | Same |
-| S4 | Toggle the edit "Lock" to ON while editing; another member can still remove it and overwrite unsaved changes | Team action | One member edits; the other only reads |
+| S4 | Toggle the edit "Lock" to ON while editing; another member can still remove it and overwrite unsaved changes | Team action | The team has one member, who edits in a single window |
 | S5 | The page accepts images (JPG, PNG, GIF up to 10 MB) by upload or paste; it does not accept videos or documents | Met | Eight images are prepared in `submission/media/` (6 PNG and 2 GIF; the largest is 3.24 MB; each was opened and looked at). [SUBMISSION.md](SUBMISSION.md) says which goes under which field |
 | S6 | Videos and documents go on a cloud service or repository with "a publicly accessible link with no logins, permissions, or registrations required" | Met, with one open point | See the table of answers above. The deck copy on the site answered 404 at check time; the GitHub copy answered 200 |
 | S7 | Before submitting: set files to public and test each link in a private browser | Team action | Do it for the three links of fields 3 and 4 |
@@ -162,7 +162,7 @@ addresses the wording; the score is the judges'.
 | S23 | Visuals must "display an image of the project" | Met | Real screenshots of the app on slides 1, 2, 3 and 4 |
 | S24 | Visuals must "describe the user experience" | Met (fixed today) | Slide 4 now has a block "What a user does": type coordinates or pick a field, watch the little video, click a star for its spectrum, switch to the difference views |
 | S25 | Visuals must "include how NASA and space agency open and space based data and technology make your solution possible" | Met (sharpened today) | Slide 6, column "The data that make it possible": NASA SPHEREx Level-2 images from NASA/IPAC IRSA as the core, NASA/JPL Horizons, and the partner agency ESA with Gaia DR3; acknowledgements and DOIs on slide 7 |
-| S26 | Slide content must address the team name, the names of the team members and the challenge selected | Met | Slide 1: ZENITH LABS; Abed El Rahmane Jaafir, Mohamad Alayli; "Planet X and SPHEREx" |
+| S26 | Slide content must address the team name, the names of the team members and the challenge selected | Met | Slide 1: ZENITH LABS; Abed El Rahmane Jaafir; former member: Mohamad Alayli (until 14 November 2026); "Planet X and SPHEREx" |
 | S27 | "Projects that exceed these limits will not be eligible for Global Judging" | Met | 7 slides; no video in the demo field |
 | S28 | All members are confirmed participants at the same Local Event; a waitlisted member must ask the Local Lead for acceptance | Team action | Same as J2 |
 | S29 | All required fields completed; all content in English | Team action | Same as J3, J5 |
@@ -170,7 +170,7 @@ addresses the wording; the score is the judges'.
 | S31 | Demos and final projects "may not include any images, video, audio, or other likeness to persons under 18 years old" | Met | No person appears in the deck (all seven slides viewed), in the eight prepared images (viewed) or on the site; there is no audio or video |
 | S32 | Tick "Terms and Conditions", tick "Confirm All Work is Original", then "Submit for Judging"; a banner and a confirmation message appear | Team action | Take a screenshot of the banner |
 | S33 | The project may be edited and resubmitted until the end; "Only your last saved submission will be reviewed" | Team action | Submit early, resubmit after any correction, and check the page once more at the end |
-| S34 | A participant certificate becomes available on the user Profile once the project is submitted | Team action | Both members: see S35 |
+| S34 | A participant certificate becomes available on the user Profile once the project is submitted | Team action | The member: see S35 |
 | S35 | To get it: profile icon, "Profile", "Participant Information", "2026 NASA Space Apps Challenge", yellow "Download Participant Certificate" button; paper size Letter; PDF only; use a laptop; the name printed is the "Full Name" of the profile, which can be changed at any time | Team action | Check the spelling of the Full Name before downloading. For download problems the guide gives a support address on its page 15 |
 
 Count: 53 rows. Met: 30 (three of them with the open point of the site copy of the deck).

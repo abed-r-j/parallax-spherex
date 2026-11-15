@@ -6,13 +6,13 @@ You make two files: `ParallaX_demo_30s.mp4` (at most **30.0 s**, hard limit) and
 
 ## 0. The simpler route: no editor at all
 
-Follow `RECORD_AND_ASSEMBLE.md`: play `teleprompter_30s.mp4` / `teleprompter_2min.mp4`, film yourselves reading it, then run `assemble.ps1` once per video. It lines your recording up with the ready-made picture track (`base_*.mp4`: the screen clips cut to the script, subtitles, opening and closing text), keeps your faces on screen the whole time, fixes the loudness, cuts at the script's end and checks the length. The files are then called `final_30s.mp4` and `final_2min.mp4`.
+Follow `RECORD_AND_ASSEMBLE.md`: play `teleprompter_30s.mp4` / `teleprompter_2min.mp4`, film yourself reading it, then run `assemble.ps1` once per video. It lines your recording up with the ready-made picture track (`base_*.mp4`: the screen clips cut to the script, subtitles, opening and closing text), keeps your face on screen the whole time, fixes the loudness, cuts at the script's end and checks the length. The files are then called `final_30s.mp4` and `final_2min.mp4`.
 
 The rest of this page is the **manual alternative** in Clipchamp, for when you want to cut by hand (you can also drop `base_*.mp4` into Clipchamp as the picture track and only add your camera clip). The filming advice in section 1 applies to both routes.
 
-## 1. Film yourselves (Windows Camera app or a phone)
+## 1. Film yourself (Windows Camera app or a phone)
 
-* **Framing**: landscape (16:9), 1080p, 30 fps. Both of you in the picture from the chest up, eyes about one third from the top, camera at eye height on a stable support (a stack of books works). Look at the lens, not at the screen.
+* **Framing**: landscape (16:9), 1080p, 30 fps. One member (Abed) in the picture from the chest up, eyes about one third from the top, camera at eye height on a stable support (a stack of books works). Look at the lens, not at the screen.
 * **Light**: face a window or a lamp; never have the window behind you. Plain, tidy background, nothing with a logo on it.
 * **Sound**: a quiet room with soft furniture, phone or laptop about an arm's length away, no fan or air conditioning. If you have wired earphones with a microphone, use them. Record ten seconds, listen back with headphones, then continue.
 * **What to say**: exactly the lines marked ON CAMERA and the voice lines in `SCRIPT_30s.md` and `SCRIPT_2min.md`. English only.
@@ -27,7 +27,7 @@ The rest of this page is the **manual alternative** in Clipchamp, for when you w
 4. Put each voice recording on the audio track under its screen clip. Select every clip that has sound and set the same volume; mute nothing but the screen clips (they have no sound anyway).
 5. **Subtitles**: Clipchamp cannot import `.srt` files. Either add "Text" items (style "Plain text", white, bottom centre) and paste the lines from `subs_30s.srt` or `subs_2min.srt` at their times, or turn on "Captions" (auto-captions, English) and correct every line against the script. English subtitles are a good idea even though you speak English. If you upload to YouTube you can also attach the `.srt` file there (Subtitles, Add, Upload file, "With timing").
 6. Add the on-screen texts named in the script (project name and tagline, the data credit) as "Text" items in Segoe UI or a similar plain font. On the last seconds add, small: "SPHEREx data: NASA/IPAC IRSA. Not affiliated with or endorsed by NASA. Made with the help of an SI coding assistant."
-7. No music, unless you composed and recorded it yourselves. No transitions longer than a quarter of a second. No stock footage, no stickers, no filters.
+7. No music, unless you composed and recorded it yourself. No transitions longer than a quarter of a second. No stock footage, no stickers, no filters.
 8. "Export", 1080p. Name the files as above.
 
 ## 3. Check the length (do not skip)
@@ -47,7 +47,7 @@ The rest of this page is the **manual alternative** in Clipchamp, for when you w
 * English speech, or English subtitles if any word is in another language.
 * No music, images or footage that you do not own. The screen clips are our own app on public NASA data.
 * Nobody under 18 in the picture or on the sound, not even in the background.
-* Both of you agree to appear on camera; nobody else is in the frame.
+* The member on camera agrees to appear; nobody else is in the frame.
 * No NASA, JPL, Caltech, IPAC or Space Apps logos, no mission patches, no NASA-style lettering, on screen, on clothes or behind you.
 * No SI-generated voices, faces, images or video. If a tool offers "AI voiceover", "AI avatar" or "background replace", do not use it.
 * Say only what the scripts say about results. Never say that ParallaX found Planet X or measured a parallax.

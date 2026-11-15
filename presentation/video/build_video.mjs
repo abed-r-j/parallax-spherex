@@ -22,7 +22,7 @@ const LT = { x: 96, y: 692, w: 1728, h: 184 } // lower third for the opening and
 const COUNT = 5.5 // teleprompter: five numbers, then a half-second long beep at zero
 
 const OPEN = ['ParallaX: chromatic difference imaging for the SPHEREx sky',
-  'Team ZENITH LABS - Abed El Rahmane Jaafir, Mohamad Alayli',
+  'Team ZENITH LABS - Abed El Rahmane Jaafir',
   'Challenge: Planet X and SPHEREx   |   NASA Space Apps Challenge 2026 - Beirut']
 const CLOSE = ['https://abed-r-j.github.io/parallax-spherex/',
   'Data: SPHEREx Level-2 spectral images, NASA/IPAC IRSA; ESA Gaia DR3; JPL Horizons',

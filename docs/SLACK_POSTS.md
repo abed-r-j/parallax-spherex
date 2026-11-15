@@ -1,7 +1,7 @@
 # Slack posts for the team channel
 
-Eight messages to paste into the team's Slack channel, in this order. Each is under 1200
-characters and can be read on its own. Text between square brackets in capitals is a
+Eight messages to paste into the team's Slack channel, in this order, plus a short team
+update under post 1. Each is under 1200 characters and can be read on its own. Text between square brackets in capitals is a
 placeholder: replace it before posting. Do not post phone numbers, e-mail addresses or
 identity documents in the channel; send those privately to the organizers.
 
@@ -16,13 +16,20 @@ Times are Beirut time. Post 2 is due Saturday 14 November at 14:30 and post 5 on
 ```
 Team ZENITH LABS. Challenge: "Planet X and SPHEREx". Project: ParallaX.
 
-Members:
-- Abed El Rahmane Jaafir, team lead. AI engineer; MEng Software Engineering, currently Master in AI at Saint Joseph University of Beirut. Role: [CONFIRM, for example: problem definition, method, science checks, final decisions].
-- Mohamad Alayli. BSc Computer Science, Lebanese American University; autonomous systems and back-end engineering. Role: [CONFIRM, for example: back end, testing, demo, deployment].
+Member:
+- Abed El Rahmane Jaafir, team lead. AI engineer; MEng Software Engineering, currently Master in AI at Saint Joseph University of Beirut. Role: [CONFIRM, for example: problem definition, method, science checks, demo, final decisions].
+
+Former member: Mohamad Alayli (until 14 November 2026).
 
 Tools: Python, TypeScript and React, public NASA data, and an SI coding assistant (Claude) that we direct and review.
 
 Note on timing: we began preparing on 12-13 November, before the on-site event, after the organizers allowed early preparation.
+```
+
+### Team update (post once, if post 1 went out with two members)
+
+```
+Team update, ZENITH LABS: the team is now one member, Abed El Rahmane Jaafir (team lead). Mohamad Alayli was a member until 14 November 2026 and is credited as a former member. The project, ParallaX, and the challenge, "Planet X and SPHEREx", are unchanged.
 ```
 
 ## 2. Idea description (due Saturday 14:30)

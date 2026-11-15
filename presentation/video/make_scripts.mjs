@@ -14,41 +14,41 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const here = dirname(fileURLToPath(import.meta.url))
-const A = 'Abed'
-const M = 'Mohamad'
+const A = 'Abed' // single speaker: every line is spoken by one member
 const CAM = 'ON CAMERA'
 
 // 30 seconds: [start s, end s, speaker, picture, spoken text]
 const S30 = {
   file: '30s', title: 'ParallaX: project demo video (30 seconds or less)', maxWords: 70, end: 28.5, hard: 30,
   cues: [
-    [0.0, 3.0, A, `${CAM}: both members, side by side. Abed speaks, Mohamad waves.`, 'We are Abed and Mohamad, team ZENITH LABS.'],
-    [3.0, 7.0, M, `${CAM}: both members. Mohamad speaks.`, 'Pluto was found by blinking two photos. We blink SPHEREx.'],
+    [0.0, 3.0, A, `${CAM}: one member (Abed), facing the camera.`, 'I am Abed, team ZENITH LABS.'],
+    [3.0, 7.0, A, `${CAM}: Abed.`, 'Pluto was found by blinking two photos. We blink SPHEREx.'],
     [7.0, 11.5, A, 'SCREEN: shot_01_type_coordinates.mp4 (from 3.0 s: typing the coordinates, landing on the field). Text over the first second: "ParallaX: chromatic difference imaging for the SPHEREx sky".', 'This is ParallaX: it finds fainter changes in the infrared sky.'],
-    [11.5, 15.5, M, 'SCREEN: shot_03_time_wavelength.mp4 (2 s), then shot_04_naive_false_alarms.mp4 (2 s).', 'SPHEREx never repeats a colour, so stars become false alarms.'],
+    [11.5, 15.5, A, 'SCREEN: shot_03_time_wavelength.mp4 (2 s), then shot_04_naive_false_alarms.mp4 (2 s).', 'SPHEREx never repeats a colour, so stars become false alarms.'],
     [15.5, 20.5, A, 'SCREEN: shot_05_three_way.mp4 (from 2.5 s, where the naive panel glows and the template panel does not). Text: "SPHEREx data: NASA/IPAC IRSA".', 'From NASA’s open data, we predict each frame’s own colours, and subtract.'],
-    [20.5, 25.0, M, 'SCREEN: shot_11_live_fetch.mp4 (the progress bar and the picture arriving, sped up 2x), or shot_12_asteroid_europa.mp4.', 'Next: anyone types coordinates and explores the changing sky.'],
-    [25.0, 28.5, A, `${CAM}: both members. One closing line, then hold still for one second.`, 'ParallaX: open source, open data.'],
+    [20.5, 25.0, A, 'SCREEN: shot_11_live_fetch.mp4 (the progress bar and the picture arriving, sped up 2x), or shot_12_asteroid_europa.mp4.', 'Next: anyone types coordinates and explores the changing sky.'],
+    [25.0, 28.5, A, `${CAM}: Abed. One closing line, then hold still for one second.`, 'ParallaX: open source, open data.'],
   ],
 }
-// 2 minutes: [section or '', speaker, picture, spoken text]; times are computed from the word counts
+// 2 minutes: [section or '', speaker, picture, spoken text, optional word count used for the timing]; times are computed from the word counts.
+// The second line keeps its earlier timing weight (15 words) so that no cue time moves: retime_2min.ps1 maps line numbers to the recording.
 const S120 = {
   file: '2min', title: 'ParallaX: two-minute video for the local judges', maxWords: 290, end: 115, hard: 120,
   auto: [
-    ['Introduction', A, `${CAM}: both members.`, 'We are ZENITH LABS. I am Abed El Rahmane Jaafir.'],
-    ['', M, `${CAM}: both members.`, 'And I am Mohamad Alayli. This is ParallaX, for the challenge Planet X and SPHEREx.'],
-    ['Why we chose this approach', M, `${CAM}: Mohamad alone, or keep both.`, 'Pluto was found by blinking two photographs. The challenge asks for a tool to do that with the SPHEREx infrared sky.'],
-    ['', M, 'SCREEN: shot_03_time_wavelength.mp4, then shot_04_naive_false_alarms.mp4.', 'But SPHEREx never photographs a spot in the same colour twice, and its pixels are coarse. Blink two dates, and stars light up as false alarms.'],
-    ['', M, 'SCREEN: shot_06_chromatic.mp4.', 'So we chose to correct the colour first, and only then compare.'],
+    ['Introduction', A, `${CAM}: one member (Abed).`, 'We are ZENITH LABS. I am Abed El Rahmane Jaafir.'],
+    ['', A, `${CAM}: Abed.`, 'This is ParallaX, for the challenge Planet X and SPHEREx.', 15],
+    ['Why we chose this approach', A, `${CAM}: Abed.`, 'Pluto was found by blinking two photographs. The challenge asks for a tool to do that with the SPHEREx infrared sky.'],
+    ['', A, 'SCREEN: shot_03_time_wavelength.mp4, then shot_04_naive_false_alarms.mp4.', 'But SPHEREx never photographs a spot in the same colour twice, and its pixels are coarse. Blink two dates, and stars light up as false alarms.'],
+    ['', A, 'SCREEN: shot_06_chromatic.mp4.', 'So we chose to correct the colour first, and only then compare.'],
     ['Data, software, methods and tools', A, 'SCREEN: shot_01_type_coordinates.mp4. Text over the picture: "Data: SPHEREx (NASA/IPAC IRSA), Gaia DR3, CatWISE2020, JPL Horizons, IMCCE SkyBoT".', 'Our data is open: SPHEREx images from the NASA/IPAC archive, with Gaia, CatWISE, JPL Horizons and SkyBoT.'],
     ['', A, 'SCREEN: shot_11_live_fetch.mp4 (whole fetch, sped up 2x). Text: "Python pipeline + React / TypeScript app, no server".', 'A Python pipeline does the science, and a React and TypeScript app shows it. An index of more than 1.6 million public images lets the browser fetch any position, with no server.'],
-    ['Demonstration', M, 'SCREEN: shot_02_blink_barnard.mp4.', 'Here is Barnard’s Star, blinked pass by pass: you can see it move.'],
-    ['', M, 'SCREEN: shot_05_three_way.mp4 (whole clip).', 'Here is one frame differenced three ways: naive, wavelength-matched, and our chromatic template, which predicts the frame at its own wavelengths from the other passes.'],
-    ['', M, 'SCREEN: shot_07_click_spectrum.mp4, then shot_12_asteroid_europa.mp4.', 'Click any star for its spectrum. And here an asteroid crosses, right under its predicted label.'],
+    ['Demonstration', A, 'SCREEN: shot_02_blink_barnard.mp4.', 'Here is Barnard’s Star, blinked pass by pass: you can see it move.'],
+    ['', A, 'SCREEN: shot_05_three_way.mp4 (whole clip).', 'Here is one frame differenced three ways: naive, wavelength-matched, and our chromatic template, which predicts the frame at its own wavelengths from the other passes.'],
+    ['', A, 'SCREEN: shot_07_click_spectrum.mp4, then shot_12_asteroid_europa.mp4.', 'Click any star for its spectrum. And here an asteroid crosses, right under its predicted label.'],
     ['What makes it distinctive', A, 'SCREEN: shot_09_ledger.mp4. Text: "1.2 to 1.9 times fainter than the gated pair, at a matched false-detection rate (blank sky)".', 'What is distinctive: we publish the measurements. On blank sky, at the same false-alarm rate, the template finds moving sources 1.2 to 1.9 times fainter than a wavelength-matched pair.'],
-    ['Development process, challenges and limitations', M, `${CAM}: Mohamad.`, 'We started on the twelfth and thirteenth of November, before the on-site event, as the organizers allowed. An SI coding assistant helped; we directed and checked its work, and an independent review re-ran the code.'],
+    ['Development process, challenges and limitations', A, `${CAM}: Abed.`, 'We started on the twelfth and thirteenth of November, before the on-site event, as the organizers allowed. An SI coding assistant helped; we directed and checked its work, and an independent review re-ran the code.'],
     ['', A, `${CAM}: Abed. Optional cut-away: shot_08_subtract_passes.mp4.`, 'The hard part was honesty. Bright stars saturate, parallax is not measured, and this is not a Planet Nine detector.'],
-    ['', A, `${CAM}: both members.`, 'ParallaX is open source. Thank you.'],
+    ['', A, `${CAM}: Abed.`, 'ParallaX is open source. Thank you.'],
   ],
 }
 
@@ -62,13 +62,13 @@ const stamp = (s) => {
 /** Give every cue a pause of 0.4 s plus a share of the remaining time in proportion to its words. */
 function retime(S) {
   const pause = 0.4
-  const total = S.auto.reduce((a, c) => a + words(c[3]), 0)
+  const total = S.auto.reduce((a, c) => a + (c[4] ?? words(c[3])), 0)
   const k = (S.end - pause * S.auto.length) / total
   let t = 0
   S.sections = []
-  S.cues = S.auto.map(([section, who, pic, text], i) => {
+  S.cues = S.auto.map(([section, who, pic, text, weight], i) => {
     const a = t
-    t = i === S.auto.length - 1 ? S.end : Math.round((t + pause + words(text) * k) * 2) / 2
+    t = i === S.auto.length - 1 ? S.end : Math.round((t + pause + (weight ?? words(text)) * k) * 2) / 2
     if (section) S.sections.push([section, a])
     return [a, t, who, pic, text]
   })
@@ -95,11 +95,11 @@ for (const S of [S30, S120]) {
   if (total > S.maxWords) throw new Error(`${S.file}: ${total} spoken words, limit ${S.maxWords}`)
   if (last > S.end + 1e-9) throw new Error(`${S.file}: ends at ${last} s, target ${S.end} s`)
   if (Math.max(...rate) > 165) throw new Error(`${S.file}: a line needs ${Math.max(...rate).toFixed(0)} words per minute`)
-  const by = (who) => S.cues.filter((c) => c[2] === who).reduce((a, c) => a + words(c[4]), 0)
   let md = `# ${S.title}\n\n`
   md += `SI disclosure: drafted with the help of an SI coding assistant (Claude, by Anthropic); to be reviewed and spoken by the team. Generated by \`make_scripts.mjs\` together with \`subs_${S.file}.srt\`: edit the cues there and run it again.\n\n`
   md += `* Target length **${clock(S.end)}** (hard limit ${clock(S.hard)}${S.file === '30s' ? ': a longer video makes the project ineligible for Global Judging' : ', as asked by the local organizers'}).\n`
-  md += `* Spoken words: **${total}** (limit ${S.maxWords}); Abed ${by(A)}, Mohamad ${by(M)}. Average ${(total / last * 60).toFixed(0)} words per minute; fastest line ${Math.max(...rate).toFixed(0)}.\n`
+  md += `* Spoken words: **${total}** (limit ${S.maxWords}), all spoken by one member (${A}). Average ${(total / last * 60).toFixed(0)} words per minute; fastest line ${Math.max(...rate).toFixed(0)}.\n`
+  md += `* Speaker: Abed El Rahmane Jaafir (one member on camera). Former member: Mohamad Alayli (until 14 November 2026).\n`
   md += `* Screen clips are in this folder (see \`SHOTLIST.md\`); they are silent. Subtitles: \`subs_${S.file}.srt\`.\n`
   if (S.file === '30s') md += `* Structure suggested by the organizers: 0:00 names and team; 0:02 the challenge and why; 0:05 project name and tagline; 0:10 how it works, with the product on screen and how NASA open data made it possible; 0:20 to 0:30 the future. This script keeps that order; the first three steps start one to two seconds later than suggested so that nobody has to rush.\n`
   else md += `* The five required points, in order: ${S.sections.filter(([n]) => n !== 'Introduction').map(([n, t]) => `${n.toLowerCase()} (${clock(t)})`).join('; ')}.\n`
