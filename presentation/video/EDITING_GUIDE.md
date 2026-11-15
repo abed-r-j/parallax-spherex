@@ -4,6 +4,12 @@ SI disclosure: drafted with the help of an SI coding assistant (Claude, by Anthr
 
 You make two files: `ParallaX_demo_30s.mp4` (at most **30.0 s**, hard limit) and `ParallaX_judges_2min.mp4` (about **1:55**, at most 2:00).
 
+## 0. The simpler route: no editor at all
+
+Follow `RECORD_AND_ASSEMBLE.md`: play `teleprompter_30s.mp4` / `teleprompter_2min.mp4`, film yourselves reading it, then run `assemble.ps1` once per video. It lines your recording up with the ready-made picture track (`base_*.mp4`: the screen clips cut to the script, subtitles, opening and closing text), keeps your faces on screen the whole time, fixes the loudness, cuts at the script's end and checks the length. The files are then called `final_30s.mp4` and `final_2min.mp4`.
+
+The rest of this page is the **manual alternative** in Clipchamp, for when you want to cut by hand (you can also drop `base_*.mp4` into Clipchamp as the picture track and only add your camera clip). The filming advice in section 1 applies to both routes.
+
 ## 1. Film yourselves (Windows Camera app or a phone)
 
 * **Framing**: landscape (16:9), 1080p, 30 fps. Both of you in the picture from the chest up, eyes about one third from the top, camera at eye height on a stable support (a stack of books works). Look at the lens, not at the screen.

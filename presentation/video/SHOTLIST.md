@@ -4,6 +4,13 @@ SI disclosure: the capture scripts and this list were written with the help of a
 
 The clips `shot_*.mp4` are unedited captures of the running app on real data. They are not SI-generated video, so they carry no SI watermark; each file's metadata (title and comment) says it is a scripted capture of the real app.
 
+**Simpler route (recommended):** the clips are already cut to the script in `base_30s.mp4` and `base_2min.mp4` (made by `build_video.mjs`, shot plan below); `RECORD_AND_ASSEMBLE.md` explains how one command adds your own recording. Cutting the clips by hand in Clipchamp (`EDITING_GUIDE.md`) remains the manual alternative.
+
+Shot plan used by `build_video.mjs` (cuts only; speed changes of at most 15%; the camera fills the frame where it says CAMERA, otherwise it sits in a small window, top right):
+
+* 30 s: 0-3 CAMERA with the opening text; 3-7 shot 13 (Pluto, 1.15x); 7-11.5 shot 01 from 3.0 s; 11.5-13.5 shot 03; 13.5-15.5 shot 04; 15.5-20.5 shot 05 from 2.5 s; 20.5-25 shot 11 in three 1.5 s pieces (typing, fetching, stepping; jump cuts instead of the 2x speed-up); 25-28.5 CAMERA with the closing text.
+* 2 min: 0-11 CAMERA (opening text for 6 s); 11-19.5 shot 13 (1.15x); 19.5-25.5 shot 03; 25.5-30 shot 04; 30-35 shot 06; 35-42 shot 01 from 2.0 s; 42-55 shot 11 in five pieces (typing, options, fetching, field filling, stepping); 55-60.5 shot 02; 60.5-71 shot 05 (0.85x, last frame held); 71-73.8 shot 07; 73.8-77.5 shot 12; 77.5-89.5 shot 09 (0.85x, last frame held 1.3 s); 89.5-115 CAMERA (closing text for the last 6 s). Shots 08, 10 and 11b are not used.
+
 All clips are silent, 1920x1080, 30 frames per second, H.264 (`.mp4`), and open in Clipchamp. The only thing drawn on top of the app is the white mouse pointer (headless Chrome shows none). Clips may be trimmed, sped up or slowed down freely in the editor.
 
 | Clip | Length | What it shows | Script line it covers |

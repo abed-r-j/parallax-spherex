@@ -1,0 +1,10 @@
+# The team's own recordings and the assembled videos: the team decides later whether to publish them
+takes/
+final_*.mp4
+final_*_contact.jpg
+# Test outputs and dummy takes (make_placeholders.ps1 and assemble.ps1 recreate them)
+TEST_*.mp4
+TEST_*_contact.jpg
+placeholders/
+# Intermediate text and filter files of build_video.mjs
+_build/
