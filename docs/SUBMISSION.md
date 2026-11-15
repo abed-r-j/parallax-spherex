@@ -75,10 +75,9 @@ private window at the moment you submit):
 https://github.com/abed-r-j/parallax-spherex/blob/main/presentation/ParallaX_ZENITH_LABS.pdf
 ```
 
-* On 15 November at 12:30 Beirut time the first link still answered 404 (the file is ready
-  in `web/public/` and goes live when the site is published again); the backup answered 200.
-  **Open the first link in a private window before pasting it.** Paste whichever opens; you
-  can change it later by resubmitting. A link that answers 404 cannot be judged.
+* The first link answers 200 (verified 15 November 18:40, identical to the repository
+  copy). **Open it in a private window before pasting it.** You can change it later by
+  resubmitting. A link that answers 404 cannot be judged.
 * The limit is strict: more than 7 slides, or a video over 30 seconds, makes the project
   ineligible for Global Judging. The PDF has exactly 7 pages (counted on 15 November).
 * The deck shows what the guide asks of a slide demo: the team name, the members' names and
@@ -86,14 +85,11 @@ https://github.com/abed-r-j/parallax-spherex/blob/main/presentation/ParallaX_ZEN
   (slide 4, "What a user does"); and how NASA and partner-agency data make it possible
   (slide 6, credits on slide 7).
 
-Optional, only if the team records one before the form closes. A video does not replace the
-deck unless you decide so; if you do put a video in this field it must be 30.0 seconds or
-less as shown by the host, with English narration or English subtitles, and nobody under 18
-may appear or be heard:
-
-```
-[OPTIONAL: public link to a 30-second demo video, if one is recorded]
-```
+Decision: field 3 carries the 7-slide deck. A 27.6-second demo video and a 112.9-second
+judging video (required by the Beirut organizers) were recorded on 15 November 2026; one
+adult team member appears and speaks, and there is no music. Both were posted in the team's
+Slack channel on 15 November ([SLACK_POSTS.md](SLACK_POSTS.md), post 7). They are not hosted
+on the project site or in the repository, and they do not go in this field.
 
 ## 4. Link to Final Project
 
@@ -153,8 +149,8 @@ HOW WE TESTED IT, AND WHAT WE FOUND
 We treated the idea as a hypothesis and tested it against two baselines on real data, with known answers as controls.
 - Sensitivity. At an equal false-alarm rate (0.5 per frame) the template finds moving sources 1.2 to 1.9 times fainter than the wavelength-matched pair on blank sky in five fields (Barnard's Star field: 563 microJy against 1003), and 1.1 to 1.6 times fainter next to a star. It is 3 to 15% deeper in quoted noise.
 - The five challenge targets, against catalogues. Barnard's Star: 10.2 +- 0.5 arcsec/yr (Gaia DR3: 10.36). Epsilon Indi B: 4.64 +- 0.09 (catalogue: 4.70). WISE 0855-0714: recovered only in stacks, with a statistic of 6.6 calibrated on random tracks. RW Aurigae and R Draconis: brightness changes measured.
-- Moving objects with a known answer. Asteroid (52) Europa is found in 24 of 24 frames, and its track is recovered with no ephemeris at 28.3 arcsec per hour (JPL Horizons: 28.5). Pluto, the original Planet X, is found in 18 of 18 frames where Horizons predicts it.
-- Review. The work went through an independent adversarial review that re-ran the code; these are the corrected numbers. Anyone can regenerate them with two scripts.
+- Moving objects with a known answer. Asteroid (52) Europa is detected in all 24 frames that contain it; with no ephemeris the classifier flags 21 of them as a mover and recovers the track at 28.3 arcsec per hour (JPL Horizons: 28.5). Pluto, the original Planet X, is found in 18 of 18 frames where Horizons predicts it.
+- Review. A separate adversarial review pass by the SI assistant, independent of the session that wrote the code, re-ran the code; these are the corrected numbers. Anyone can regenerate them with two scripts.
 What did not work, which we also publish: a raw count of false alarms is not a fair comparison, because our low count rests on a measured error map that the pairs do not have, and with a purely statistical noise model our method floods like the others; for a star that shifts one or two pixels a simple blink of per-pass stacks shows the motion better than our template; parallax is not measured reliably; bright targets saturate; R Draconis is not a clean test. Planet X is the motivation, not a claim: a real Planet Nine would be too faint for single SPHEREx frames.
 
 HOW NASA DATA IS USED
@@ -170,7 +166,7 @@ WHAT DO YOU HOPE TO ACHIEVE?
 That people who are not astronomers can see the infrared sky change for themselves, and that the comparison we publish helps others avoid false alarms in SPHEREx data. Next steps: more moving-object fields (asteroids and comets), the chromatic template in live fields, and following each new SPHEREx data release.
 
 WHAT TOOLS, CODING LANGUAGES, HARDWARE, OR SOFTWARE DID YOU USE?
-Languages: Python 3 and TypeScript. Pipeline: NumPy, SciPy, Astropy, HTTPX, FastAPI, Typer, Matplotlib. Web app: React, Vite. Tests: pytest (130 tests) and Vitest (55 tests). Hosting and automation: GitHub Pages and GitHub Actions. Hardware: one laptop. An SI coding assistant (Claude, by Anthropic) was used under the team's direction; see the SI field. Open source, Apache-2.0. Development began on 12-13 November 2026, before the on-site event, after the local organizers allowed early preparation. Not affiliated with or endorsed by NASA.
+Languages: Python 3 and TypeScript. Pipeline: NumPy, SciPy, Astropy, HTTPX, FastAPI, Typer, Matplotlib. Web app: React, Vite. Tests: pytest (130 tests) and Vitest (55 tests). Hosting: GitHub Pages (published from the gh-pages branch by a local script). Tests are run locally; a manual GitHub Actions workflow for them is included but has not been run. Hardware: one laptop. An SI coding assistant (Claude, by Anthropic) was used under the team's direction; see the SI field. Open source, Apache-2.0. Development began on 12-13 November 2026, before the on-site event, after the local organizers allowed early preparation. Not affiliated with or endorsed by NASA.
 ```
 
 **Images to paste in this field** (from `submission/media/`), each right after the paragraph
@@ -204,7 +200,7 @@ than what happened.
 ```
 Yes. We used one SI tool: Claude, a large language model by Anthropic, as a research, coding and writing assistant.
 
-How we used it: the team chose the challenge, the goal and the direction: a comparison of SPHEREx dates that accounts for the changing wavelength. The specific method (a per-pixel chromatic template checked against two baselines) was worked out with the SI assistant, which also surveyed existing tools, gathered and checked background research (the challenge text, the rules, the archive interfaces, the literature), wrote the code and its tests, and drafted the documents under the team's direction. The team reviewed the work, ran it and is responsible for it.
+How we used it: the team chose the challenge, the goal and the direction: a comparison of SPHEREx dates that accounts for the changing wavelength. The specific method (a per-pixel chromatic template checked against two baselines) was worked out with the SI assistant, which also surveyed existing tools, gathered and checked background research (the challenge text, the rules, the archive interfaces, the literature), wrote the code and its tests, and drafted the documents under the team's direction. Separate sessions of the same assistant, independent of the session that wrote the code, re-ran the code as an adversarial review; this was not a human or third-party review. The team reviewed the work, ran it and is responsible for it.
 
 What SI was not used for: no SI-generated images, video, audio, voices or faces appear anywhere in the project. Every figure is a plot made by our code from real SPHEREx data, or a screenshot of the running app. All results are computed by the project's own code from real SPHEREx data; the tool itself contains no machine-learning or language model.
 
@@ -254,7 +250,7 @@ SOFTWARE (all open source; none copied into our code, all installed as dependenc
 - Web: React and React DOM (MIT), Vite (MIT), TypeScript (Apache-2.0), Vitest (MIT), ESLint and typescript-eslint (MIT), Playwright core (Apache-2.0, drives Chrome for screenshots).
 - Slides and page images: PptxGenJS (MIT) to build the deck; Microsoft PowerPoint to export it to PDF; pypdf (BSD-3-Clause) and python-pptx (MIT) to write the document properties; FFmpeg (LGPL/GPL, used as a command-line tool, not redistributed) to encode the two animated GIFs from our own screen captures.
 - Fonts: IBM Plex Sans and IBM Plex Mono (SIL Open Font License 1.1), bundled with the web app through the @fontsource packages. The PDF and PowerPoint deliverables (slides, report, paper) use system fonts that ship with Windows and Office (Segoe UI, Consolas, Times New Roman, Cambria Math); these are not redistributed in the repository beyond being embedded in those files.
-- Hosting and automation: GitHub Pages and GitHub Actions.
+- Hosting: GitHub Pages, published from the gh-pages branch by a local script. Tests are run locally; a manual GitHub Actions test workflow is included in the repository but has not been run.
 - SI tool: Claude, by Anthropic (see the Use of SI field).
 - Full list with versions and licences: THIRD_PARTY_LICENSES.md in the repository, https://github.com/abed-r-j/parallax-spherex/blob/main/THIRD_PARTY_LICENSES.md
 
@@ -315,7 +311,7 @@ Awards Guide.
 |---|---|
 | **Impact**: the problem addressed; how many it helps or inspires | Field 2 "Why it is important"; field 5 "What benefits does it have?" |
 | **Creativity**: a novel concept or a meaningful improvement on existing ideas | Field 5 "What is new" (correct along the wavelength axis instead of rejecting frames; a published three-way comparison) |
-| **Validity**: scientifically sound, feasible, complete, usable and user-friendly | Field 5 "How we tested it" (baselines, known answers, injected sources, independent review, published failures); the four user steps; the live link in field 4 works now |
+| **Validity**: scientifically sound, feasible, complete, usable and user-friendly | Field 5 "How we tested it" (baselines, known answers, injected sources, a separate SI review pass, published failures); the four user steps; the live link in field 4 works now |
 | **Relevance**: addresses the challenge directly; NASA data is a core component, not a superficial addition | Field 2 "How it addresses the challenge"; field 5 "How NASA data is used"; field 7 |
 | **Presentation**: the challenge, the solution and its significance told clearly; "judges evaluate the demo and full project" | The 7-slide deck (field 3), the sub-headed text, the pasted images |
 

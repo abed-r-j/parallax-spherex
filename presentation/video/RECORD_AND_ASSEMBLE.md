@@ -8,9 +8,9 @@ The exact words are in `SCRIPT_30s.md` and `SCRIPT_2min.md`. Do the 30-second vi
 2. **Start recording yourself** with the Windows Camera app (video mode) or a phone propped at eye level next to the laptop. One member (Abed) in the frame, landscape if possible, a quiet room, the light in front of you (never a window behind you).
 3. **Press play.** You hear five short beeps (5, 4, 3, 2, 1) and one long beep at zero. Start speaking as the long beep ends and follow the big line; the name beside it says who speaks, the bar shows how much of the line's time is used, the small line is what comes next. After the last line hold still for one second.
 4. **Stop the recording** and copy the file to `presentation\video\takes\` as `take_30s.mp4` (and `take_2min.mp4` for the long one). A `.mov` from a phone also works: give its name with `-Take`.
-5. **Run the two commands** in PowerShell (Start menu, type "PowerShell"):
+5. **Run the two commands** in PowerShell (Start menu, type "PowerShell"), starting in the folder of the repository:
 
-       cd "C:\Users\abedr\Downloads\Nasa Space Apps Beirut\parallax-spherex\presentation\video"
+       cd presentation\video
        powershell -ExecutionPolicy Bypass -File assemble.ps1 -Video 30s  -Take takes\take_30s.mp4
        powershell -ExecutionPolicy Bypass -File assemble.ps1 -Video 2min -Take takes\take_2min.mp4
 

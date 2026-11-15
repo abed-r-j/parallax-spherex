@@ -27,7 +27,7 @@ Run these before opening a pull request. They need no network.
 
 ```bash
 cd pipeline
-uv run pytest -q                        # 120 passed, 2 skipped
+uv run pytest -q                        # 130 passed, 2 skipped
 uv run ruff check src scripts tests
 
 cd ../web

@@ -116,7 +116,7 @@ $graph = Join-Path $tmp 'graph.txt'
 
 Write-Host "Composing $Out ($Layout layout) ..."
 & ffmpeg -hide_banner -loglevel error -y -i $base -i $Take -/filter_complex $graph -map '[vout]' -map '[aout]' `
-  -c:v libx264 -profile:v high -preset medium -crf 20 -pix_fmt yuv420p -r 30 -c:a aac -b:a 160k -t (N $end) -movflags +faststart $Out
+  -c:v libx264 -profile:v high -preset medium -crf 20 -pix_fmt yuv420p -r 30 -c:a aac -b:a 160k -t (N $end) -movflags +faststart -map_metadata -1 -metadata "title=ParallaX - $Video video (team ZENITH LABS)" $Out
 if ($LASTEXITCODE -ne 0) { Fail 'ffmpeg could not compose the video' }
 
 # ---- 3. check ----

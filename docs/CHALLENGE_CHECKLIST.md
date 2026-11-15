@@ -65,8 +65,10 @@ State of the audit: 14 November 2026 for sections A to C; the two official guide
 
 ## What is honestly not met or only partly met
 
-* **No video is recorded.** The official Project Demo is the 7-slide deck, which the guide
-  accepts in place of a 30-second video.
+* The official Project Demo in the form is the 7-slide deck. A 27.6-second demo video and a
+  112.9-second judging video (required by the Beirut organizers) were also recorded on 15
+  November 2026; one adult team member appears and speaks in them, with no music. They were
+  posted in the team's Slack channel and are not hosted on the site or in the repository.
 * **B11**: Aladin is not used.
 * **Depth of the "moving object" demonstration**: the three test stars move 1 to 2 pixels.
   The tool shows it best with per-pass stacks and Subtract, not with the chromatic template.
@@ -91,7 +93,7 @@ Beirut time with `curl.exe`, without any login or cookie, following redirects.
 |---|---|
 | `https://abed-r-j.github.io/parallax-spherex/` | 200 |
 | `https://abed-r-j.github.io/parallax-spherex/?field=barnard` | 200 |
-| `https://abed-r-j.github.io/parallax-spherex/ParallaX_ZENITH_LABS.pdf` | **404 at that time** (the copy was still being added to the site; re-check before pasting) |
+| `https://abed-r-j.github.io/parallax-spherex/ParallaX_ZENITH_LABS.pdf` | 404 at that time; **200, verified 15 November 18:40, identical to the repository copy** |
 | `https://github.com/abed-r-j/parallax-spherex` | 200 |
 | `https://github.com/abed-r-j/parallax-spherex/blob/main/presentation/ParallaX_ZENITH_LABS.pdf` | 200 (raw file: 200, a PDF of 788 kB, the deck as pushed on 14 November) |
 | `https://github.com/abed-r-j/parallax-spherex/blob/main/docs/ParallaX_Project_Report.pdf` | 200 |
@@ -100,7 +102,7 @@ Beirut time with `curl.exe`, without any login or cookie, following redirects.
 | `https://irsa.ipac.caltech.edu/Missions/spherex.html`, `https://caltech-ipac.github.io/irsa-tutorials/spherex/`, `https://ssd.jpl.nasa.gov/` | 200 each |
 
 The deck was rebuilt on 15 November (slides 4 and 6 changed, see S24 and S25). The copies on
-GitHub and on the site show the new slides only after the next push and site publish.
+GitHub and on the site are the rebuilt deck (verified 15 November 18:40).
 
 ### Eligibility for Global Judging (Judging & Awards Guide, pages 3 and 4)
 
@@ -113,7 +115,7 @@ GitHub and on the site show the new slides only after the next push and site pub
 | J5 | English on the project page and in linked materials | Met | Form text, deck, site, README and report are in English |
 | J6 | Submit on the Project tab ("edit", then "submit") before Sunday 15 November, 23:59 local time of the Local Event | Team action | Beirut time. Plan in [SUBMISSION_DAY.md](SUBMISSION_DAY.md): first submission by 18:00 |
 | J7 | Tick the box "I have read and understand the project submission requirements ... and I agree to the Participant Terms and Conditions and Privacy Policy" | Team action | The member reads the guide and the terms before ticking |
-| J8 | Tick the box confirming original work, that all external resources (code, text, images, even open source) are listed in the References field, and that no copyrighted material is used without permission | Team action | Field 8 of [SUBMISSION.md](SUBMISSION.md) and `THIRD_PARTY_LICENSES.md` hold the list; all images are our own screenshots and plots; no music or footage is used. One addition made today: the deck-building library (PptxGenJS, MIT) is now named in field 8; it should also be added to `THIRD_PARTY_LICENSES.md` |
+| J8 | Tick the box confirming original work, that all external resources (code, text, images, even open source) are listed in the References field, and that no copyrighted material is used without permission | Team action | Field 8 of [SUBMISSION.md](SUBMISSION.md) and `THIRD_PARTY_LICENSES.md` hold the list; all images are our own screenshots and plots; no music or third-party footage is used. One addition made today: the deck-building library (PptxGenJS, MIT) is now named in field 8; it should also be added to `THIRD_PARTY_LICENSES.md` |
 | J9 | Review for prohibited bilateral activity with China or a Chinese-owned entity, decided by NASA "based on information provided by the applicant" | Team action | Nothing to change in the project. The member answers any affiliation question on the site truthfully; the data used come from NASA/IPAC, NASA/JPL, ESA and IMCCE (France) |
 | J10 | Everyone who submits a project by the deadline receives a certificate of participation | Team action | After submitting: see S35 |
 
@@ -142,12 +144,12 @@ addresses the wording; the score is the judges'.
 | S3 | Click "Edit"; click "Save Progress" often; changes are visible only to the team until the project is submitted | Team action | Same |
 | S4 | Toggle the edit "Lock" to ON while editing; another member can still remove it and overwrite unsaved changes | Team action | The team has one member, who edits in a single window |
 | S5 | The page accepts images (JPG, PNG, GIF up to 10 MB) by upload or paste; it does not accept videos or documents | Met | Eight images are prepared in `submission/media/` (6 PNG and 2 GIF; the largest is 3.24 MB; each was opened and looked at). [SUBMISSION.md](SUBMISSION.md) says which goes under which field |
-| S6 | Videos and documents go on a cloud service or repository with "a publicly accessible link with no logins, permissions, or registrations required" | Met, with one open point | See the table of answers above. The deck copy on the site answered 404 at check time; the GitHub copy answered 200 |
+| S6 | Videos and documents go on a cloud service or repository with "a publicly accessible link with no logins, permissions, or registrations required" | Met | See the table of answers above. The deck copy on the site answers 200 (verified 15 November 18:40, identical to the repository copy); the GitHub copy answers 200 |
 | S7 | Before submitting: set files to public and test each link in a private browser | Team action | Do it for the three links of fields 3 and 4 |
 | S8 | Recommended, not required, for a new website: request a FortiGuard Web Filter Classification (pick a category; company name "N/A") | Team action (optional) | Suggested category "Education" or "Reference"; the guide's link points to `https://www.fortiguard.com/faq/wfratingsubmit`; see [SUBMISSION_DAY.md](SUBMISSION_DAY.md) |
 | S9 | Field "Project Name": "What is the name of your project?" | Met | Field 1 |
 | S10 | Field "High-Level Project Summary": "What did you develop? How does it address the challenge? Why is it important?" | Met | Field 2, one heading per question |
-| S11 | Field "Link to Project Demo": a 7-slide presentation or a video of 30 seconds or less, on an external host, public, no password, permission or registration | Met, with the open point of S6 | Field 3 |
+| S11 | Field "Link to Project Demo": a 7-slide presentation or a video of 30 seconds or less, on an external host, public, no password, permission or registration | Met | Field 3 |
 | S12 | The demo counts, "but the majority of judges' evaluation will be based on your project submission" | Met | The long, sub-headed versions of fields 2 and 5 are the ones to paste |
 | S13 | Field "Link to Final Project": a public link to the final project | Met | Field 4: the live site (200), with the repository (200) |
 | S14 | Field "Detailed Project Description": what it does, how it works, benefits, what you hope to achieve, tools, languages, hardware, software | Met | Field 5, one heading per question |
@@ -155,7 +157,7 @@ addresses the wording; the score is the judges'.
 | S16 | Field "NASA Data": specific details; "To be eligible for a Global Award, you must use at least one NASA data or resource" | Met | Field 7: SPHEREx Level-2 images from NASA/IPAC IRSA (the core), IRSA services, CatWISE2020, JPL Horizons |
 | S17 | Field "Space Agency Partner Data and Other References": all data, resources and tools, including code, text and images; partner data is "highly encouraged" | Met | Field 8. ESA, a 2026 Space Agency Partner, through Gaia DR3 |
 | S18 | Every team must create a Project Demo | Met | The 7-slide deck |
-| S19 | The demo is hosted on an external site with a public link | Met, with the open point of S6 | GitHub (200) and the project site |
+| S19 | The demo is hosted on an external site with a public link | Met | GitHub (200) and the project site (200) |
 | S20 | English on the page and in linked materials; "Slide decks must be in English" | Met | Looked at all seven slide images today |
 | S21 | "The slide deck should be no more than seven slides (including the title and intro slides)" | Met | 7 |
 | S22 | "Readable font size" and few words per slide "when possible" | Met, with a note | Body text is 14 to 19 point on a 13.3-inch-wide slide and headings are 34; side notes are 13, and only the credits on slide 7 are smaller (10 point). Slides 5 and 6 are dense: say them slowly |
@@ -167,13 +169,13 @@ addresses the wording; the score is the judges'.
 | S28 | All members are confirmed participants at the same Local Event; a waitlisted member must ask the Local Lead for acceptance | Team action | Same as J2 |
 | S29 | All required fields completed; all content in English | Team action | Same as J3, J5 |
 | S30 | "Submit for Judging" must be clicked before the deadline; anything saved or submitted after it is not eligible | Team action | Do not save anything after 23:59 |
-| S31 | Demos and final projects "may not include any images, video, audio, or other likeness to persons under 18 years old" | Met | No person appears in the deck (all seven slides viewed), in the eight prepared images (viewed) or on the site; there is no audio or video |
+| S31 | Demos and final projects "may not include any images, video, audio, or other likeness to persons under 18 years old" | Met | No person appears in the deck (all seven slides viewed), in the eight prepared images (viewed) or on the site. The two recorded videos show one adult team member; nobody under 18 is the subject of either |
 | S32 | Tick "Terms and Conditions", tick "Confirm All Work is Original", then "Submit for Judging"; a banner and a confirmation message appear | Team action | Take a screenshot of the banner |
 | S33 | The project may be edited and resubmitted until the end; "Only your last saved submission will be reviewed" | Team action | Submit early, resubmit after any correction, and check the page once more at the end |
 | S34 | A participant certificate becomes available on the user Profile once the project is submitted | Team action | The member: see S35 |
 | S35 | To get it: profile icon, "Profile", "Participant Information", "2026 NASA Space Apps Challenge", yellow "Download Participant Certificate" button; paper size Letter; PDF only; use a laptop; the name printed is the "Full Name" of the profile, which can be changed at any time | Team action | Check the spelling of the Full Name before downloading. For download problems the guide gives a support address on its page 15 |
 
-Count: 53 rows. Met: 30 (three of them with the open point of the site copy of the deck).
+Count: 53 rows. Met: 30.
 Team action: 21 (one optional). Not applicable: 2.
 
 Not affiliated with or endorsed by NASA.

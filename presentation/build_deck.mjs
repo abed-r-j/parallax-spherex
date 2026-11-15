@@ -258,8 +258,8 @@ const body = (extra = {}) => ({ fontFace: SANS, fontSize: 18, color: C.ink, marg
       'Licence: Apache-2.0',
     ]],
     ['HOW IT WAS BUILT', C.accent, [
-      'Research, pipeline, three-way comparison, then web app and live mode',
-      'An independent adversarial review re-ran the code; the numbers shown are the corrected ones',
+      'Research, pipeline, three-way comparison, web app, live mode',
+      'Review: a separate pass by the SI assistant, independent of the session that wrote the code, re-ran it; numbers shown are corrected',
       'Development began on 12–13 November 2026, before the on-site event; the local organizers allowed early preparation',
     ]],
   ]

@@ -106,12 +106,12 @@ project's own code.
 | @vitejs/plugin-react | 6.3.0 | MIT | build |
 | typescript | 6.0.3 | Apache-2.0 | type checking |
 | vitest | 5.1.0 | MIT | tests |
-| eslint | 10.14.0 | MIT | lint |
+| eslint | 10.15.0 | MIT | lint |
 | @eslint/js | 10.0.1 | MIT | lint |
 | typescript-eslint | 8.72.2 | MIT | lint |
 | eslint-plugin-react-hooks | 7.1.1 | MIT | lint |
 | globals | 17.14.0 | MIT | lint |
-| playwright-core | 1.65.0 | Apache-2.0 | drives an installed Chrome for screenshots and checks |
+| playwright-core | 1.65.0 in `web/`, 1.65.1 in `presentation/` | Apache-2.0 | drives an installed Chrome for screenshots and checks |
 | pptxgenjs | 4.0.1 | MIT | builds the slide deck (`presentation/build_deck.mjs`) |
 | python-pptx | 1.0.2 | MIT | stamps document properties into the slide deck (`submission/set_metadata.py`) |
 | pypdf | 7.1.0 | BSD-3-Clause | stamps document properties into the PDFs (`submission/set_metadata.py`) |
@@ -120,17 +120,18 @@ project's own code.
 | @types/react | 19.3.0 | MIT | types |
 | @types/react-dom | 19.3.0 | MIT | types |
 
-`web/node_modules` holds 174 packages in all once the transitive build dependencies are
-counted. Their declared licences are: MIT (135), Apache-2.0 (16), ISC (9), BSD-2-Clause (6),
+`web/node_modules` holds 179 packages in all once the transitive build dependencies are
+counted. Their declared licences are: MIT (137), Apache-2.0 (17), ISC (10), BSD-2-Clause (6),
 BSD-3-Clause (2), MPL-2.0 (2: lightningcss and its Windows binary), OFL-1.1 (2: the fonts
-above), BlueOak-1.0.0 (1: minimatch) and CC-BY-4.0 (1: caniuse-lite, browser-support data by
-caniuse.com). None of these transitive packages is shipped in the site. The exact list is
+above), BlueOak-1.0.0 (2: minimatch 11.0.8, set by an override in `web/package.json`, and its
+dependency @isaacs/nonrecursive-glob-match) and CC-BY-4.0 (1: caniuse-lite, browser-support
+data by caniuse.com). None of these transitive packages is shipped in the site. The exact list is
 reproducible from `web/package-lock.json`.
 
 ### Continuous integration (`.github/workflows/ci.yml`)
 
-GitHub Actions `actions/checkout`, `actions/setup-node`, `actions/upload-pages-artifact`,
-`actions/deploy-pages` (MIT) and `astral-sh/setup-uv` (MIT).
+GitHub Actions `actions/checkout`, `actions/setup-node` (MIT) and `astral-sh/setup-uv` (MIT).
+The workflow is started by hand and has not been run; tests are run locally.
 
 ## 3. Fonts
 

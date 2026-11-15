@@ -215,7 +215,7 @@ pipeline.*
 **Engineering.** The sky index has zero misses against the live archive at six test
 positions. In-browser live mode fetched 55 images of the galaxy M51 in 10 to 12 seconds on a
 fast connection (one to two minutes on a slow one). Browser and pipeline agree on the same
-images to 2e-4 in pixel value.
+images to 2e-4 (relative) in pixel value.
 
 ## 6. What makes it distinctive
 
@@ -257,7 +257,8 @@ open code under Apache-2.0, open data, and a method others can reuse.
 interfaces, the literature and existing tools, with every claim marked verified or not. We
 then built in small parts with a fixed data format between pipeline and website, tested each
 part offline, and ran everything on real data before writing any claim. The work then went
-through an independent adversarial review that re-ran the code. It found, among other
+through a separate adversarial review pass by the SI assistant, independent of the session
+that wrote the code, which re-ran the code. It found, among other
 things, that our "plain noise" comparison did not give the three methods the same noise
 model, and that the classifier called only 2 of the asteroid's 24 detections a mover without
 the ephemeris. Both were fixed; the numbers in this report are the corrected ones.
@@ -315,7 +316,7 @@ the ephemeris. Both were fixed; the numbers in this report are the corrected one
 
 ## 10. Roadmap
 
-1. Publish the site and the repository; add more fields to the ledger.
+1. Add more fields to the ledger (the site and the repository are already public).
 2. Model the sub-pixel position of each exposure in the template (the largest remaining
    noise term).
 3. Co-moving fields, to follow a fast object across the sky and stack along its track.

@@ -17,7 +17,7 @@ Times are Beirut time. Post 2 is due Saturday 14 November at 14:30 and post 5 on
 Team ZENITH LABS. Challenge: "Planet X and SPHEREx". Project: ParallaX.
 
 Member:
-- Abed El Rahmane Jaafir, team lead. AI engineer; MEng Software Engineering, currently Master in AI at Saint Joseph University of Beirut. Role: [CONFIRM, for example: problem definition, method, science checks, demo, final decisions].
+- Abed El Rahmane Jaafir, team lead. AI engineer; MEng Software Engineering, currently Master in AI at Saint Joseph University of Beirut. Role: team lead; science, software, documents and demo.
 
 Former member: Mohamad Alayli (until 14 November 2026).
 
@@ -109,8 +109,8 @@ Targets:
 
 Caveats we publish:
 - A raw count of false alarms is not a fair comparison: ours is low thanks to a measured error map the pairs lack. With plain noise all three flood.
-- Matched pairs lose only 1 to 4% of pictures. Our gain is sensitivity, not rescued pictures.
-- An independent review re-ran the code; these are the corrected numbers.
+- Matched pairs lose only 1 to 4% of pictures (21% in R Draconis). Our gain is sensitivity, not rescued pictures.
+- A separate SI session re-ran the code; these are the corrected numbers.
 - For a star that moves one or two pixels, a simple blink of per-pass stacks shows the motion better than our method.
 - Parallax is not measured reliably. Bright stars saturate. R Draconis is not a clean test.
 - We do not claim Planet X.
@@ -147,7 +147,9 @@ Numbers have not changed since the validation post unless stated here: [NONE / W
 
 If the first slides link does not open in a private window, post the backup instead:
 `https://github.com/abed-r-j/parallax-spherex/blob/main/presentation/ParallaX_ZENITH_LABS.pdf`.
-If the team records a video, add one line with its public link.
+The 30-second demo video (27.6 s) and the 2-minute judging video (112.9 s) were recorded on
+15 November and are posted in the channel; they are not hosted on the site or in
+the repository.
 
 ```
 ParallaX: demo and final links. Project form submitted.
@@ -156,6 +158,7 @@ ParallaX: demo and final links. Project form submitted.
 - Live tool: https://abed-r-j.github.io/parallax-spherex/
 - Source code: https://github.com/abed-r-j/parallax-spherex
 - Report: https://github.com/abed-r-j/parallax-spherex/blob/main/docs/ParallaX_Project_Report.pdf
+- Videos: the 30-second demo video and the 2-minute judging video are posted in this channel.
 
 All links open without sign-in. What a user does: type coordinates or pick a field, watch the little video, click a star for its spectrum, switch to the difference views. Try these:
 - Barnard's Star: https://abed-r-j.github.io/parallax-spherex/?field=barnard

@@ -95,9 +95,9 @@ URL parameters (from `web/src/lib/urlstate.ts`):
 2. **It publishes a reproducible false-alarm ledger.** Naive pair, wavelength-gated pair and
    chromatic template are run on the same real frames, with artificial sources injected and
    searched for again, and compared at a matched false-alarm rate. The limits we measured are
-   published next to the results ([docs/RESULTS.md](docs/RESULTS.md), section 2.2). The work
-   went through an independent adversarial review that re-ran the code; the published numbers
-   are the corrected ones.
+   published next to the results ([docs/RESULTS.md](docs/RESULTS.md), section 2.2). A separate
+   adversarial review pass by the SI assistant, independent of the session that wrote the
+   code, re-ran the code; the published numbers are the corrected ones.
 3. **Any coordinates, in the browser, with no server.** A 45.6 MB index of all 1,628,230
    public SPHEREx Level-2 images ships with the site. The page looks up which images cover
    your position and reads only the pixels it needs from the public archive bucket: 55 images
@@ -209,7 +209,7 @@ with the SPHEREx spacecraft as the observer, predicts it: on average the measure
 differs from the prediction by 0.05 +- 0.04 pixel for Europa and 0.03 +- 0.10 pixel for Pluto.
 Without the ephemeris, the classifier itself calls 21 of Europa's 24 detections a mover and
 the linker recovers its track blind (28.3 arcsec per hour at position angle 89.2 deg; the
-ephemeris says 28.5 at 89.1). Before a fix made after the independent review it called only
+ephemeris says 28.5 at 89.1). Before a fix made during our own review it called only
 2 of 24 a mover. Pluto moves too slowly (0.7 arcsec per hour) for a blind track: the
 classifier calls 8 of its 18 detections a mover and 8 a variable, and only the ephemeris
 names it.
@@ -220,7 +220,8 @@ names it.
 
 Requirements: Python 3.11 or newer with [uv](https://docs.astral.sh/uv/), and Node.js 22 or
 newer with npm. Commands are written for a POSIX shell; on Windows PowerShell they are the
-same with `\` in paths.
+same with `\` in paths. Lines chained with `&&` need PowerShell 7; in Windows PowerShell 5.1
+run the parts one per line.
 
 ### (a) Just look at it
 
@@ -235,7 +236,8 @@ uv run parallax serve         # open http://127.0.0.1:8000  (Ctrl+C to stop)
 ```
 
 `parallax serve` serves the web app and the published data packs and also acts as the live
-engine. If you only want the static site, any static server will do:
+engine. If you only want the static site, any static server will do (run this from the repository
+root, not from `pipeline/`):
 
 ```bash
 python -m http.server 8000 --directory web/dist

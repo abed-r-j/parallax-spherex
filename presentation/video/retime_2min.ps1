@@ -51,7 +51,9 @@ $g += "[1:a]adelay=$([int]($Lead * 1000)):all=1,highpass=f=80,afftdn=nr=6,loudno
 $graph = Join-Path $env:TEMP "parallax_retime_$PID.txt"
 [IO.File]::WriteAllText($graph, ($g -join ";`n"), (New-Object Text.UTF8Encoding($false)))
 & ffmpeg -hide_banner -loglevel error -y -i base_2min.mp4 -i $Take -/filter_complex $graph -map '[vout]' -map '[aout]' `
-  -c:v libx264 -profile:v high -preset medium -crf 21 -pix_fmt yuv420p -r 30 -c:a aac -b:a 160k -t (N $end) -movflags +faststart $Out
+  -c:v libx264 -profile:v high -preset medium -crf 21 -pix_fmt yuv420p -r 30 -c:a aac -b:a 160k -t (N $end) -movflags +faststart `
+  -map_metadata -1 -metadata "title=ParallaX - 2-minute video (team ZENITH LABS)" `
+  -metadata "comment=SPHEREx data: NASA/IPAC IRSA. Not affiliated with or endorsed by NASA. Made with the help of an SI coding assistant (Claude, Anthropic)." $Out
 $code = $LASTEXITCODE
 Remove-Item $graph -ErrorAction SilentlyContinue
 if ($code -ne 0) { Write-Host 'FAILED: ffmpeg could not compose the video' -ForegroundColor Red; exit 1 }

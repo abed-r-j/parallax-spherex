@@ -21,8 +21,7 @@ judged.
 - [ ] Open in a **private window**, signed out, and confirm each one loads:
   - `https://abed-r-j.github.io/parallax-spherex/` (the tool)
   - `https://abed-r-j.github.io/parallax-spherex/ParallaX_ZENITH_LABS.pdf` (the 7 slides).
-    At 12:30 on 15 November this one still answered 404: it goes live only when the site is
-    published again. Until it opens, the demo link to use is the GitHub copy,
+    200, verified 15 November 18:40, identical to the repository copy. Backup, the GitHub copy:
     `https://github.com/abed-r-j/parallax-spherex/blob/main/presentation/ParallaX_ZENITH_LABS.pdf`
   - `https://github.com/abed-r-j/parallax-spherex` (the code)
 - [ ] On the laptop that will present, have open: the deck
@@ -92,12 +91,15 @@ after 23:59.
   images, even open source or free) is listed in the References field**; and no copyrighted
   material is used without permission.
   Our list of resources is field 8 of SUBMISSION.md and `THIRD_PARTY_LICENSES.md` in the
-  repository. Every image is our own screenshot or plot. There is no music and no footage.
+  repository. Every image is our own screenshot or plot. There is no music. The only
+  footage is the team member's own camera recording and scripted screen captures of our app.
 * The SI field (field 6) must match what really happened. The guide says SI may speed up the
   work but must not come up with the idea; our statement says who did what. The answer is
   not shown to the judges, but the "SI disclosure" lines in the code, the app's About page
   and the slides are.
-* Nobody under 18 may appear or be heard in the demo or the project. Nobody appears at all.
+* Nobody under 18 may appear or be heard in the demo or the project. The only
+  person presented is the one adult team member, in the two recorded videos; no one appears
+  in the deck, the images or the site.
 * China-affiliation review: NASA reviews every team for prohibited bilateral activity with
   China or a Chinese-owned entity, from the information the applicants gave. Nothing to do
   in the project; answer any question on the site truthfully.

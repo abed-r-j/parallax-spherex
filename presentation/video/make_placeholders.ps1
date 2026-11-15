@@ -1,6 +1,7 @@
 # Makes clearly labelled PLACEHOLDER takes for testing assemble.ps1. They are not recordings of anyone:
 # a plain colour card, 2.5 s of silence, then tone bursts standing in for speech.
 #   powershell -ExecutionPolicy Bypass -File make_placeholders.ps1
+# SI disclosure: written with the help of an SI coding assistant (Claude, by Anthropic).
 $ErrorActionPreference = 'Stop'
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $dir = Join-Path $here 'placeholders'

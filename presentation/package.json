@@ -1,1 +1,14 @@
-{"name":"parallax-presentation","private":true,"type":"module","license":"Apache-2.0","description":"Build scripts for the ParallaX slide deck and screen footage. Written with the help of an SI coding assistant (Claude, Anthropic), directed and checked by the team.","dependencies":{"playwright-core":"^1.65.1","pptxgenjs":"^4.0.1"}}
+{
+  "name": "parallax-presentation",
+  "private": true,
+  "type": "module",
+  "license": "Apache-2.0",
+  "description": "Build scripts for the ParallaX slide deck and screen footage. Written with the help of an SI coding assistant (Claude, Anthropic), directed and checked by the team.",
+  "dependencies": {
+    "playwright-core": "^1.65.1",
+    "pptxgenjs": "^4.0.1"
+  },
+  "overrides": {
+    "image-size": "^2.1.0"
+  }
+}

@@ -1,6 +1,6 @@
 # Likely questions from judges, with honest answers
 
-Thirty-five questions (12b and 15b were added after the independent review; 22b, 25b and 31
+Thirty-five questions (12b and 15b were added after the separate SI review pass; 22b, 25b and 31
 after reading the two official guides on 15 November) grouped by the five judging criteria
 (Impact, Creativity, Validity, Relevance, Presentation). Each answer is short, says what is
 true, and is backed by a number from [RESULTS.md](RESULTS.md) or the build reports. Where
@@ -108,15 +108,15 @@ artificial sources are added to real frames and searched for again. (3) A physic
 "mover" that is absent in the exposure of the same detector two minutes later is a cosmic
 ray; this removed 14 of 17 single-frame movers in the first 202 Barnard frames. (4) Labels
 from SkyBoT and JPL Horizons for known objects. And we count false detections rather than
-assume there are none: 0.99 per frame in Barnard's field for our method. Finally, the work
-went through an independent adversarial review that re-ran the code; the published numbers
-are the corrected ones.
+assume there are none: 0.99 per frame in Barnard's field for our method. Finally, a separate
+adversarial review pass by the SI assistant, independent of the session that wrote the
+code, re-ran the code; the published numbers are the corrected ones.
 
 **12b. Did the classifier find the asteroid by itself?**
 Now yes; at first, no. Asteroid (52) Europa is detected in all 24 frames that contain it
 (S/N 111 to 236). Without the ephemeris, the classifier calls 21 of the 24 a mover and the
 linker recovers the track blind: 28.3 arcsec per hour at position angle 89.2 degrees, against
-28.5 at 89.1 from JPL Horizons. Before a fix made after the independent review it called
+28.5 at 89.1 from JPL Horizons. Before a fix made during our own review (the SI review pass) it called
 only 2 of 24 a mover (so bright a source covered more pixels than a fixed limit allowed), and
 our earlier "24 of 24" rested on the ephemeris label. Pluto is detected in 18 of 18 frames
 (S/N 14 to 57) but moves 0.7 arcsec per hour, below the linker's minimum of 1: blind, the
@@ -155,7 +155,7 @@ do not have, so the false-alarm columns are not like for like. Under every calib
 tried it still gives fewer false detections than the gated pair in Barnard's and RW
 Aurigae's fields; in Epsilon Indi and WISE 0855 the answer depends on the noise model; in
 R Draconis it has slightly more. An earlier version of our table showed the template's
-map-based numbers in the "plain" column; the independent review caught it and we corrected
+map-based numbers in the "plain" column; the separate SI review pass caught it and we corrected
 it. The claim we stand on is the matched-rate sensitivity. The false-alarm tail itself is
 not Gaussian: artefacts of saturated stars and unflagged transients dominate it, which is
 why the matched-rate thresholds are 8 to 12 sigma.
@@ -264,7 +264,8 @@ works on live fields.
 We chose the challenge, the goal and the direction, directed the work, decided what to keep,
 ran everything and reviewed it. The specific method was worked out with an SI assistant
 (Claude, by Anthropic), which also surveyed existing tools, wrote the code and the tests and
-drafted the documents under that direction. Every number
+drafted the documents under that direction. Separate sessions of the same assistant also
+re-ran the code as a review; it was not a human or third-party review. Every number
 comes from our own code running on real SPHEREx data. No SI-generated images, video, voices
 or faces are used, and the tool contains no machine-learning model.
 
@@ -279,9 +280,11 @@ remaining noise term. Add co-moving fields so that a fast object can be followed
 sky. Build a volunteer vetting queue on top of the candidates. And run the ledger on many
 more fields, so the benchmark is a survey property and not five examples.
 
-**31. Where is your demo, and why slides and not a video?**
-The official Project Demo is a deck of 7 slides including the title, which the Project
-Submission Guide accepts in place of a 30-second video. It is served by the project site at
+**31. Where is your demo?**
+The Project Demo link in the form is a deck of 7 slides including the title, which the Project
+Submission Guide accepts as the demo. We also recorded a 27.6-second demo video and a
+112.9-second judging video on 15 November; both are posted in our Slack channel (they are
+not hosted on the site or in the repository). The deck is served by the project site at
 <https://abed-r-j.github.io/parallax-spherex/ParallaX_ZENITH_LABS.pdf>, with a copy in the
 repository under `presentation/`. It names the team, the members and the challenge (slide
 1), shows the tool, says what a user does (slide 4) and which NASA and ESA data make it

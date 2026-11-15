@@ -2,7 +2,7 @@
 
 SI disclosure: drafted with the help of an SI coding assistant (Claude, by Anthropic); the team films, speaks and edits everything itself. No SI-generated voices, faces, images or video.
 
-You make two files: `ParallaX_demo_30s.mp4` (at most **30.0 s**, hard limit) and `ParallaX_judges_2min.mp4` (about **1:55**, at most 2:00).
+You make two files: `final_30s.mp4` (at most **30.0 s**, hard limit) and `final_2min.mp4` (about **1:55**, at most 2:00). For a take that was cut by hand and no longer follows the teleprompter clock, `retime_30s.ps1` / `retime_2min.ps1` build the same two files.
 
 ## 0. The simpler route: no editor at all
 
