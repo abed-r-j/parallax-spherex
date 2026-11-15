@@ -93,5 +93,14 @@
    "blurb": "Pluto, magnitude 14.5, creeps 12 pixels across this patch between 4 and 10 October 2025 (18 frames) and is gone in the other survey passes: what a slow, distant solar-system body looks like to SPHEREx. Detector 2 only (1.1-1.7 micron).",
    "thumb": "pluto/thumb.png"
   }
- ]
+ ],
+ "provenance": {
+  "generator": "parallax-spherex 1.0.0",
+  "siDisclosure": "Produced with the help of an SI coding assistant (Claude, Anthropic), directed and checked by the team; computed by the project's own code from real SPHEREx data.",
+  "source": "SPHEREx Level-2 spectral images, NASA/IPAC IRSA",
+  "dois": [
+   "10.26131/IRSA662",
+   "10.26131/IRSA678"
+  ]
+ }
 }
